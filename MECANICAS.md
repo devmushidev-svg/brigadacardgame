@@ -29,6 +29,7 @@ Se definen en `heroes` dentro de `src/cartas.json`:
              "efectos": [{ "tipo": "invocar", "carta": "tun", "cantidad": 1 }] } }
 ```
 
+- **Color de clase (`marco`):** como en Hearthstone, las cartas de clase usan el marco del color de su héroe (Tun = verde selva); las neutrales son de piedra gris y dicen "Neutral". La misión mantiene su marco dorado.
 - **Poder de héroe:** una vez por turno; usa los mismos efectos que las cartas, y puede pedir objetivo.
 
 ## Imágenes
@@ -120,7 +121,6 @@ Diseño de Mario. Arquetipo: paladín molesto — llenar la mesa de Tun, buffear
 | **Tun Maestro del Universo** (legendaria, recompensa) | 5 | 8/8 | Grito: invoca 5 Tun y cada uno se lanza contra un enemigo al azar | hecho |
 | **Panamá** (legendaria) | 1 | 1/1 | Grito: por el resto de la partida, cada vez que un jugador robe, invoca un Tun para él | hecho |
 | Tun Puto | 3 | 1/5 | Cada vez que muere un Tun (de cualquier lado), 1 de daño a un enemigo al azar | hecho |
-| Tun Brawl Stars | 2 | 2/3 | — | hecho |
 | Choza de Monos | 4 | 0/8 | Al final de tu turno, invoca dos Tun | hecho |
 | Tun Satánico | **5** | **3/3** | Grito: destruye a tus otros Tun y gana +2/+2 por cada uno | hecho — **coste y stats provisionales**, falta que Mario los defina |
 
@@ -128,6 +128,7 @@ Diseño de Mario. Arquetipo: paladín molesto — llenar la mesa de Tun, buffear
 
 | Carta | Coste | Stats | Efecto | Estado |
 |---|---|---|---|---|
+| Tun Brawl Stars | 2 | 2/3 | — (tribu Tun: cuenta para la misión y Tun Puto) | hecho |
 | Mauro Sosa | 2 | 2/3 | Grito: si el rival tiene una mujer en la mano, te la robás | hecho — falta marcar qué cartas son mujer (`"etiquetas": ["mujer"]`) |
 
 ## Animaciones automáticas

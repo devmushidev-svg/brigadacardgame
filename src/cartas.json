@@ -130,7 +130,6 @@
    "ataque": 2,
    "vida": 3,
    "tribu": "tun",
-   "clase": "tun",
    "arte": "/arte/tun_brawl.webp",
    "texto": ""
   },
@@ -194,6 +193,7 @@
    "id": "tun",
    "nombre": "Tun",
    "arte": "🧍",
+   "marco": "linear-gradient(160deg, #8db356, #557a2b 40%, #2f4a16 80%, #557a2b)",
    "clase": "tun",
    "poder": {
     "nombre": "Llamar a otro Tun",
