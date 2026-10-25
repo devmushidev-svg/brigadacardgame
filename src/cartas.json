@@ -1085,7 +1085,7 @@
    "id": "t_desvelada",
    "nombre": "Desvelada",
    "tipo": "hechizo",
-   "coste": 0,
+   "coste": 2,
    "clase": "cruit",
    "token": true,
    "etiquetas": [

@@ -217,7 +217,7 @@ Sin mazo armado, el héroe sale al azar.
 | Laboratorio 🧪 | 2 | Obtenés 2 Leches |
 | Tesis 📚 | 3 | 2 de daño a tu héroe y 6 de daño a un enemigo |
 | Hoja de Cálculo 📊 | 2 | +3/+3 a un esbirro |
-| Desvelada ☕ | 0 | +3 de maná este turno |
+| Desvelada ☕ | 2 | +3 de maná este turno |
 
 ## Pendiente de agregar al motor (ideas en discusión)
 
