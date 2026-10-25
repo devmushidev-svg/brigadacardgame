@@ -55,7 +55,8 @@ function armarMazo(estado, db, clase) {
   intentos = 0;
   while (neutrales.length && mazo.length < CONFIG.TAM_MAZO && intentos++ < 1000) meter(elegir(estado, neutrales));
   // si todavía hay pocas cartas diseñadas, se repiten las no legendarias para completar el mazo
-  const repetibles = [...deClase, ...neutrales].filter((c) => c.rareza !== "legendaria");
+  const noLeg = (l) => l.filter((c) => c.rareza !== "legendaria");
+  const repetibles = noLeg(deClase).length ? noLeg(deClase) : noLeg(neutrales);
   while (repetibles.length && mazo.length < CONFIG.TAM_MAZO) mazo.push(elegir(estado, repetibles).id);
   return barajar(estado, mazo);
 }
@@ -120,6 +121,14 @@ function registrar(estado, texto) {
   if (estado.log.length > 30) estado.log.shift();
 }
 
+// filtro: { etiqueta: "mujer" } o { tribu: "tun" } (sobre la carta de la base)
+function cumpleFiltro(c, f) {
+  if (!c) return false;
+  if (f?.etiqueta && !(c.etiquetas || []).includes(f.etiqueta)) return false;
+  if (f?.tribu && c.tribu !== f.tribu) return false;
+  return true;
+}
+
 function darCarta(estado, s, id, ev) {
   const p = estado.j[s];
   if (p.mano.length >= CONFIG.MAX_MANO) {
@@ -168,7 +177,7 @@ function finTurno(estado, s, ev, db) {
   for (const m of [...estado.j[s].tablero]) {
     const c = db[m.id];
     if (c?.fin_turno && m.vida > 0) {
-      ev.push({ e: "dispara", uid: m.uid });
+      ev.push({ e: "dispara", uid: m.uid, por: "fin_turno" });
       aplicarEfectos(estado, s, c.fin_turno, null, ev, db, m.uid);
       resolverMuertes(estado, ev, db);
       if (estado.fase !== "jugando") return;
@@ -301,6 +310,19 @@ function aplicarEfectos(estado, s, efectos, elegido, ev, db, fuente, ctx = {}) {
     const n = ef.cantidad ?? 1;
     if (ef.tipo === "robar") { for (let k = 0; k < n; k++) robar(estado, s, ev, db); continue; }
     if (ef.tipo === "mana") { const p = estado.j[s]; p.mana = Math.min(CONFIG.MAX_MANA, p.mana + n); ev.push({ e: "mana", seat: s, n }); continue; }
+    if (ef.tipo === "robar_mano") {
+      // roba de la mano rival cartas que cumplan el filtro (etiqueta o tribu)
+      const rival = estado.j[1 - s], yo = estado.j[s];
+      for (let k = 0; k < n; k++) {
+        const ok = rival.mano.filter((c) => cumpleFiltro(db[c.id], ef.filtro));
+        if (!ok.length || yo.mano.length >= CONFIG.MAX_MANO) break;
+        const c = elegir(estado, ok);
+        rival.mano.splice(rival.mano.indexOf(c), 1);
+        yo.mano.push(c);
+        ev.push({ e: "robo", de: 1 - s, a: s, uid: c.uid, carta: c.id });
+      }
+      continue;
+    }
     if (ef.tipo === "dar_carta") { for (let k = 0; k < n; k++) darCarta(estado, s, ef.carta, ev); continue; }
     if (ef.tipo === "devorar") {
       // destruye a tus otros esbirros (de la tribu del filtro) y gana stats por cada uno
@@ -377,7 +399,7 @@ function resolverMuertes(estado, ev, db) {
         for (const v of [...estado.j[s2].tablero]) {
           const cm = db[v.id]?.cuando_muere;
           if (v.vida > 0 && cm && cm.tribu === m.tribu) {
-            ev.push({ e: "dispara", uid: v.uid });
+            ev.push({ e: "dispara", uid: v.uid, por: "muere" });
             aplicarEfectos(estado, s2, cm.efectos, null, ev, db, v.uid);
           }
         }

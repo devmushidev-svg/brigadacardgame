@@ -48,7 +48,7 @@ Recomendado: PNG o WEBP cuadrado de 512×512, con el personaje centrado, porque 
 | `hechizo` | aplica `efectos` y se va |
 | `mision` | queda activa con un contador; al cumplirse aplica su `recompensa` |
 
-Campos: `id`, `nombre`, `coste`, `ataque`, `vida`, `texto`, `arte` (emoji o `/arte/x.png` en `public/arte/`), `clase`, `tribu`, `rareza` (`legendaria`), `token: true` (no entra al mazo; solo se invoca o se da), `arquetipo`.
+Campos: `id`, `nombre`, `coste`, `ataque`, `vida`, `texto`, `arte` (emoji o `/arte/x.png` en `public/arte/`), `clase`, `tribu`, `rareza` (`legendaria`), `token: true` (no entra al mazo; solo se invoca o se da), `arquetipo`, `etiquetas` (lista libre, ej. `["mujer"]`, para efectos que buscan cartas por etiqueta), `entrada` (animación al entrar: `legendaria` —automática en legendarias— o `demonio`).
 
 ## Palabras clave (`claves`)
 
@@ -85,6 +85,7 @@ Campos: `id`, `nombre`, `coste`, `ataque`, `vida`, `texto`, `arte` (emoji o `/ar
 | `mana` | maná extra este turno |
 | `dar_carta` | pone `carta` en tu mano |
 | `global` | crea un efecto permanente con `disparador` y `efectos` |
+| `robar_mano` | te robás N cartas de la mano rival que cumplan el `filtro` (`{ "etiqueta": "mujer" }` o `{ "tribu": ... }`); si no hay, no pasa nada |
 | `devorar` | destruye a tus otros esbirros (con `filtro` de tribu) y la carta gana +`ataque`/+`vida` por cada uno |
 
 **Efecto visual (`fx`):** cualquier efecto puede llevar `"fx"` para que el cliente lo dibuje distinto:
@@ -122,6 +123,19 @@ Diseño de Mario. Arquetipo: paladín molesto — llenar la mesa de Tun, buffear
 | Tun Brawl Stars | 2 | 2/3 | — | hecho |
 | Choza de Monos | 4 | 0/8 | Al final de tu turno, invoca dos Tun | hecho |
 | Tun Satánico | **5** | **3/3** | Grito: destruye a tus otros Tun y gana +2/+2 por cada uno | hecho — **coste y stats provisionales**, falta que Mario los defina |
+
+## Neutrales
+
+| Carta | Coste | Stats | Efecto | Estado |
+|---|---|---|---|---|
+| Mauro Sosa | 2 | 2/3 | Grito: si el rival tiene una mujer en la mano, te la robás | hecho — falta marcar qué cartas son mujer (`"etiquetas": ["mujer"]`) |
+
+## Animaciones automáticas
+
+- Legendarias: se oscurece la pantalla, aparecen grandes con rayos y caen de golpe a la mesa (onda expansiva + temblor). Tun Satánico usa la versión roja (`"entrada": "demonio"`).
+- Efectos de fin de turno: el esbirro se levanta brillando con un círculo rúnico y su carta aparece al lado; lo que invoca sale volando desde él (igual con el poder de héroe y los gritos).
+- Misión: medallón arriba del retrato del héroe con anillo de progreso; cada avance suena y brilla; al completarse hay fanfarria, el medallón se agranda y se muestra la recompensa.
+- Robar de la mano: la carta cruza la pantalla de una mano a la otra.
 
 ## Pendiente de agregar al motor (ideas en discusión)
 

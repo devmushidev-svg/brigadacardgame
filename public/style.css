@@ -88,11 +88,17 @@ button { font-family: var(--f-tit); cursor: pointer; }
 .heroe-arte img { width: 100%; height: 100%; object-fit: cover; }
 .heroe .stat.hp { right: -12px; bottom: -8px; width: calc(var(--esb) * .44); height: calc(var(--esb) * .5); font-size: calc(var(--esb) * .26); }
 .heroe.desconectado { filter: grayscale(.9) brightness(.6); }
-.mision-chip { position: absolute; left: -16px; bottom: -6px; min-width: 38px; height: 38px; padding: 0 6px; border-radius: 19px; display: flex; align-items: center; gap: 2px;
-  font: 900 12px var(--f-tit); color: var(--oro); background: radial-gradient(circle at 40% 30%, #6b4a1a, #2a1806); border: 2px solid var(--oro);
-  box-shadow: 0 3px 6px #000; cursor: help; }
-.mision-chip span { font-size: 15px; }
-.mision-chip.completa { background: radial-gradient(circle at 40% 30%, #ffe9a0, #c98a1c); color: #2a1806; }
+/* misión: medallón arriba al centro del retrato, con anillo de progreso (como Hearthstone) */
+.mision-chip { position: absolute; left: 50%; top: calc(var(--esb) * -0.3); transform: translateX(-50%); z-index: 5;
+  width: calc(var(--esb) * .52); height: calc(var(--esb) * .52); min-width: 34px; min-height: 34px; border-radius: 50%; padding: 3px; cursor: help;
+  background: conic-gradient(#ffd34f calc(var(--p, 0) * 360deg), #2a1806 0); box-shadow: 0 0 0 2px #2a1806, 0 0 0 4px var(--oro2), 0 4px 10px #000c; }
+.mision-arte { display: grid; place-items: center; width: 100%; height: 100%; border-radius: 50%; overflow: hidden; font-size: 16px;
+  background: radial-gradient(circle at 40% 30%, #6b4a1a, #2a1806); box-shadow: inset 0 0 8px #000; }
+.mision-arte img { width: 100%; height: 100%; object-fit: cover; }
+.mision-chip b { position: absolute; left: 50%; bottom: -9px; transform: translateX(-50%); white-space: nowrap; padding: 0 6px; border-radius: 9px;
+  font: 900 11px/16px var(--f-tit); color: var(--oro); background: #2a1806; border: 1.5px solid var(--oro2); }
+.mision-chip.completa { box-shadow: 0 0 0 2px #2a1806, 0 0 0 4px #ffe9a0, 0 0 18px #ffd34f; }
+.mision-chip.completa b { background: radial-gradient(circle at 40% 30%, #ffe9a0, #c98a1c); color: #2a1806; }
 
 /* poder de héroe */
 .poder { position: relative; width: calc(var(--esb) * .72); height: calc(var(--esb) * .72); border-radius: 50%; flex: none; padding: 5px; color: #fff;
@@ -253,8 +259,7 @@ button { font-family: var(--f-tit); cursor: pointer; }
   .tablero .esbirro { --esb: min(calc((100vw - 110px) / 7), 62px); padding: 3px; }
   .tablero { gap: 4px; min-height: 84px; }
   .esbirro.provocar::before { inset: -6px -7px -4px; }
-  .mision-chip { left: -30px; bottom: auto; top: 50%; transform: translateY(-50%); height: 26px; min-width: 0; padding: 0 5px; font-size: 10px; }
-  .mision-chip span { font-size: 11px; }
+  .mision-chip b { font-size: 9px; line-height: 13px; bottom: -7px; }
 }
 /* PC: cartas más grandes y la mano se levanta al pasar el mouse */
 @media (min-width: 900px) {
@@ -263,3 +268,19 @@ button { font-family: var(--f-tit); cursor: pointer; }
   .campo { margin: 6px 110px; }
   .mano .carta:hover { z-index: 10; transform: translateY(-46%) scale(1.45); transition: transform .12s; }
 }
+
+/* ---------- efectos grandes ---------- */
+.onda { position: fixed; width: 40px; height: 40px; border-radius: 50%; border: 4px solid var(--c); box-shadow: 0 0 20px var(--c), inset 0 0 14px var(--c); pointer-events: none; }
+.velo { position: fixed; inset: 0; background: radial-gradient(circle, #0000 10%, #000b 75%); opacity: 0; }
+.velo.rojo { background: radial-gradient(circle, #3a000033 10%, #1a0000dd 75%); }
+.rayos { position: fixed; width: 90vmin; height: 90vmin; border-radius: 50%; pointer-events: none;
+  background: repeating-conic-gradient(#ffd34f88 0 6deg, #0000 6deg 20deg); -webkit-mask: radial-gradient(circle, #000 15%, #0000 68%); mask: radial-gradient(circle, #000 15%, #0000 68%); }
+.rayos.rojo { background: repeating-conic-gradient(#ff2a2a99 0 5deg, #0000 5deg 16deg); }
+.entrada-fig { position: fixed; width: 92px; height: 112px; padding: 6px; border-radius: 50%; pointer-events: none;
+  background: linear-gradient(145deg, #fff0b0, var(--oro) 30%, var(--oro2) 60%, #ffe08a 80%, var(--oro3)); box-shadow: 0 0 0 2px #2a1806, 0 0 40px #ffd34f, 0 14px 30px #000; }
+.entrada-fig.rojo { background: linear-gradient(145deg, #ff8a7a, #a3121a 40%, #3a0006 75%, #ff4a3a); box-shadow: 0 0 0 2px #1a0000, 0 0 50px #ff2a2a, 0 14px 30px #000; }
+.entrada-fig span { display: grid; place-items: center; width: 100%; height: 100%; border-radius: 50%; overflow: hidden; font-size: 54px; background: var(--ruido), var(--fondo, #555); }
+.entrada-fig img { width: 100%; height: 100%; object-fit: cover; }
+.runa { position: fixed; width: 110px; height: 110px; border-radius: 50%; pointer-events: none; border: 3px dashed #ffd34f; box-shadow: 0 0 16px #ffd34f, inset 0 0 16px #ffd34f88; }
+.popup-carta { position: fixed; z-index: 64; pointer-events: none; filter: drop-shadow(0 10px 20px #000c); }
+.popup-carta .carta { --carta-w: min(34vw, 170px); }

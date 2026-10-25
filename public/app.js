@@ -72,6 +72,24 @@ const Sonido = (() => {
       o.connect(bp).connect(g).connect(c.destination); o.start(t); o.stop(t + 0.14);
     },
     lanzar() { ruido(0.25, 0.12, 1800); },
+    // entrada legendaria: brillo que sube (o coro oscuro si es demonio)
+    legendaria(oscuro) {
+      if (mudo) return;
+      const notas = oscuro ? [110, 131, 156, 185] : [392, 494, 587, 784, 988];
+      notas.forEach((f, i) => tono(f, 0.9 - i * 0.08, oscuro ? "sawtooth" : "triangle", oscuro ? 0.05 : 0.07, 1.02, i * 0.07));
+      if (!oscuro) [1568, 1976, 2637].forEach((f, i) => tono(f, 0.4, "sine", 0.035, 1, 0.3 + i * 0.09));
+      ruido(0.7, 0.05, oscuro ? 500 : 4000);
+    },
+    robo() { ruido(0.3, 0.15, 3000); tono(300, 0.25, "triangle", 0.08, 2.2); tono(900, 0.2, "sine", 0.05, 0.5, 0.25); },
+    slam() { tono(55, 0.6, "sine", 0.6, 0.5); tono(110, 0.25, "square", 0.08, 0.4); ruido(0.5, 0.35, 900); },
+    activa() { [880, 1320, 1760].forEach((f, i) => tono(f, 0.22, "sine", 0.07, 1.01, i * 0.05)); ruido(0.15, 0.04, 5000); },
+    progreso(fr) { const f = 520 + fr * 700; tono(f, 0.14, "triangle", 0.09); tono(f * 1.5, 0.12, "sine", 0.04, 1, 0.03); },
+    logro() { // fanfarria de misión cumplida
+      [523, 659, 784, 1046, 1318].forEach((f, i) => tono(f, 0.5, "triangle", 0.12, 1, i * 0.09));
+      [[1046, 1318, 1568]].forEach((ac) => ac.forEach((f) => tono(f, 1.3, "sine", 0.06, 1, 0.5)));
+      [2093, 2637, 3136].forEach((f, i) => tono(f, 0.6, "sine", 0.03, 1, 0.55 + i * 0.12));
+      tono(65, 0.5, "sine", 0.4, 0.6, 0.45); ruido(0.6, 0.08, 6000);
+    },
     piedra() { // crac de piedra: chasquido agudo + golpe grave + cascajo
       if (mudo) return;
       ruido(0.05, 0.6, 6000); tono(70, 0.25, "sine", 0.45, 0.4);
@@ -160,6 +178,77 @@ function temblar(el, fuerte = false) {
     ? [{ transform: "translate(0,0)" }, { transform: "translate(-9px,5px)" }, { transform: "translate(8px,-6px)" }, { transform: "translate(-6px,-3px)" }, { transform: "translate(4px,4px)" }, { transform: "translate(0,0)" }]
     : [{ transform: "translateX(0)" }, { transform: "translateX(-5px)" }, { transform: "translateX(5px)" }, { transform: "translateX(-3px)" }, { transform: "translateX(0)" }],
     { duration: fuerte ? 380 : 260 });
+}
+
+// onda expansiva
+function onda(x, y, color = "#ffd34f", tam = 260) {
+  const o = document.createElement("div");
+  o.className = "onda"; o.style.cssText = `left:${x}px;top:${y}px;--c:${color}`;
+  $("#fx").append(o);
+  o.animate([{ transform: "translate(-50%,-50%) scale(.1)", opacity: 1 }, { transform: `translate(-50%,-50%) scale(${tam / 40})`, opacity: 0 }], { duration: 600, easing: "cubic-bezier(.2,.8,.3,1)" }).onfinish = () => o.remove();
+}
+
+// entrada de legendaria (estilo Hearthstone): se oscurece todo, aparece grande con rayos y cae de golpe a la mesa
+async function entradaEspecial(c, seat, tipo) {
+  const tab = $(`.tablero[data-seat="${seat}"]`);
+  if (!tab) return;
+  const demonio = tipo === "demonio", color = demonio ? "#ff2a2a" : "#ffd34f";
+  const d = centro(tab), cx = innerWidth / 2, cy = innerHeight / 2;
+  const velo = document.createElement("div"), rayos = document.createElement("div"), fig = document.createElement("div");
+  velo.className = "velo" + (demonio ? " rojo" : "");
+  rayos.className = "rayos" + (demonio ? " rojo" : "");
+  fig.className = "entrada-fig" + (demonio ? " rojo" : "");
+  fig.innerHTML = `<span>${artHTML(c.arte)}</span>`;
+  fig.style.setProperty("--fondo", colorDe(c.arquetipo || c.id));
+  rayos.style.cssText = fig.style.cssText + `;left:${cx}px;top:${cy}px`;
+  fig.style.left = cx + "px"; fig.style.top = cy + "px";
+  $("#fx").append(velo, rayos, fig);
+  Sonido.legendaria(demonio);
+  if (demonio) setTimeout(() => Sonido.demonio(), 250);
+  velo.animate([{ opacity: 0 }, { opacity: 1 }], { duration: 300, fill: "forwards" });
+  rayos.animate([{ transform: "translate(-50%,-50%) scale(.2) rotate(0)", opacity: 0 }, { transform: "translate(-50%,-50%) scale(1) rotate(90deg)", opacity: 1 }], { duration: 750, fill: "forwards", easing: "ease-out" });
+  await fig.animate([{ transform: "translate(-50%,-50%) scale(.1) rotate(-20deg)", opacity: 0 }, { transform: "translate(-50%,-50%) scale(2.1) rotate(3deg)", opacity: 1, offset: 0.7 },
+    { transform: "translate(-50%,-50%) scale(1.9) rotate(0)", opacity: 1 }], { duration: 700, easing: "cubic-bezier(.2,.9,.3,1.2)", fill: "forwards" }).finished;
+  await esperar(320);
+  rayos.animate([{ opacity: 1 }, { opacity: 0 }], { duration: 250, fill: "forwards" });
+  await fig.animate([{ transform: "translate(-50%,-50%) scale(1.9)" }, { transform: `translate(calc(-50% + ${d.x - cx}px), calc(-50% + ${d.y - cy}px)) scale(1)` }],
+    { duration: 190, easing: "cubic-bezier(.7,0,1,.6)", fill: "forwards" }).finished;
+  Sonido.slam();
+  temblar($(".mesa"), true);
+  onda(d.x, d.y, color, 360);
+  particulas(d.x, d.y, color, 34, 140);
+  particulas(d.x, d.y + 20, "#d8c3a0", 20, 80);
+  fig.remove(); rayos.remove();
+  await velo.animate([{ opacity: 1 }, { opacity: 0 }], { duration: 300 }).finished;
+  velo.remove();
+}
+
+// efecto de fin de turno: la carta se levanta brillando y se muestra al lado, como en Hearthstone
+async function activarCarta(el) {
+  Sonido.activa();
+  const c = centro(el), id = el.dataset.carta;
+  el.style.zIndex = 30;
+  const anillo = document.createElement("div");
+  anillo.className = "runa"; anillo.style.left = c.x + "px"; anillo.style.top = c.y + "px";
+  $("#fx").append(anillo);
+  anillo.animate([{ transform: "translate(-50%,-50%) scale(.4) rotate(0)", opacity: 0 }, { transform: "translate(-50%,-50%) scale(1.2) rotate(120deg)", opacity: 1, offset: 0.4 },
+    { transform: "translate(-50%,-50%) scale(1.6) rotate(240deg)", opacity: 0 }], { duration: 900 }).onfinish = () => anillo.remove();
+  el.animate([{ transform: "translateY(0) scale(1)", filter: "none" }, { transform: "translateY(-14px) scale(1.25)", filter: "brightness(1.5) drop-shadow(0 0 16px #ffd34f)", offset: 0.3 },
+    { transform: "translateY(-14px) scale(1.25)", filter: "brightness(1.5) drop-shadow(0 0 16px #ffd34f)", offset: 0.75 }, { transform: "translateY(0) scale(1)", filter: "none" }],
+    { duration: 950, easing: "ease-in-out" }).onfinish = () => (el.style.zIndex = "");
+  particulas(c.x, c.y, "#ffd34f", 14, 60);
+  if (DB[id]) { // la carta aparece a un lado del esbirro
+    const m = document.createElement("div");
+    m.className = "popup-carta";
+    m.innerHTML = cartaHTML(DB[id]);
+    const izq = c.x > innerWidth / 2;
+    m.style.top = Math.min(Math.max(c.y, 140), innerHeight - 140) + "px";
+    m.style[izq ? "right" : "left"] = Math.max(8, izq ? innerWidth - c.x + 50 : c.x + 50) + "px";
+    document.body.append(m);
+    await m.animate([{ transform: "translateY(-50%) scale(.3)", opacity: 0 }, { transform: "translateY(-50%) scale(1.05)", opacity: 1, offset: 0.2 },
+      { transform: "translateY(-50%) scale(1)", opacity: 1, offset: 0.85 }, { transform: "translateY(-50%) scale(.6)", opacity: 0 }], { duration: 1100, easing: "ease-out" }).finished;
+    m.remove();
+  } else await esperar(700);
 }
 
 // golpe con peso: destello blanco, sacudida según el daño y temblor de pantalla si es grande
@@ -363,10 +452,39 @@ async function animarUno(e, ev, v, nuevos, yo) {
         Sonido.hechizo();
         if (e.seat !== yo) await mostrarCarta(e.carta, 1000); else await esperar(150);
         break;
-      case "invoca":
+      case "invoca": {
         nuevos.add(e.uid);
-        if (e.seat !== yo && !DB[e.carta]?.token) await mostrarCarta(e.carta, 850);
+        const c = DB[e.carta] || {};
+        if (e.seat !== yo && !c.token) await mostrarCarta(e.carta, 850);
+        const tipo = c.entrada || (c.rareza === "legendaria" ? "legendaria" : null);
+        if (tipo) {
+          ev.__origen = null;
+          (nuevos.especial ||= new Set()).add(e.uid);
+          await entradaEspecial(c, e.seat, tipo);
+        } else if (ev.__origen) (nuevos.origen ||= new Map()).set(e.uid, ev.__origen);
         break;
+      }
+      case "grito": ev.__origen = e.uid; break;
+      case "robo": { // una carta pasa de la mano rival a la tuya
+        Sonido.robo();
+        const desdeEl = e.de === yo ? $(`.mano .carta[data-uid="${e.uid}"]`) || $(".mano") : $(".mano-rival") || refEl("h" + e.de);
+        const hastaEl = e.a === yo ? $(".mano") : $(".mano-rival") || refEl("h" + e.a);
+        const o = centro(desdeEl), d = centro(hastaEl);
+        const m = document.createElement("div");
+        m.className = "popup-carta"; m.innerHTML = cartaHTML(DB[e.carta] || {});
+        m.style.left = innerWidth / 2 + "px"; m.style.top = innerHeight / 2 + "px";
+        document.body.append(m);
+        if (desdeEl?.classList?.contains("carta")) desdeEl.style.visibility = "hidden";
+        await m.animate([{ transform: `translate(calc(-50% + ${o.x - innerWidth / 2}px), calc(-50% + ${o.y - innerHeight / 2}px)) scale(.4) rotate(-15deg)`, opacity: 0 },
+          { transform: "translate(-50%,-50%) scale(1.15) rotate(3deg)", opacity: 1, offset: 0.3 },
+          { transform: "translate(-50%,-50%) scale(1.1) rotate(-2deg)", opacity: 1, offset: 0.7 },
+          { transform: `translate(calc(-50% + ${d.x - innerWidth / 2}px), calc(-50% + ${d.y - innerHeight / 2}px)) scale(.35) rotate(10deg)`, opacity: 0.4 }],
+          { duration: 1500, easing: "ease-in-out" }).finished;
+        m.remove();
+        break;
+      }
+      case "poder": ev.__origen = "poder" + e.seat; break;
+      case "roba": case "turno": case "hechizo": ev.__origen = null; break;
       case "ataque": {
         const de = refEl(e.de), a = refEl(e.a);
         if (!de && a) {
@@ -457,15 +575,43 @@ async function animarUno(e, ev, v, nuevos, yo) {
         break;
       }
       case "mision": if (e.seat !== yo) await mostrarCarta(e.carta, 1000); else Sonido.hechizo(); break;
-      case "mision_progreso": numero(refEl("h" + e.seat), `${e.progreso}/${e.meta}`, "buff"); break;
-      case "mision_completa": {
-        const el = refEl("h" + e.seat);
-        if (el) { const c = centro(el); for (let k = 0; k < 3; k++) particulas(c.x, c.y, "#ffd34f", 20, 110); }
-        Sonido.victoria();
-        await banner(e.seat === yo ? "¡MISIÓN COMPLETA!" : `${V.j[e.seat].nombre} completó su misión`, 1400);
+      case "mision_progreso": {
+        const chip = $(`.heroe[data-ref="h${e.seat}"] .mision-chip`);
+        if (chip) {
+          chip.style.setProperty("--p", Math.min(1, e.progreso / e.meta));
+          chip.querySelector("b").textContent = `${Math.min(e.progreso, e.meta)}/${e.meta}`;
+          chip.animate([{ transform: "translateX(-50%) scale(1)" }, { transform: "translateX(-50%) scale(1.3)", filter: "brightness(1.6)" }, { transform: "translateX(-50%) scale(1)" }], 260);
+          const c = centro(chip); particulas(c.x, c.y, "#ffd34f", 6, 30);
+        }
+        if (!ev.__tics || ev.__tics < 6) { ev.__tics = (ev.__tics || 0) + 1; Sonido.progreso(e.progreso / e.meta); }
+        await esperar(70);
         break;
       }
-      case "dispara": { const el = refEl(e.uid); if (el) el.animate([{ transform: "scale(1)" }, { transform: "scale(1.15)" }, { transform: "scale(1)" }], 300); await esperar(200); break; }
+      case "mision_completa": {
+        const chip = $(`.heroe[data-ref="h${e.seat}"] .mision-chip`), el = chip || refEl("h" + e.seat);
+        Sonido.logro();
+        if (chip) {
+          chip.classList.add("completa"); chip.querySelector("b").textContent = "✔";
+          chip.style.zIndex = 70;
+          chip.animate([{ transform: "translateX(-50%) scale(1)" }, { transform: "translateX(-50%) scale(2.6) rotate(-8deg)", filter: "brightness(2) drop-shadow(0 0 20px #ffd34f)", offset: 0.4 },
+            { transform: "translateX(-50%) scale(2.3) rotate(4deg)", filter: "brightness(1.5) drop-shadow(0 0 30px #ffd34f)", offset: 0.7 }, { transform: "translateX(-50%) scale(1)" }], { duration: 1300, easing: "ease-in-out" });
+        }
+        if (el) { const c = centro(el); for (let k = 0; k < 3; k++) setTimeout(() => particulas(c.x, c.y, "#ffd34f", 22, 120), k * 180); onda(c.x, c.y, "#ffd34f"); }
+        await banner(e.seat === yo ? "¡MISIÓN COMPLETA!" : `${V.j[e.seat].nombre} completó su misión`, 1400);
+        const premio = (DB[e.carta]?.mision?.recompensa || []).find((r) => r.tipo === "dar_carta");
+        if (premio) await mostrarCarta(premio.carta, 1300);
+        break;
+      }
+      case "dispara": {
+        const el = refEl(e.uid);
+        ev.__origen = e.uid;
+        if (!el) break;
+        if (e.por === "muere") { // reacción rápida (Tun Puto)
+          el.animate([{ filter: "none", transform: "scale(1)" }, { filter: "drop-shadow(0 0 12px #ffd34f) brightness(1.4)", transform: "scale(1.15)" }, { filter: "none", transform: "scale(1)" }], 280);
+          await esperar(160);
+        } else await activarCarta(el);
+        break;
+      }
       case "global": { const g = ev.find((x) => x.e === "grito" || x.e === "hechizo"); toast("efecto activo por el resto de la partida", 1800); break; }
     }
   }
@@ -474,7 +620,7 @@ async function animarUno(e, ev, v, nuevos, yo) {
 // ---------- lo que pasa después de dibujar ----------
 async function despues(ev, v, antes, nuevos) {
   const yo = yoDe(v);
-  let monitos = 0;
+  let monitos = 0, salidas = 0;
   for (const uid of nuevos) {
     const el = refEl(uid);
     if (!el) continue;
@@ -483,6 +629,20 @@ async function despues(ev, v, antes, nuevos) {
     if (c.sonido) Sonido.archivo(c.sonido);
     else if (c.tribu === "tun" && !c.token) Sonido.mono();
     else if (c.tribu === "tun" && monitos++ < 2) setTimeout(() => Sonido.monito(), monitos * 90);
+    if (nuevos.especial?.has(uid)) { // ya hizo su entrada grande: solo brilla en su lugar
+      el.animate([{ filter: "brightness(2.2) drop-shadow(0 0 20px #ffd34f)" }, { filter: "none" }], 700);
+      continue;
+    }
+    const org = nuevos.origen?.get(uid);
+    const oEl = org && (org.startsWith("poder") ? $(`[data-poder="${org.slice(5)}"]`) : refEl(org));
+    if (oEl && oEl !== el) { // sale disparado de la carta que lo creó (choza, maestro, poder)
+      const o = centro(oEl), d = centro(el), k = salidas++;
+      el.animate([{ transform: `translate(${o.x - d.x}px, ${o.y - d.y}px) scale(.2)`, opacity: 0 }, { opacity: 1, offset: 0.25 },
+        { transform: "translate(0,0) scale(1.12)", offset: 0.8 }, { transform: "translate(0,0) scale(1)" }],
+        { duration: 480, delay: k * 90, easing: "cubic-bezier(.3,.7,.4,1)", fill: "backwards" });
+      setTimeout(() => { const c = centro(el); particulas(c.x, c.y, "#d8c3a0", 8, 35); Sonido.jugar(); }, 400 + k * 90);
+      continue;
+    }
     Sonido.jugar();
     el.animate([{ transform: "translateY(-50px) scale(1.45)", opacity: 0 }, { transform: "translateY(4px) scale(.95)", opacity: 1, offset: 0.6 },
       { transform: "translateY(0) scale(1)" }], { duration: 380, easing: "cubic-bezier(.3,1.4,.6,1)" });
@@ -544,7 +704,8 @@ function heroeHTML(v, s) {
   const mi = p.mision;
   return `<div class="heroe ${desc ? "desconectado" : ""}" data-ref="h${s}" data-seat="${s}" data-heroe="${esc(p.heroe || "")}" style="--fondo:${colorDe(h?.id || p.nombre)}">
     <span class="heroe-arte">${h ? artHTML(h.arte) : esc((p.nombre || "?")[0].toUpperCase())}</span>
-    ${mi ? `<div class="mision-chip ${mi.completa ? "completa" : ""}" data-carta="${esc(mi.id)}"><span>🏆</span>${mi.completa ? "✔" : `${mi.progreso}/${mi.meta}`}</div>` : ""}
+    ${mi ? `<div class="mision-chip ${mi.completa ? "completa" : ""}" data-carta="${esc(mi.id)}" style="--p:${mi.completa ? 1 : Math.min(1, mi.progreso / mi.meta)}">
+      <span class="mision-arte">${artHTML(DB[mi.id]?.arte || "🏆")}</span><b>${mi.completa ? "✔" : `${mi.progreso}/${mi.meta}`}</b></div>` : ""}
     <div class="stat hp ${p.vida < p.vidaMax ? "herido" : ""}">${p.vida}</div></div>`;
 }
 function poderHTML(v, s) {

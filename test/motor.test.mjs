@@ -99,6 +99,19 @@ for (let k = 0; k < 20; k++) {
   for (const p of e.j) assert.equal(p.mazo.length + p.mano.filter((c) => c.id !== "moneda" && c.id !== "tun_awarded").length, 20, "mazo de 20");
 }
 // --- Tun Puto: cada Tun que muere pega 1 a un enemigo ---
+// Mauro Sosa: roba una mujer de la mano rival (y no toca lo demás)
+{
+  const e = nueva(11); const s = e.turno, r = 1 - s;
+  db.prueba_mujer = { id: "prueba_mujer", nombre: "Mujer", tipo: "esbirro", coste: 1, ataque: 1, vida: 1, etiquetas: ["mujer"], token: true };
+  e.j[r].mano = [{ uid: "x1", id: "tun_brawl" }, { uid: "x2", id: "prueba_mujer" }];
+  preparar(e, s, ["mauro_sosa"]);
+  const res = M.aplicar(e, s, { t: "jugar", uid: "t0" }, db, 0);
+  assert.ok(!res.error, res.error);
+  assert.ok(e.j[s].mano.some((c) => c.uid === "x2"), "me robé la mujer");
+  assert.deepEqual(e.j[r].mano.map((c) => c.uid), ["x1"], "al rival le queda lo demás");
+  const res2 = M.aplicar(e, s, { t: "fin" }, db, 0);
+  delete db.prueba_mujer;
+}
 {
   const e = nueva(9); const s = e.turno, r = 1 - s;
   e.j[s].tablero = []; e.j[r].tablero = [];

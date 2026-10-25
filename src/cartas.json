@@ -153,8 +153,20 @@
    ]
   },
   {
+   "id": "mauro_sosa",
+   "nombre": "Mauro Sosa",
+   "tipo": "esbirro",
+   "coste": 2,
+   "ataque": 2,
+   "vida": 3,
+   "texto": "Grito de batalla: si el rival tiene una mujer en la mano, te la robás.",
+   "arte": "/arte/mauro_sosa.webp",
+   "grito": [{ "tipo": "robar_mano", "filtro": { "etiqueta": "mujer" }, "cantidad": 1 }]
+  },
+  {
    "id": "tun_satanico",
    "nombre": "Tun Satánico",
+   "entrada": "demonio",
    "tipo": "esbirro",
    "coste": 5,
    "ataque": 3,
