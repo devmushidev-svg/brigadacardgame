@@ -344,7 +344,7 @@
    "coste": 1,
    "clase": "tun",
    "rareza": "legendaria",
-   "arte": "🏆",
+   "arte": "/arte/tun_awarded.webp",
    "texto": "Misión: invoca 15 Tun. Recompensa: Tun Maestro del Universo.",
    "mision": {
     "contar": "invocar_tribu",
@@ -369,7 +369,7 @@
    "clase": "tun",
    "rareza": "legendaria",
    "token": true,
-   "arte": "🌌",
+   "arte": "/arte/tun_maestro.webp",
    "texto": "Grito de batalla: invoca 5 Tun y dispáralos a los enemigos.",
    "grito": [
     {
@@ -416,7 +416,7 @@
    "vida": 5,
    "tribu": "tun",
    "clase": "tun",
-   "arte": "💢",
+   "arte": "/arte/tun_puto.webp",
    "texto": "Cada vez que muere un Tun, inflige 1 de daño a un enemigo al azar.",
    "cuando_muere": {
     "tribu": "tun",
@@ -438,7 +438,7 @@
    "vida": 3,
    "tribu": "tun",
    "clase": "tun",
-   "arte": "🎮",
+   "arte": "/arte/tun_brawl.webp",
    "texto": ""
   },
   {
@@ -449,7 +449,7 @@
    "ataque": 0,
    "vida": 8,
    "clase": "tun",
-   "arte": "🛖",
+   "arte": "/arte/choza_monos.webp",
    "texto": "Al final de tu turno, invoca dos Tun.",
    "fin_turno": [
     {
@@ -468,7 +468,7 @@
    "vida": 3,
    "tribu": "tun",
    "clase": "tun",
-   "arte": "😈",
+   "arte": "/arte/tun_satanico.webp",
    "statsProvisionales": true,
    "texto": "Grito de batalla: destruye a tus otros Tun y gana +2/+2 por cada uno.",
    "grito": [
