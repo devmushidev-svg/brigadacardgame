@@ -316,5 +316,5 @@ button { font-family: var(--f-tit); cursor: pointer; }
 @keyframes tirador { from { filter: drop-shadow(0 0 4px #ffd34f); transform: translateY(0); } to { filter: drop-shadow(0 0 16px #ffd34f) brightness(1.25); transform: translateY(-6px) scale(1.08); } }
 .stat.mana.rebajado { color: #9dff8a; text-shadow: 0 0 6px #2bff5a, 0 1px 0 #000; }
 .placa .mejora { font: 800 12px var(--f-txt); color: #ffcf7a; text-shadow: 0 1px 2px #000; }
-.contador-muertos { flex: none; z-index: 3; padding: 2px 9px; border-radius: 12px;
-  font: 800 13px var(--f-txt); color: #e8e0d0; background: #1a120cdd; border: 1.5px solid #8a7a60; box-shadow: 0 2px 6px #000a; cursor: help; }
+.carta .contador-carta { position: absolute; z-index: 3; right: 4%; top: 36%; padding: 1px 7px; border-radius: 10px; white-space: nowrap;
+  font: 900 calc(var(--carta-w) * .1) var(--f-tit); color: #f2ead8; background: #1a120ce6; border: 1.5px solid #c9b79a; box-shadow: 0 2px 5px #000b; }

@@ -133,6 +133,7 @@ function cartaHTML(c, { uid = "", clase = "" } = {}) {
   const marco = c.clase && c.tipo !== "mision" ? HEROES[c.clase]?.marco : null;
   return `<div class="carta ${esH ? "hechizo" : ""} ${c.tipo === "mision" ? "mision" : ""} ${c.rareza === "legendaria" ? "legendaria" : ""} ${clase}" ${uid ? `data-uid="${uid}"` : ""} data-carta="${esc(c.id)}"${marco ? ` style="--marco:${esc(marco)}"` : ""}>
     <div class="arte" style="--fondo:${colorDe(c.arquetipo || c.id)}">${artHTML(c.arte)}</div>
+    ${c.contador != null ? `<div class="contador-carta" title="Tun muertos esta partida">☠ ${c.contador}</div>` : ""}
     <div class="titulo">${esc(c.nombre)}</div>
     <div class="texto ${((l) => (l > 115 ? "t4" : l > 85 ? "t3" : l > 50 ? "t2" : ""))((c.texto || "").length)}">${esc(c.texto || "")}</div>
     ${etiqueta ? `<div class="arq">${esc(etiqueta)}</div>` : ""}
@@ -714,12 +715,11 @@ function objetivosAtaque(v, s, atacante = null) {
 const puedeAtacar = (m) => !m.noAtaca && m.ataque > 0 && !m.dormido && m.ataques < (m.doble ? 2 : 1);
 // la carta de la mano con su coste real (ej. Tun Cool baja según la mesa)
 const cartaMano = (c) => (DB[c.id] ? { ...DB[c.id], coste: c.coste ?? DB[c.id].coste, ataque: c.ataque ?? DB[c.id].ataque, vida: c.vida ?? DB[c.id].vida,
-  texto: DB[c.id].texto + (c.cantidad != null ? ` (ahora: ${c.cantidad})` : "") + contadorMuertos(DB[c.id]) } : null);
-// cartas que dependen de los Tun muertos muestran cuántos van
+  texto: DB[c.id].texto + (c.cantidad != null ? ` (ahora: ${c.cantidad})` : ""), contador: contadorMuertos(DB[c.id]) } : null);
+// cartas que dependen de los Tun muertos llevan un contador en la carta
 function contadorMuertos(c) {
   const t = c.descuento?.por === "tribu_muertos" ? c.descuento.tribu : (c.efectos || []).find((e) => e.tipo === "invocar_por_muertos")?.tribu;
-  if (!t || !V) return "";
-  return ` (${t[0].toUpperCase() + t.slice(1)} muertos: ${V.muertosTribu?.[t] || 0})`;
+  return t && V ? V.muertosTribu?.[t] || 0 : null;
 }
 function jugable(v, c) {
   const p = v.j[v.yo];
@@ -785,7 +785,7 @@ function render(v) {
     </div>
     <div class="campo">
       <div class="tablero" data-seat="${riv}">${R.tablero.map((m) => esbirroHTML(m, riv, v)).join("")}</div>
-      <div class="medio">${v.muertosTribu?.tun ? `<span class="contador-muertos" title="Tun muertos esta partida (Funeral de Tun, Tun Mastermind)">☠ ${v.muertosTribu.tun}</span>` : ""}${(v.globales || []).map((g) => `<span class="global" data-carta="${esc(g)}">${artHTML(DB[g]?.arte || "🌐")}</span>`).join("")}<div class="reloj"></div><div class="linea"><div class="cuerda"></div></div><div class="reloj turno-txt">${v.yo < 0 ? "mirando" : ""}</div></div>
+      <div class="medio">${(v.globales || []).map((g) => `<span class="global" data-carta="${esc(g)}">${artHTML(DB[g]?.arte || "🌐")}</span>`).join("")}<div class="reloj"></div><div class="linea"><div class="cuerda"></div></div><div class="reloj turno-txt">${v.yo < 0 ? "mirando" : ""}</div></div>
       <div class="tablero" data-seat="${yo}" id="mi-tablero">${P.tablero.map((m) => esbirroHTML(m, yo, v)).join("")}</div>
     </div>
     <div class="zona yo">
