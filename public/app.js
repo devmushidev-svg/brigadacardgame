@@ -1260,17 +1260,29 @@ function render(v) {
 }
 
 // ---------- tutorial dentro del juego: un globo dice qué hacer y resalta dónde ----------
-let guiaIntro = false;
+// pasos que se enseñan una sola vez
+const G = { intro: false, verCarta: false, poder: false, verRival: false };
 function guiaTutorial(v) {
   $("#guia")?.remove();
+  $$(".guia-foco").forEach((el) => el.classList.remove("guia-foco"));
   if (!v.tutorial || v.yo < 0 || v.fase !== "jugando" || (v.pendiente && v.pendiente.seat === v.yo)) return;
   const P = v.j[v.yo], R = v.j[1 - v.yo];
   let texto = "", foco = null, boton = "";
-  if (!guiaIntro) {
+  if (P.poderUsado) G.poder = true;
+  if (!G.intro) {
     texto = `<b>¡Bienvenido!</b> Ganás cuando la vida del héroe rival (arriba, <b>${R.vida}</b>) llega a 0. Cada turno tenés <b>maná</b> (los cristales azules) para jugar cartas: empezás con 1 y ganás uno más por turno.`;
     foco = refEl("h" + (1 - v.yo)); boton = "¡Vamos!";
   } else if (v.turno !== v.yo) {
     texto = "Turno del rival. Mirá lo que hace...";
+  } else if (!G.verCarta && P.mano?.length) {
+    foco = $(".mano .carta");
+    texto = "<b>Tocá una carta de tu mano</b> para verla grande: vas a ver qué hace y qué significa cada número.";
+  } else if (!G.verRival && R.tablero.length) {
+    foco = refEl(R.tablero[0].uid);
+    texto = "El rival jugó un esbirro. <b>Mantené apretado</b> un esbirro suyo para ver qué hace.";
+  } else if (!G.poder && v.numTurno >= 3 && P.poder && !P.poderUsado && P.poder.coste <= P.mana && P.tablero.length < 7) {
+    foco = $("#poder");
+    texto = `Este círculo es tu <b>poder de héroe</b>. Cada héroe tiene uno distinto y se puede usar <b>una vez por turno</b> pagando su maná. El de Tun cuesta ${P.poder.coste}: ${esc(P.poder.texto || "")} <b>Tocalo.</b>`;
   } else {
     const mano = (P.mano || []).map((c) => ({ c, d: cartaMano(c) })).filter((x) => x.d && jugable(v, x.d));
     const carta = mano.find((x) => x.d.tipo === "esbirro") || mano[0];
@@ -1284,7 +1296,6 @@ function guiaTutorial(v) {
         ? `<b>Arrastrá ${esc(d.nombre)}</b> a tu mesa. Cuesta <b>${d.coste}</b> de maná (el número azul) y tenés <b>${P.mana}</b>.${d.grito ? " Tiene <b>Grito de batalla</b>: hace algo al jugarlo." : ""}`
         : pideObjetivo(d) ? `<b>${esc(d.nombre)}</b> es un <b>hechizo</b>: arrastralo sobre el objetivo que quieras.`
         : `<b>${esc(d.nombre)}</b> es un <b>hechizo</b>: arrastralo hacia arriba para lanzarlo.`;
-      if (v.numTurno >= 3 && !guiaIntro.tip) { guiaIntro.tip = true; texto += " <i>Tip: tocá una carta para verla grande y leer qué hacen sus palabras en negrita.</i>"; }
     } else if (atacante) {
       foco = refEl(atacante.uid);
       const muro = R.tablero.some((m) => m.provocar);
@@ -1304,7 +1315,7 @@ function guiaTutorial(v) {
   const medio = $(".medio");
   if (medio && !boton) g.style.top = centro(medio).y + "px"; // sobre la línea del medio, entre las dos mesas
   if (foco) foco.classList.add("guia-foco");
-  if (boton) $("#guia-ok").onclick = () => { guiaIntro = {}; guiaTutorial(V); };
+  if (boton) $("#guia-ok").onclick = () => { G.intro = true; guiaTutorial(V); };
 }
 
 // ---------- mulligan: al empezar, cada uno elige qué cartas de su mano inicial cambiar ----------
@@ -1494,14 +1505,19 @@ function cancelarApuntado(redibujar = true) {
 function marcar(validos) { validos.forEach((r) => refEl(r)?.classList.add("objetivo")); }
 const bajo = (x, y) => document.elementFromPoint(x, y)?.closest("[data-ref]")?.dataset.ref;
 
+// en el tutorial, al ver una carta grande se explica qué es cada número
+const statsHTML = (c) => `<div class="palabras"><div><b>🔷 Maná (arriba):</b> lo que cuesta jugarla.</div>${c.tipo === "esbirro"
+  ? `<div><b>🟡 Ataque (abajo a la izquierda):</b> el daño que hace al atacar.</div><div><b>❤️ Vida (abajo a la derecha):</b> el daño que aguanta; si llega a 0, muere.</div>`
+  : `<div><b>Hechizo:</b> no tiene ataque ni vida; hace su efecto y se va.</div>`}</div>`;
 function zoom(idCarta, uid) {
+  if (V?.tutorial) { if (uid) G.verCarta = true; else if (V.j[1 - V.yo]?.tablero.some((m) => m.id === idCarta)) G.verRival = true; }
   const enMano = uid && V?.j[V.yo]?.mano?.find((x) => x.uid === uid);
   const c = enMano ? cartaMano(enMano) : DB[idCarta];
   if (!c) return;
   const puede = uid && V && V.yo >= 0 && V.turno === V.yo && V.fase === "jugando" && jugable(V, c);
   const m = document.createElement("div");
   m.className = "modal";
-  m.innerHTML = `<div class="modal-caja">${cartaHTML(c, { clase: "grande" })}${palabrasHTML(c)}
+  m.innerHTML = `<div class="modal-caja">${cartaHTML(c, { clase: "grande" })}${V?.tutorial ? statsHTML(c) : ""}${palabrasHTML(c)}
     ${puede ? '<button class="boton" id="jugar" style="width:min(56vw,260px)">Jugar</button>' : ""}</div>`;
   document.body.append(m);
   const abierto = Date.now();
@@ -1515,7 +1531,7 @@ function zoom(idCarta, uid) {
 // al cerrar algo encima de la mesa, se ignoran los toques un momento (si no, en Android
 // el mismo toque terminaba el turno o jugaba algo que estaba abajo)
 let cerradoEn = 0;
-function cerrarModal(m) { m.remove(); cerradoEn = Date.now(); }
+function cerrarModal(m) { m.remove(); cerradoEn = Date.now(); if (V?.tutorial && $("#app .mesa")) guiaTutorial(V); }
 const recienCerrado = () => Date.now() - cerradoEn < 450;
 
 function intentarJugar(uid, pos, origen, fantasma) {
