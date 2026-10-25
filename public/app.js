@@ -127,7 +127,7 @@ const artHTML = (arte) => (/^(https?:)?\//.test(arte || "") ? `<img src="${esc(a
 
 function cartaHTML(c, { uid = "", clase = "" } = {}) {
   const esH = c.tipo === "hechizo" || c.tipo === "mision";
-  const etiqueta = [c.clase ? HEROES[c.clase]?.nombre || c.clase : "", c.arquetipo || "", c.tribu && c.tribu !== c.clase ? c.tribu : ""].filter(Boolean).join(" · ");
+  const etiqueta = [c.clase ? HEROES[c.clase]?.nombre || c.clase : (c.token ? "" : "Neutral"), c.arquetipo || "", c.tribu && c.tribu !== c.clase ? c.tribu : ""].filter(Boolean).join(" · ");
   return `<div class="carta ${esH ? "hechizo" : ""} ${c.tipo === "mision" ? "mision" : ""} ${c.rareza === "legendaria" ? "legendaria" : ""} ${clase}" ${uid ? `data-uid="${uid}"` : ""} data-carta="${esc(c.id)}">
     <div class="arte" style="--fondo:${colorDe(c.arquetipo || c.id)}">${artHTML(c.arte)}</div>
     <div class="titulo">${esc(c.nombre)}</div>
