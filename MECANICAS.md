@@ -108,6 +108,8 @@ Campos: `id`, `nombre`, `coste`, `ataque`, `vida`, `texto`, `arte` (emoji o `/ar
 
 **Sonidos:** las cartas de Tun suenan a mono al jugarse; los Tun invocados hacen un "uh" corto. Una carta puede llevar `"sonido": "/sonidos/x.mp3"` (archivo en `public/sonidos/`) para usar un audio propio en vez del sintetizado.
 
+**Por cada (`porCada`):** en un `buff`, multiplica los stats: `{ "por": "etiqueta_jugados", "etiqueta": "tarea" }` cuenta las cartas con esa etiqueta que jugaste esta partida (Cruit Excel). En la mano se ve "(llevás N)".
+
 **Bonus (`bonus`):** `{ "por": "tribu_jugados", "tribu": "tun" }` suma a la `cantidad` 1 por cada carta de esa tribu que jugaste desde la mano esta partida (Tunita). En la mano se ve "(ahora: N)".
 
 **Objetivos:**
@@ -180,6 +182,8 @@ Diseño de Mario. Marco azul (provisional). Cruit es no binario: toda carta con 
 | Lechero ♂ | 1 | 1/3 | Grito y último aliento: obtenés una Leche | hecho |
 | Leche (hechizo) | 1 | — | +1/+1 a un esbirro; si es un Cruit, activa su grito y su último aliento | hecho |
 | Nullscape (hechizo) | 4 | — | Todos los esbirros hacen parkour; solo uno al azar sobrevive | hecho |
+| Cruit Excel ⚧ (tribu Cruit) | 5 | 2/2 | Grito: +3/+3 por cada Tarea que lanzaste esta partida | hecho |
+| Tarea de la U (hechizo, etiqueta Tarea) | 1 | — | 2 de daño a tu héroe, roba una carta | hecho |
 
 Sin mazo armado, el héroe sale al azar.
 

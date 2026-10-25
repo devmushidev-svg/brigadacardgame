@@ -346,6 +346,21 @@ for (let k = 0; k < 20; k++) {
   assert.equal(e.j[0].tablero.length + e.j[1].tablero.length, 1, "Nullscape: solo uno sobrevive");
 }
 
+// --- Cruit Excel y Tarea de la U ---
+{
+  const e = nueva(43, ["cruit", "cruit"]); const s = e.turno;
+  e.j[s].tablero = [];
+  preparar(e, s, ["tarea_uni", "tarea_uni", "cruit_excel"]);
+  const v = e.j[s].vida, mano = e.j[s].mano.length;
+  M.aplicar(e, s, { t: "jugar", uid: "t0" }, db, 0);
+  M.aplicar(e, s, { t: "jugar", uid: "t1" }, db, 0);
+  assert.equal(e.j[s].vida, v - 4); assert.equal(e.j[s].mano.length, mano - 2 + 2, "roba una por tarea");
+  assert.equal(M.vista(e, s, db).j[s].mano.find((c) => c.id === "cruit_excel").veces, 2);
+  M.aplicar(e, s, { t: "jugar", uid: "t2" }, db, 0);
+  const x = e.j[s].tablero.find((m) => m.id === "cruit_excel");
+  assert.deepEqual([x.ataque, x.vida], [8, 8], "2/2 + 2 tareas x +3/+3");
+}
+
 // --- estrés: miles de partidas con jugadas al azar ---
 let r = 12345;
 const rand = () => ((r = (r * 1103515245 + 12345) >>> 0) / 4294967296);

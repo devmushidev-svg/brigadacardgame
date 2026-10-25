@@ -350,6 +350,13 @@ function objetivos(estado, s, efecto, elegido, fuente) {
 }
 
 // cantidad real de un efecto: "bonus" la sube (ej. Tunita: +1 por cada Tun que jugaste esta partida)
+// cuántas veces vale un "por cada": cartas de una tribu o con una etiqueta jugadas esta partida
+export function contarPorCada(estado, s, pc) {
+  if (!pc) return 1;
+  if (pc.por === "tribu_jugados") return estado.j[s].jugadosTribu?.[pc.tribu] || 0;
+  if (pc.por === "etiqueta_jugados") return estado.j[s].jugadosEtiqueta?.[pc.etiqueta] || 0;
+  return 1;
+}
 export function cantidadDe(estado, s, ef) {
   let n = ef.cantidad ?? 1;
   if (ef.bonus?.por === "tribu_jugados") n += estado.j[s].jugadosTribu?.[ef.bonus.tribu] || 0;
@@ -506,13 +513,15 @@ function aplicarEfectos(estado, s, efectos, elegido, ev, db, fuente, ctx = {}) {
       else if (ef.tipo === "curar") curar(estado, ref, n, ev);
       else if (ef.tipo === "destruir" && t.tipo === "esbirro") { t.obj.vida = 0; ev.push({ e: "destruido", a: ref }); }
       else if (ef.tipo === "buff" && t.tipo === "esbirro") {
-        t.obj.ataque += ef.ataque || 0;
-        t.obj.vida += ef.vida || 0;
-        t.obj.vidaMax += ef.vida || 0;
+        const k = contarPorCada(estado, s, ef.porCada); // ej. Cruit Excel: +3/+3 por cada tarea
+        if (!k && ef.porCada) continue;
+        t.obj.ataque += (ef.ataque || 0) * k;
+        t.obj.vida += (ef.vida || 0) * k;
+        t.obj.vidaMax += (ef.vida || 0) * k;
         if (ef.provocar) t.obj.provocar = true;
         if (ef.escudo) t.obj.escudo = true;
         if (ef.carga) { t.obj.carga = true; t.obj.dormido = false; }
-        ev.push({ e: "buff", a: ref, ataque: ef.ataque || 0, vida: ef.vida || 0 });
+        ev.push({ e: "buff", a: ref, ataque: (ef.ataque || 0) * k, vida: (ef.vida || 0) * k });
       }
     }
   }
@@ -699,6 +708,7 @@ export function aplicar(estado, s, accion, db, ahora) {
     }
     p.mana -= coste;
     p.mano.splice(i, 1);
+    for (const et of carta.etiquetas || []) (p.jugadosEtiqueta ||= {})[et] = (p.jugadosEtiqueta[et] || 0) + 1;
     registrar(estado, `${p.nombre} jugo ${carta.nombre}`);
     if (carta.tipo === "mision") {
       p.mision = { id: carta.id, nombre: carta.nombre, ...copia(carta.mision), progreso: 0, completa: false };
@@ -785,8 +795,9 @@ export function vista(estado, yo, db0 = {}) {
       mano: s === yo ? p.mano.map((c) => {
         const d = db0[c.id], mej = d?.tipo === "esbirro" && d.tribu && p.mejoras?.[d.tribu];
         const ef = d && [...(d.efectos || []), ...(d.grito || [])].find((x) => x.bonus);
+        const pc = d && [...(d.efectos || []), ...(d.grito || [])].find((x) => x.porCada)?.porCada;
         return { ...c, coste: d ? costeDe(estado, s, d) : undefined, ...(mej ? { ataque: d.ataque + mej.ataque, vida: d.vida + mej.vida } : {}),
-          ...(ef ? { cantidad: cantidadDe(estado, s, ef) } : {}) };
+          ...(ef ? { cantidad: cantidadDe(estado, s, ef) } : {}), ...(pc ? { veces: contarPorCada(estado, s, pc) } : {}) };
       }) : undefined,
       mejoras: p.mejoras || null,
       tablero: p.tablero,

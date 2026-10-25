@@ -600,6 +600,54 @@
      "tipo": "pelea"
     }
    ]
+  },
+  {
+   "id": "cruit_excel",
+   "nombre": "Cruit Excel",
+   "genero": "no_binario",
+   "tipo": "esbirro",
+   "coste": 5,
+   "ataque": 2,
+   "vida": 2,
+   "tribu": "cruit",
+   "clase": "cruit",
+   "arte": "/arte/cruit_excel.webp",
+   "texto": "Grito de batalla: gana +3/+3 por cada Tarea que lanzaste esta partida.",
+   "grito": [
+    {
+     "tipo": "buff",
+     "objetivo": "yo",
+     "ataque": 3,
+     "vida": 3,
+     "porCada": {
+      "por": "etiqueta_jugados",
+      "etiqueta": "tarea"
+     }
+    }
+   ]
+  },
+  {
+   "id": "tarea_uni",
+   "nombre": "Tarea de la U",
+   "tipo": "hechizo",
+   "coste": 1,
+   "clase": "cruit",
+   "etiquetas": [
+    "tarea"
+   ],
+   "arte": "/arte/tarea_uni.webp",
+   "texto": "Tarea. Inflige 2 de daño a tu héroe. Roba una carta.",
+   "efectos": [
+    {
+     "tipo": "dano",
+     "objetivo": "heroe_propio",
+     "cantidad": 2
+    },
+    {
+     "tipo": "robar",
+     "cantidad": 1
+    }
+   ]
   }
  ],
  "heroes": [

@@ -907,7 +907,7 @@ function objetivosAtaque(v, s, atacante = null) {
 const puedeAtacar = (m) => !m.noAtaca && m.ataque > 0 && !m.dormido && m.ataques < (m.doble ? 2 : 1);
 // la carta de la mano con su coste real (ej. Tun Cool baja según la mesa)
 const cartaMano = (c) => (DB[c.id] ? { ...DB[c.id], coste: c.coste ?? DB[c.id].coste, ataque: c.ataque ?? DB[c.id].ataque, vida: c.vida ?? DB[c.id].vida,
-  texto: DB[c.id].texto + (c.cantidad != null ? ` (ahora: ${c.cantidad})` : ""), contador: contadorMuertos(DB[c.id]) } : null);
+  texto: DB[c.id].texto + (c.cantidad != null ? ` (ahora: ${c.cantidad})` : "") + (c.veces != null ? ` (llevás ${c.veces})` : ""), contador: contadorMuertos(DB[c.id]) } : null);
 // cartas que dependen de los Tun muertos llevan un contador en la carta
 function contadorMuertos(c) {
   const t = c.descuento?.por === "tribu_muertos" ? c.descuento.tribu : (c.efectos || []).find((e) => e.tipo === "invocar_por_muertos")?.tribu;
