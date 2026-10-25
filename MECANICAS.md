@@ -100,7 +100,7 @@ Campos: `id`, `nombre`, `coste`, `ataque`, `vida`, `texto`, `arte` (emoji o `/ar
 | `robar_vida` | daño que se **suma** a la vida de tu héroe (puede pasar de 30, sube la vida máxima); cada esbirro tuyo con `aumenta_robo_vida` suma ese número (Cruit Vampiro) |
 | `moneda` | 50/50: aplica `cara` o `cruz` (listas de efectos) con animación de moneda |
 | `pelea` | como Pelea de Hearthstone: todos los esbirros hacen parkour y solo uno al azar sobrevive |
-| `activar` | si el esbirro elegido es de la tribu del `filtro` (Cruit), repite su grito de batalla y su último aliento |
+| `activar` | si el esbirro es de la tribu del `filtro` (Cruit), repite su grito de batalla y su último aliento. Un esbirro que ya se está activando no se vuelve a activar (evita bucles) |
 | `transformar` | convierte a los esbirros del `objetivo` en `carta` (pierden buffs y claves; quedan en el mismo lugar y del mismo dueño) |
 | `invocar_por_muertos` | invoca `carta` una vez por cada esbirro de la `tribu` que murió en la partida; cada uno que no cabe en la mesa da +1 de ataque o +1 de vida (al azar) a uno de tus esbirros de esa tribu al azar. En la mano, la carta (y Tun Mastermind) lleva un contador ☠ con los Tun muertos |
 | `mejora_tribu` | por el resto de la partida, tus esbirros de esa `tribu` tienen +`ataque`/+`vida`: los que están en mesa, los de la mano y los que vengan (se ve en la placa del jugador) |
@@ -196,7 +196,7 @@ Diseño de Mario. Marco azul (provisional). Cruit es no binario: toda carta con 
 | Caca (ficha) | 0 | — | Se lanza al robarla: 3 de daño a quien la roba y roba otra | hecho |
 | Cruit Tostadora ⚧ | 1 | 1/2 | Grito: robás una carta | hecho |
 | Cruit Baño ⚧ | 3 | 3/2 | Último aliento: 2 de daño a todos los enemigos | hecho |
-| Cruit Vaca ⚧ | 4 | 3/4 | Grito: obtenés 2 Leches | hecho |
+| **Cruit Vaca** ⚧ (legendaria) | 4 | 3/4 | Grito: una Leche a cada uno de tus otros esbirros (+1/+1 y activa a los Cruit) | hecho |
 | **Cruit Verity** ⚧ (legendaria) | 3 | 3/1 | Último aliento: invoca a Verity 6/6 | hecho |
 | Verity ⚧ (ficha, forma monstruosa) | 6 | 6/6 | — | hecho |
 | Elliot Cruit ⚧ (tribu Cruit, Forsaken) | 2 | 2/2 | Al final de tu turno, una pizza cura 3 a un aliado herido al azar | hecho |

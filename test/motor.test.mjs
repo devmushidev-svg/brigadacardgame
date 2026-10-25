@@ -431,16 +431,31 @@ for (let k = 0; k < 20; k++) {
 {
   const e = nueva(48, ["cruit", "cruit"]); const s = e.turno, r = 1 - s;
   e.j[s].tablero = []; e.j[r].tablero = [{ uid: "rv", id: "x", tribu: null, ataque: 9, vida: 9, vidaMax: 9, ataques: 0 }];
-  preparar(e, s, ["cruit_tostadora", "cruit_vaca", "cruit_bano"]);
+  preparar(e, s, ["cruit_tostadora", "cruit_bano", "cruit_vaca"]);
   M.aplicar(e, s, { t: "jugar", uid: "t0" }, db, 0);
   assert.equal(e.j[s].mano.length, 3, "tostadora roba");
   M.aplicar(e, s, { t: "jugar", uid: "t1" }, db, 0);
-  assert.equal(e.j[s].mano.filter((c) => c.id === "leche").length, 2);
+  const mano = e.j[s].mano.length;
   M.aplicar(e, s, { t: "jugar", uid: "t2" }, db, 0);
+  assert.equal(e.j[s].mano.length, mano - 1 + 1, "Vaca: la Leche activa a la Tostadora (roba otra)");
+  assert.equal(e.j[s].tablero.find((m) => m.id === "cruit_tostadora").ataque, 2, "+1/+1");
+  assert.equal(e.j[r].tablero[0].vida, 7, "y el último aliento del Baño (2 a todos los enemigos)");
+  e.j[r].tablero[0].vida = 9;
   const bano = e.j[s].tablero.find((m) => m.id === "cruit_bano"); bano.dormido = false;
   const v = e.j[r].vida;
   M.aplicar(e, s, { t: "atacar", de: bano.uid, a: "rv" }, db, 0);
-  assert.equal(e.j[r].vida, v - 2); assert.equal(e.j[r].tablero[0].vida, 9 - 3 - 2);
+  assert.equal(e.j[r].vida, v - 2); assert.equal(e.j[r].tablero[0].vida, 9 - 4 - 2);
+}
+// --- dos Cruit Vaca no se activan sin fin ---
+{
+  const e = nueva(50, ["cruit", "cruit"]); const s = e.turno;
+  e.j[s].tablero = [];
+  preparar(e, s, ["cruit_vaca", "cruit_vaca"]);
+  db.cruit_vaca.rareza = null;
+  M.aplicar(e, s, { t: "jugar", uid: "t0" }, db, 0);
+  const res = M.aplicar(e, s, { t: "jugar", uid: "t1" }, db, 0);
+  db.cruit_vaca.rareza = "legendaria";
+  assert.ok(!res.error && res.ev.length < 200, "termina");
 }
 
 // --- Cruit Verity: al morir sale Verity 6/6 ---

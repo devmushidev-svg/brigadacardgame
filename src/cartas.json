@@ -854,14 +854,23 @@
    "ataque": 3,
    "vida": 4,
    "arte": "/arte/cruit_vaca.webp",
-   "texto": "Grito de batalla: obtenés 2 Leches.",
+   "texto": "Grito de batalla: dale una Leche a cada uno de tus otros esbirros (+1/+1; los Cruit activan su grito y su último aliento).",
    "grito": [
     {
-     "tipo": "dar_carta",
-     "carta": "leche",
-     "cantidad": 2
+     "tipo": "buff",
+     "objetivo": "aliados",
+     "ataque": 1,
+     "vida": 1
+    },
+    {
+     "tipo": "activar",
+     "objetivo": "aliados",
+     "filtro": {
+      "tribu": "cruit"
+     }
     }
-   ]
+   ],
+   "rareza": "legendaria"
   },
   {
    "id": "cruit_verity",

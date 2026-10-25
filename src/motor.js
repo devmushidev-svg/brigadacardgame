@@ -469,16 +469,23 @@ function aplicarEfectos(estado, s, efectos, elegido, ev, db, fuente, ctx = {}) {
       continue;
     }
     if (ef.tipo === "activar") {
-      // Leche: si el esbirro es de la tribu del filtro (Cruit), repite su grito y su último aliento
+      // Leche: si el esbirro es de la tribu del filtro (Cruit), repite su grito y su último aliento.
+      // Un esbirro que ya se está activando no se vuelve a activar (si no, dos Cruit Vaca se activarían sin fin)
+      const activos = (estado._activando ||= []);
+      if (fuente) activos.push(fuente);
       for (const ref of objetivos(estado, s, ef, elegido, fuente)) {
         const t = buscar(estado, ref);
-        if (!t || t.tipo !== "esbirro" || (ef.filtro?.tribu && t.obj.tribu !== ef.filtro.tribu)) continue;
+        if (!t || t.tipo !== "esbirro" || (ef.filtro?.tribu && t.obj.tribu !== ef.filtro.tribu) || activos.includes(ref)) continue;
         const c = db[t.obj.id];
         if (!c?.grito && !c?.aliento) continue;
+        activos.push(ref);
         ev.push({ e: "dispara", uid: ref, por: "leche" });
         if (c.grito) aplicarEfectos(estado, t.seat, c.grito, null, ev, db, ref);
         if (c.aliento) aplicarEfectos(estado, t.seat, c.aliento, null, ev, db, ref);
+        activos.splice(activos.lastIndexOf(ref), 1);
       }
+      if (fuente) activos.splice(activos.lastIndexOf(fuente), 1);
+      if (!activos.length) delete estado._activando;
       continue;
     }
     if (ef.tipo === "transformar") {
