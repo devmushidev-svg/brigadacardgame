@@ -92,6 +92,8 @@ const Sonido = (() => {
       o.connect(f).connect(g).connect(c.destination); o.start(t); l.start(t); o.stop(t + 0.85); l.stop(t + 0.85);
       for (let i = 0; i < 6; i++) setTimeout(() => ruido(0.12, 0.12, 500 + Math.random() * 700), 120 + i * 80);
     },
+    moneda() { for (let i = 0; i < 7; i++) tono(2200 + (i % 2) * 400, 0.05, "square", 0.025, 1, i * 0.12); setTimeout(() => tono(1800, 0.3, "triangle", 0.08, 0.98), 1050); },
+    disparo() { ruido(0.35, 0.5, 3500); tono(90, 0.3, "sine", 0.5, 0.4); },
     parkour() { [0, 380, 760].forEach((d, i) => setTimeout(() => { ruido(0.25, 0.14, 2500); tono(300 + i * 90, 0.12, "triangle", 0.08, 1.8); }, d)); },
     slam() { tono(55, 0.6, "sine", 0.6, 0.5); tono(110, 0.25, "square", 0.08, 0.4); ruido(0.5, 0.35, 900); },
     activa() { [880, 1320, 1760].forEach((f, i) => tono(f, 0.22, "sine", 0.07, 1.01, i * 0.05)); ruido(0.15, 0.04, 5000); },
@@ -264,6 +266,35 @@ async function activarCarta(el) {
       { transform: "translateY(-50%) scale(1)", opacity: 1, offset: 0.85 }, { transform: "translateY(-50%) scale(.6)", opacity: 0 }], { duration: 1100, easing: "ease-out" }).finished;
     m.remove();
   } else await esperar(700);
+}
+
+// algo que vuela en arco girando (la pizza de Elliot)
+async function lanzarCosa(desdeEl, aEl, html, tam = 34, dur = 600, gira = true) {
+  if (!aEl) return;
+  const o = centro(desdeEl || aEl), d = centro(aEl), x = document.createElement("div");
+  x.style.cssText = `position:fixed;left:0;top:0;font-size:${tam}px;line-height:1;z-index:67;pointer-events:none;filter:drop-shadow(0 4px 3px #000a)`;
+  x.textContent = html;
+  $("#fx").append(x);
+  Sonido.lanzar();
+  const alto = Math.max(80, Math.abs(d.x - o.x) * 0.3 + 60), kf = [];
+  for (let i = 0; i <= 20; i++) { const t = i / 20; kf.push({ transform: `translate(${o.x + (d.x - o.x) * t - tam / 2}px, ${o.y + (d.y - o.y) * t - Math.sin(Math.PI * t) * alto - tam / 2}px) rotate(${gira ? t * 540 : 0}deg)`, offset: t }); }
+  await x.animate(kf, { duration: dur, easing: "linear" }).finished;
+  x.remove();
+  particulas(d.x, d.y, "#ffb347", 14, 50);
+}
+// disparo del trabuco de Chance: fogonazo, trazo de la bala y chispazo
+async function disparar(desdeEl, aEl) {
+  if (!aEl) return;
+  const o = centro(desdeEl), d = centro(aEl), largo = Math.hypot(d.x - o.x, d.y - o.y), ang = Math.atan2(d.y - o.y, d.x - o.x);
+  Sonido.disparo();
+  particulas(o.x, o.y, "#ffe08a", 12, 40);
+  const t = document.createElement("div");
+  t.style.cssText = `position:fixed;left:${o.x}px;top:${o.y}px;width:${largo}px;height:4px;margin-top:-2px;transform-origin:0 50%;transform:rotate(${ang}rad);z-index:67;pointer-events:none;
+    background:linear-gradient(90deg,#fff0,#fff6c0 70%,#fff);box-shadow:0 0 10px #ffd34f;border-radius:2px`;
+  $("#fx").append(t);
+  await t.animate([{ clipPath: "inset(0 100% 0 0)" }, { clipPath: "inset(0 0 0 0)", offset: 0.5 }, { clipPath: "inset(0 0 0 100%)" }], { duration: 220, easing: "ease-out" }).finished;
+  t.remove();
+  particulas(d.x, d.y, "#ffd34f", 18, 70);
 }
 
 // vómito: chorro verde-amarillo que sale del esbirro y salpica a todos
@@ -748,7 +779,29 @@ async function animarUno(e, ev, v, nuevos, yo) {
         if (sob) { const c = centro(sob); particulas(c.x, c.y, "#ffd34f", 24, 90); sob.animate([{ filter: "brightness(2) drop-shadow(0 0 20px #ffd34f)" }, { filter: "none" }], 900); }
         break;
       }
+      case "repite": { // Coco Supremo: cada carta repetida aparece un momento
+        Sonido.hechizo();
+        await mostrarCarta(e.carta, 650);
+        break;
+      }
+      case "moneda": { // moneda que gira en el centro y cae en cara o cruz
+        const m = document.createElement("div");
+        m.className = "moneda-flip";
+        m.innerHTML = `<div class="moneda-cara">R$</div><span class="moneda-txt">${e.resultado === "cara" ? "¡CARA!" : "cruz..."}</span>`;
+        document.body.append(m);
+        Sonido.moneda();
+        const giro = m.firstElementChild;
+        await giro.animate([{ transform: "translateY(60px) rotateY(0) scale(.5)" }, { transform: "translateY(-80px) rotateY(1440deg) scale(1.2)", offset: 0.5 },
+          { transform: `translateY(0) rotateY(${e.resultado === "cara" ? 2880 : 2700}deg) scale(1)` }], { duration: 1100, easing: "cubic-bezier(.3,.6,.4,1)", fill: "forwards" }).finished;
+        Sonido[e.resultado === "cara" ? "victoria" : "error"]();
+        $(".moneda-txt", m).animate([{ opacity: 0, transform: "scale(.5)" }, { opacity: 1, transform: "scale(1.15)" }, { opacity: 1, transform: "scale(1)" }], { duration: 300, fill: "forwards" });
+        await esperar(650);
+        m.animate([{ opacity: 1 }, { opacity: 0 }], 250).onfinish = () => m.remove();
+        break;
+      }
       case "fx": {
+        if (e.fx === "pizza") await lanzarCosa(refEl(e.de), refEl(e.a), "🍕", 34, 650, true);
+        if (e.fx === "bala") await disparar(refEl(e.de) || $(`.tablero[data-seat="${V.j[0].tablero.some((m) => m.uid === e.de) ? 0 : 1}"]`) || $(".campo"), refEl(e.a));
         if (e.fx === "vomito") await vomitar(refEl(e.de) || $(`.tablero[data-seat="${e.seat}"]`), (e.a || []).map(refEl).filter(Boolean));
         if (e.fx === "piedra") await tirarPiedra(refEl(e.de) || $(`.tablero[data-seat="${V.j[0].tablero.some((m) => m.uid === e.de) ? 0 : 1}"]`), refEl(e.a));
         break;

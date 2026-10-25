@@ -647,6 +647,80 @@
      "cantidad": 1
     }
    ]
+  },
+  {
+   "id": "elliot",
+   "nombre": "Elliot",
+   "genero": "hombre",
+   "tipo": "esbirro",
+   "coste": 2,
+   "ataque": 2,
+   "vida": 2,
+   "clase": "cruit",
+   "arte": "/arte/elliot.webp",
+   "texto": "Al final de tu turno, lanza una pizza que cura 3 a un aliado herido al azar.",
+   "fin_turno": [
+    {
+     "tipo": "curar",
+     "objetivo": "aliado_herido_azar",
+     "cantidad": 3,
+     "fx": "pizza"
+    }
+   ]
+  },
+  {
+   "id": "chance",
+   "nombre": "Chance",
+   "genero": "hombre",
+   "tipo": "esbirro",
+   "coste": 3,
+   "ataque": 3,
+   "vida": 3,
+   "tribu": "cruit",
+   "clase": "cruit",
+   "arte": "/arte/chance.webp",
+   "texto": "Grito de batalla: tira una moneda. Cara: 6 de daño a un enemigo al azar. Cruz: 3 de daño a tu héroe.",
+   "grito": [
+    {
+     "tipo": "moneda",
+     "cara": [
+      {
+       "tipo": "dano",
+       "objetivo": "enemigo_azar",
+       "cantidad": 6,
+       "fx": "bala"
+      }
+     ],
+     "cruz": [
+      {
+       "tipo": "dano",
+       "objetivo": "heroe_propio",
+       "cantidad": 3,
+       "fx": "bala"
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "coco_supremo",
+   "nombre": "Coco Supremo",
+   "tipo": "esbirro",
+   "coste": 9,
+   "ataque": 7,
+   "vida": 5,
+   "rareza": "legendaria",
+   "clase": "cruit",
+   "arte": "/arte/coco_supremo.webp",
+   "texto": "Grito de batalla: repite los gritos de batalla y últimos alientos de todos los Cruit que jugaste esta partida.",
+   "grito": [
+    {
+     "tipo": "repetir_jugados",
+     "filtro": {
+      "tribu": "cruit"
+     }
+    }
+   ]
   }
  ],
  "heroes": [

@@ -361,6 +361,38 @@ for (let k = 0; k < 20; k++) {
   assert.deepEqual([x.ataque, x.vida], [8, 8], "2/2 + 2 tareas x +3/+3");
 }
 
+// --- Elliot y Chance ---
+{
+  const e = nueva(44, ["cruit", "cruit"]); const s = e.turno, r = 1 - s;
+  e.j[s].tablero = []; e.j[r].tablero = [];
+  preparar(e, s, ["elliot", "chance"]);
+  e.j[s].vida = 20;
+  M.aplicar(e, s, { t: "jugar", uid: "t0" }, db, 0);
+  const vr = e.j[r].vida, vs = e.j[s].vida;
+  const res = M.aplicar(e, s, { t: "jugar", uid: "t1" }, db, 0);
+  const mon = res.ev.find((x) => x.e === "moneda");
+  assert.ok(mon);
+  if (mon.resultado === "cara") assert.equal(e.j[r].vida, vr - 6); else assert.equal(e.j[s].vida, vs - 3);
+  const antes = e.j[s].vida;
+  M.aplicar(e, s, { t: "fin" }, db, 0);
+  assert.equal(e.j[s].vida, Math.min(30, antes + 3), "Elliot cura al heroe herido");
+}
+
+// --- Coco Supremo: repite gritos y alientos de los Cruit jugados ---
+{
+  const e = nueva(45, ["cruit", "cruit"]); const s = e.turno, r = 1 - s;
+  e.j[s].tablero = []; e.j[r].tablero = [{ uid: "rv", id: "x", tribu: null, ataque: 1, vida: 9, vidaMax: 9, ataques: 0 }];
+  preparar(e, s, ["cruit_intolerante", "cruit_intolerante", "coco_supremo"]);
+  M.aplicar(e, s, { t: "jugar", uid: "t0" }, db, 0);
+  M.aplicar(e, s, { t: "jugar", uid: "t1" }, db, 0);
+  assert.equal(e.j[r].tablero[0].vida, 7);
+  e.j[s].mana = 10;
+  const res = M.aplicar(e, s, { t: "jugar", uid: "t2" }, db, 0);
+  assert.ok(!res.error, res.error);
+  assert.equal(res.ev.filter((x) => x.e === "repite").length, 2);
+  assert.equal(e.j[r].tablero[0].vida, 5, "2 vómitos más");
+}
+
 // --- estrés: miles de partidas con jugadas al azar ---
 let r = 12345;
 const rand = () => ((r = (r * 1103515245 + 12345) >>> 0) / 4294967296);

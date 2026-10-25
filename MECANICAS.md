@@ -94,6 +94,8 @@ Campos: `id`, `nombre`, `coste`, `ataque`, `vida`, `texto`, `arte` (emoji o `/ar
 | `robar_mano` | te robás N cartas de la mano rival que cumplan el `filtro` (`{ "genero": "mujer" }`, `{ "etiqueta": ... }` o `{ "tribu": ... }`); si no hay, no pasa nada |
 | `descubrir` | como Hearthstone: muestra 3 cartas distintas del `filtro` (ej. tribu Tun) y te quedás con una; si se acaba el turno sin elegir, se elige al azar |
 | `atraer_ataques` | tus otros esbirros (del `filtro`) atacan a esta carta, uno por uno, con choque normal |
+| `repetir_jugados` | repite los gritos y últimos alientos de las cartas del `filtro` que jugaste esta partida, en orden (Coco Supremo) |
+| `moneda` | 50/50: aplica `cara` o `cruz` (listas de efectos) con animación de moneda |
 | `pelea` | como Pelea de Hearthstone: todos los esbirros hacen parkour y solo uno al azar sobrevive |
 | `activar` | si el esbirro elegido es de la tribu del `filtro` (Cruit), repite su grito de batalla y su último aliento |
 | `transformar` | convierte a los esbirros del `objetivo` en `carta` (pierden buffs y claves; quedan en el mismo lugar y del mismo dueño) |
@@ -114,7 +116,7 @@ Campos: `id`, `nombre`, `coste`, `ataque`, `vida`, `texto`, `arte` (emoji o `/ar
 
 **Objetivos:**
 - los elige el jugador con la flecha: `elegido`, `elegido_enemigo`, `elegido_esbirro`, `elegido_aliado`
-- automáticos: `heroe_enemigo`, `heroe_propio`, `esbirro_enemigo_azar`, `esbirros_enemigos`, `todos_esbirros`, `otros_esbirros` (todos menos el que lo lanza), `aliado_azar`, `aliados` (tus otros esbirros), `todos_enemigos`, `enemigo_azar`, `yo`
+- automáticos: `heroe_enemigo`, `heroe_propio`, `esbirro_enemigo_azar`, `esbirros_enemigos`, `todos_esbirros`, `otros_esbirros` (todos menos el que lo lanza), `aliado_azar`, `aliado_herido_azar` (tu héroe o un esbirro tuyo herido), `aliados` (tus otros esbirros), `todos_enemigos`, `enemigo_azar`, `yo`
 - `filtro: { "tribu": "tun" }` limita a esbirros de esa tribu
 
 ## Misiones
@@ -184,6 +186,9 @@ Diseño de Mario. Marco azul (provisional). Cruit es no binario: toda carta con 
 | Nullscape (hechizo) | 4 | — | Todos los esbirros hacen parkour; solo uno al azar sobrevive | hecho |
 | Cruit Excel ⚧ (tribu Cruit) | 5 | 2/2 | Grito: +3/+3 por cada Tarea que lanzaste esta partida | hecho |
 | Tarea de la U (hechizo, etiqueta Tarea) | 1 | — | 2 de daño a tu héroe, roba una carta | hecho |
+| **Coco Supremo** (legendaria) | 9 | 7/5 | Grito: repite los gritos y últimos alientos de todos los Cruit que jugaste esta partida | hecho |
+| Elliot ♂ (Forsaken) | 2 | 2/2 | Al final de tu turno, una pizza cura 3 a un aliado herido al azar | hecho |
+| Chance ♂ (Forsaken, cuenta como Cruit para la Leche) | 3 | 3/3 | Grito: moneda. Cara: 6 de daño a un enemigo al azar. Cruz: 3 de daño a tu héroe | hecho |
 
 Sin mazo armado, el héroe sale al azar.
 

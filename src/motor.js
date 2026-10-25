@@ -344,6 +344,11 @@ function objetivos(estado, s, efecto, elegido, fuente) {
     case "aliados": return yo;
     case "todos_enemigos": return ["h" + otro(s), ...ene];
     case "enemigo_azar": return [elegir(estado, ["h" + otro(s), ...ene])];
+    case "aliado_herido_azar": { // tu héroe o uno de tus esbirros (incluido él mismo) que esté herido
+      const p = estado.j[s];
+      const heridos = [...(p.vida < p.vidaMax ? ["h" + s] : []), ...p.tablero.filter((m) => m.vida > 0 && m.vida < m.vidaMax && tribuOk(m)).map((m) => m.uid)];
+      return heridos.length ? [elegir(estado, heridos)] : [];
+    }
     case "yo": return fuente ? [fuente] : [];
     default: return [];
   }
@@ -389,6 +394,27 @@ function aplicarEfectos(estado, s, efectos, elegido, ev, db, fuente, ctx = {}) {
       if (!ops.length) continue;
       if (estado.pendiente) darCarta(estado, s, elegir(estado, ops), ev); // ya hay otra elección abierta
       else { estado.pendiente = { seat: s, tipo: "descubrir", opciones: ops }; ev.push({ e: "elegir", seat: s, tipo: "descubrir" }); }
+      continue;
+    }
+    if (ef.tipo === "repetir_jugados") {
+      // Coco Supremo: repite los gritos y últimos alientos de las cartas del filtro que jugaste esta partida
+      const ids = (estado.j[s].jugados || []).filter((id) => db[id] && cumpleFiltro(db[id], ef.filtro) &&
+        ![...(db[id].grito || []), ...(db[id].aliento || [])].some((x) => x.tipo === "repetir_jugados"));
+      for (const id of ids.slice(0, 30)) {
+        if (estado.fase !== "jugando") break;
+        const c = db[id];
+        ev.push({ e: "repite", seat: s, carta: id });
+        if (c.grito) aplicarEfectos(estado, s, c.grito, null, ev, db, null, ctx);
+        if (c.aliento) aplicarEfectos(estado, s, c.aliento, null, ev, db, null, ctx);
+        resolverMuertes(estado, ev, db);
+      }
+      continue;
+    }
+    if (ef.tipo === "moneda") {
+      // Chance: tira una moneda; cara o cruz aplican efectos distintos
+      const cara = azar(estado) < 0.5;
+      ev.push({ e: "moneda", seat: s, resultado: cara ? "cara" : "cruz", de: fuente });
+      aplicarEfectos(estado, s, cara ? ef.cara : ef.cruz, elegido, ev, db, fuente, ctx);
       continue;
     }
     if (ef.tipo === "pelea") {
@@ -510,7 +536,7 @@ function aplicarEfectos(estado, s, efectos, elegido, ev, db, fuente, ctx = {}) {
       const t = buscar(estado, ref);
       if (!t) continue;
       if (ef.tipo === "dano") danar(estado, ref, n, ev, { fx: fxGrupo ? null : ef.fx, de: fuente });
-      else if (ef.tipo === "curar") curar(estado, ref, n, ev);
+      else if (ef.tipo === "curar") { if (ef.fx) ev.push({ e: "fx", fx: ef.fx, de: fuente, a: ref }); curar(estado, ref, n, ev); }
       else if (ef.tipo === "destruir" && t.tipo === "esbirro") { t.obj.vida = 0; ev.push({ e: "destruido", a: ref }); }
       else if (ef.tipo === "buff" && t.tipo === "esbirro") {
         const k = contarPorCada(estado, s, ef.porCada); // ej. Cruit Excel: +3/+3 por cada tarea
@@ -709,6 +735,7 @@ export function aplicar(estado, s, accion, db, ahora) {
     p.mana -= coste;
     p.mano.splice(i, 1);
     for (const et of carta.etiquetas || []) (p.jugadosEtiqueta ||= {})[et] = (p.jugadosEtiqueta[et] || 0) + 1;
+    (p.jugados ||= []).push(carta.id); // historial de cartas jugadas (Coco Supremo)
     registrar(estado, `${p.nombre} jugo ${carta.nombre}`);
     if (carta.tipo === "mision") {
       p.mision = { id: carta.id, nombre: carta.nombre, ...copia(carta.mision), progreso: 0, completa: false };
