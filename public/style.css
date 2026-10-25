@@ -225,7 +225,7 @@ img[src^="/arte/unislop-tareas/"] { filter: invert(1) drop-shadow(0 2px 3px #000
 
 /* overlays */
 .banner { position: fixed; inset: 0; display: grid; place-items: center; pointer-events: none; z-index: 60; }
-.banner span { font-family: var(--f-tit); font-weight: 900; font-size: clamp(32px, 10vw, 70px); color: var(--oro); padding: 12px 34px; border-radius: 14px;
+.banner > span { font-family: var(--f-tit); font-weight: 900; font-size: clamp(32px, 10vw, 70px); color: var(--oro); padding: 12px 34px; border-radius: 14px;
   text-shadow: 0 3px 0 #3a2508, 0 0 24px #000; background: linear-gradient(90deg, #0000, #000c 20%, #000c 80%, #0000); }
 .modal { position: fixed; inset: 0; background: #000c; display: grid; place-items: center; z-index: 70; padding: 16px; }
 .modal-caja { text-align: center; display: grid; gap: 10px; justify-items: center; }
