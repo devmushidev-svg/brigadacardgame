@@ -50,9 +50,13 @@ function armarMazo(estado, db, clase) {
   const deClase = Object.values(db).filter((c) => !c.token && c.clase && c.clase === clase && c.tipo !== "mision");
   const neutrales = Object.values(db).filter((c) => !c.token && !c.clase);
   let intentos = 0;
-  while (deClase.length && mazo.length < CONFIG.CARTAS_DE_CLASE && intentos++ < 500) meter(elegir(estado, deClase));
+  const topeClase = neutrales.length ? CONFIG.CARTAS_DE_CLASE : CONFIG.TAM_MAZO;
+  while (deClase.length && mazo.length < topeClase && intentos++ < 500) meter(elegir(estado, deClase));
   intentos = 0;
   while (neutrales.length && mazo.length < CONFIG.TAM_MAZO && intentos++ < 1000) meter(elegir(estado, neutrales));
+  // si todavía hay pocas cartas diseñadas, se repiten las no legendarias para completar el mazo
+  const repetibles = [...deClase, ...neutrales].filter((c) => c.rareza !== "legendaria");
+  while (repetibles.length && mazo.length < CONFIG.TAM_MAZO) mazo.push(elegir(estado, repetibles).id);
   return barajar(estado, mazo);
 }
 
@@ -189,9 +193,11 @@ function danarHeroe(estado, s, n, ev) {
   ev.push({ e: "dano", a: "h" + s, n });
 }
 
-function danar(estado, ref, n, ev) {
+// extra: { fx, de } para que el cliente sepa cómo dibujar el golpe (ej. una piedra desde Tun Puto)
+function danar(estado, ref, n, ev, extra = {}) {
   const t = buscar(estado, ref);
   if (!t || n <= 0) return;
+  if (extra.fx) ev.push({ e: "fx", fx: extra.fx, de: extra.de || null, a: ref });
   if (t.tipo === "heroe") return danarHeroe(estado, t.seat, n, ev);
   if (t.obj.escudo) {
     t.obj.escudo = false;
@@ -299,7 +305,7 @@ function aplicarEfectos(estado, s, efectos, elegido, ev, db, fuente, ctx = {}) {
     if (ef.tipo === "devorar") {
       // destruye a tus otros esbirros (de la tribu del filtro) y gana stats por cada uno
       const comidos = estado.j[s].tablero.filter((m) => m.uid !== fuente && m.vida > 0 && (!ef.filtro?.tribu || m.tribu === ef.filtro.tribu));
-      for (const m of comidos) { m.vida = 0; ev.push({ e: "destruido", a: m.uid }); }
+      for (const m of comidos) { m.vida = 0; ev.push({ e: "destruido", a: m.uid, por: fuente, fx: ef.fx || null }); }
       const f = fuente && buscar(estado, fuente);
       if (f && comidos.length) {
         const a = (ef.ataque || 0) * comidos.length, v = (ef.vida || 0) * comidos.length;
@@ -334,7 +340,7 @@ function aplicarEfectos(estado, s, efectos, elegido, ev, db, fuente, ctx = {}) {
     for (const ref of objetivos(estado, s, ef, elegido, fuente)) {
       const t = buscar(estado, ref);
       if (!t) continue;
-      if (ef.tipo === "dano") danar(estado, ref, n, ev);
+      if (ef.tipo === "dano") danar(estado, ref, n, ev, { fx: ef.fx, de: fuente });
       else if (ef.tipo === "curar") curar(estado, ref, n, ev);
       else if (ef.tipo === "destruir" && t.tipo === "esbirro") { t.obj.vida = 0; ev.push({ e: "destruido", a: ref }); }
       else if (ef.tipo === "buff" && t.tipo === "esbirro") {

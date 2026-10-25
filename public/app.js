@@ -42,6 +42,55 @@ const Sonido = (() => {
     victoria() { [523, 659, 784, 1046].forEach((f, i) => tono(f, 0.35, "triangle", 0.15, 0, i * 0.13)); },
     derrota() { [392, 330, 262].forEach((f, i) => tono(f, 0.45, "sawtooth", 0.06, 0, i * 0.2)); },
     error() { tono(140, 0.15, "square", 0.05); },
+    // mono: "uh uh uh ¡AAH AAH!" con formantes (sierra filtrada + vibrato)
+    mono() {
+      if (mudo) return;
+      const c = a(), t0 = c.currentTime, base = 380 + Math.random() * 120;
+      const llamada = (t, f, dur, vol, sube, chillido) => {
+        const o = c.createOscillator(), g = c.createGain(), bp = c.createBiquadFilter(), lfo = c.createOscillator(), lg = c.createGain();
+        o.type = "sawtooth";
+        o.frequency.setValueAtTime(f, t);
+        o.frequency.exponentialRampToValueAtTime(f * sube, t + dur * 0.6);
+        o.frequency.exponentialRampToValueAtTime(f * sube * 0.8, t + dur);
+        lfo.frequency.value = chillido ? 32 : 9; lg.gain.value = chillido ? f * 0.06 : f * 0.02;
+        lfo.connect(lg).connect(o.frequency);
+        bp.type = "bandpass"; bp.frequency.value = chillido ? 1900 : 900; bp.Q.value = chillido ? 3 : 5;
+        g.gain.setValueAtTime(0.0001, t); g.gain.exponentialRampToValueAtTime(vol, t + 0.02); g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
+        o.connect(bp).connect(g).connect(c.destination);
+        o.start(t); lfo.start(t); o.stop(t + dur + 0.02); lfo.stop(t + dur + 0.02);
+      };
+      const n = 3 + Math.floor(Math.random() * 2);
+      for (let i = 0; i < n; i++) llamada(t0 + i * 0.13, base * (1 + i * 0.12), 0.11, 0.35, 1.5, false);
+      for (let i = 0; i < 2; i++) llamada(t0 + n * 0.13 + 0.05 + i * 0.24, base * 2.2, 0.22, 0.28, 1.35, true);
+    },
+    monito() { // un solo "uh" corto para los Tun invocados
+      if (mudo) return;
+      const c = a(), t = c.currentTime, o = c.createOscillator(), g = c.createGain(), bp = c.createBiquadFilter();
+      o.type = "sawtooth"; o.frequency.setValueAtTime(420, t); o.frequency.exponentialRampToValueAtTime(700, t + 0.09);
+      bp.type = "bandpass"; bp.frequency.value = 1000; bp.Q.value = 5;
+      g.gain.setValueAtTime(0.0001, t); g.gain.exponentialRampToValueAtTime(0.18, t + 0.015); g.gain.exponentialRampToValueAtTime(0.0001, t + 0.12);
+      o.connect(bp).connect(g).connect(c.destination); o.start(t); o.stop(t + 0.14);
+    },
+    lanzar() { ruido(0.25, 0.12, 1800); },
+    piedra() { // crac de piedra: chasquido agudo + golpe grave + cascajo
+      if (mudo) return;
+      ruido(0.05, 0.6, 6000); tono(70, 0.25, "sine", 0.45, 0.4);
+      setTimeout(() => ruido(0.35, 0.12, 2500), 40);
+    },
+    demonio() { // gruñido grave con distorsión
+      if (mudo) return;
+      const c = a(), t = c.currentTime, o = c.createOscillator(), o2 = c.createOscillator(), g = c.createGain(), ws = c.createWaveShaper();
+      const curva = new Float32Array(256); for (let i = 0; i < 256; i++) { const x = i / 128 - 1; curva[i] = Math.tanh(x * 6); }
+      ws.curve = curva;
+      o.type = "sawtooth"; o2.type = "square";
+      o.frequency.setValueAtTime(58, t); o.frequency.linearRampToValueAtTime(42, t + 0.9);
+      o2.frequency.setValueAtTime(87, t); o2.frequency.linearRampToValueAtTime(60, t + 0.9);
+      g.gain.setValueAtTime(0.0001, t); g.gain.exponentialRampToValueAtTime(0.22, t + 0.1); g.gain.exponentialRampToValueAtTime(0.0001, t + 1);
+      o.connect(ws); o2.connect(ws); ws.connect(g).connect(c.destination);
+      o.start(t); o2.start(t); o.stop(t + 1.05); o2.stop(t + 1.05);
+      ruido(0.8, 0.08, 300);
+    },
+    archivo(url) { if (mudo) return; try { const au = new Audio(url); au.volume = 0.8; au.play().catch(() => {}); } catch {} },
     tic() { tono(1000, 0.04, "square", 0.03); },
     get mudo() { return mudo; },
     toggle() { mudo = !mudo; localStorage.setItem("mudo", mudo ? "1" : "0"); },
@@ -111,6 +160,60 @@ function temblar(el, fuerte = false) {
     ? [{ transform: "translate(0,0)" }, { transform: "translate(-9px,5px)" }, { transform: "translate(8px,-6px)" }, { transform: "translate(-6px,-3px)" }, { transform: "translate(4px,4px)" }, { transform: "translate(0,0)" }]
     : [{ transform: "translateX(0)" }, { transform: "translateX(-5px)" }, { transform: "translateX(5px)" }, { transform: "translateX(-3px)" }, { transform: "translateX(0)" }],
     { duration: fuerte ? 380 : 260 });
+}
+
+// golpe con peso: destello blanco, sacudida según el daño y temblor de pantalla si es grande
+function impacto(el, n) {
+  if (!el) return;
+  const fuerza = Math.min(14, 3 + n * 1.6);
+  el.animate([{ filter: "brightness(3) saturate(0)" }, { filter: "brightness(1.6) sepia(1) hue-rotate(-30deg) saturate(4)", offset: 0.25 }, { filter: "none" }], { duration: 320 });
+  el.animate([{ transform: "translate(0,0)" }, { transform: `translate(${-fuerza}px, ${fuerza * 0.4}px) rotate(-3deg)` }, { transform: `translate(${fuerza * 0.8}px, ${-fuerza * 0.5}px) rotate(2deg)` },
+    { transform: `translate(${-fuerza * 0.5}px, ${-fuerza * 0.2}px)` }, { transform: "translate(0,0)" }], { duration: 300, easing: "ease-out" });
+  const c = centro(el);
+  particulas(c.x, c.y, "#ff3b2f", Math.min(22, 6 + n * 2), 40 + n * 6);
+  if (n >= 5 || (el.classList.contains("heroe") && n >= 4)) temblar($(".mesa"), true);
+}
+
+// piedra realista: sale del esbirro, vuela en arco girando con su sombra, revienta en pedazos
+const PIEDRA_SVG = `<svg viewBox="0 0 64 64" width="100%" height="100%"><defs>
+  <radialGradient id="pg" cx="35%" cy="30%" r="75%"><stop offset="0" stop-color="#b9b2a6"/><stop offset=".45" stop-color="#7d756a"/><stop offset="1" stop-color="#3b3631"/></radialGradient>
+  <filter id="pr"><feTurbulence type="fractalNoise" baseFrequency=".9" numOctaves="2" result="n"/><feColorMatrix in="n" values="0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 .5 0"/><feComposite in2="SourceGraphic" operator="in"/><feBlend in="SourceGraphic" mode="multiply"/></filter></defs>
+  <path d="M14 22 L26 9 L44 11 L56 26 L52 45 L36 56 L18 52 L8 38 Z" fill="url(#pg)" filter="url(#pr)" stroke="#2a2622" stroke-width="2"/>
+  <path d="M26 9 L30 24 L44 11 M30 24 L18 52 M30 24 L52 45" stroke="#2a262266" stroke-width="1.5" fill="none"/></svg>`;
+async function tirarPiedra(desdeEl, aEl) {
+  if (!aEl) return;
+  const o = centro(desdeEl || document.body), d = centro(aEl);
+  const piedra = document.createElement("div"), sombra = document.createElement("div");
+  piedra.style.cssText = "position:fixed;width:34px;height:34px;margin:-17px 0 0 -17px;z-index:67;pointer-events:none;filter:drop-shadow(0 3px 2px #000a)";
+  sombra.style.cssText = "position:fixed;width:30px;height:10px;margin:-5px 0 0 -15px;border-radius:50%;background:#0006;filter:blur(2px);z-index:63;pointer-events:none";
+  piedra.innerHTML = PIEDRA_SVG;
+  $("#fx").append(sombra, piedra);
+  Sonido.lanzar();
+  const altura = Math.max(90, Math.abs(d.x - o.x) * 0.35 + 70), dur = 520;
+  const pasos = 24, kfP = [], kfS = [];
+  for (let i = 0; i <= pasos; i++) {
+    const t = i / pasos, x = o.x + (d.x - o.x) * t, ySuelo = o.y + (d.y - o.y) * t, y = ySuelo - Math.sin(Math.PI * t) * altura;
+    const esc = 1 + Math.sin(Math.PI * t) * 0.45;
+    kfP.push({ left: x + "px", top: y + "px", transform: `rotate(${t * 720}deg) scale(${esc})`, offset: t });
+    kfS.push({ left: x + "px", top: ySuelo + 18 + "px", transform: `scale(${1 - Math.sin(Math.PI * t) * 0.5})`, opacity: 0.4 + (1 - Math.sin(Math.PI * t)) * 0.5, offset: t });
+  }
+  sombra.animate(kfS, { duration: dur, easing: "linear" });
+  await piedra.animate(kfP, { duration: dur, easing: "cubic-bezier(.3,.1,.7,1)" }).finished;
+  piedra.remove(); sombra.remove();
+  Sonido.piedra();
+  // pedazos de piedra y polvo
+  for (let i = 0; i < 12; i++) {
+    const f = document.createElement("div"), lado = 4 + Math.random() * 7;
+    f.style.cssText = `position:fixed;left:${d.x}px;top:${d.y}px;width:${lado}px;height:${lado}px;z-index:66;pointer-events:none;
+      background:${["#8a8276", "#5e574e", "#a59d90"][i % 3]};clip-path:polygon(50% 0,100% 40%,80% 100%,10% 85%,0 30%)`;
+    $("#fx").append(f);
+    const ang = -Math.PI * (0.1 + Math.random() * 0.8), dist = 40 + Math.random() * 60;
+    f.animate([{ transform: "translate(0,0) rotate(0)", opacity: 1 },
+      { transform: `translate(${Math.cos(ang) * dist}px, ${Math.sin(ang) * dist * 0.6}px) rotate(${Math.random() * 400}deg)`, opacity: 1, offset: 0.55 },
+      { transform: `translate(${Math.cos(ang) * dist * 1.2}px, ${Math.sin(ang) * dist * 0.2 + 30}px) rotate(${Math.random() * 600}deg)`, opacity: 0 }],
+      { duration: 650, easing: "cubic-bezier(.2,.7,.4,1)" }).onfinish = () => f.remove();
+  }
+  particulas(d.x, d.y, "#c9b79a", 10, 35);
 }
 
 async function banner(texto, ms = 1000) {
@@ -250,6 +353,11 @@ const refEl = (ref) => $(`[data-ref="${ref}"]`);
 async function animar(ev, v, nuevos) {
   const yo = yoDe(v);
   for (const e of ev) {
+    try { await animarUno(e, ev, v, nuevos, yo); } catch (err) { console.warn("animacion", e.e, err); }
+  }
+}
+async function animarUno(e, ev, v, nuevos, yo) {
+  {
     switch (e.e) {
       case "hechizo":
         Sonido.hechizo();
@@ -289,11 +397,14 @@ async function animar(ev, v, nuevos) {
       }
       case "dano": {
         const el = refEl(e.a);
+        impacto(el, e.n);
         numero(el, "-" + e.n, "dano");
-        temblar(el, e.a[0] === "h" && e.n >= 5);
-        if (e.a[0] === "h" && e.n >= 5) temblar($(".mesa"), true);
-        if (!ev.some((x) => x.e === "ataque")) Sonido.golpe(e.n);
-        await esperar(90);
+        if (!ev.some((x) => x.e === "ataque" || x.e === "fx")) Sonido.golpe(e.n);
+        await esperar(e.n >= 5 ? 220 : 110); // pausa de impacto: los golpes fuertes "pesan"
+        break;
+      }
+      case "fx": {
+        if (e.fx === "piedra") await tirarPiedra(refEl(e.de) || $(`.tablero[data-seat="${V.j[0].tablero.some((m) => m.uid === e.de) ? 0 : 1}"]`), refEl(e.a));
         break;
       }
       case "escudo_roto": {
@@ -304,7 +415,23 @@ async function animar(ev, v, nuevos) {
       }
       case "cura": numero(refEl(e.a), "+" + e.n, "cura"); Sonido.cura(); await esperar(120); break;
       case "buff": numero(refEl(e.a), `+${e.ataque}/+${e.vida}`, "buff"); await esperar(150); break;
-      case "destruido": { const el = refEl(e.a); if (el) { const c = centro(el); particulas(c.x, c.y, "#b44cff", 20, 70); } break; }
+      case "destruido": {
+        const el = refEl(e.a);
+        if (el && e.fx === "devorar") {
+          // se lo traga Tun Satánico (que acaba de entrar a la mesa: vamos hacia el centro de mi mesa)
+          if (!ev.__gruno) { Sonido.demonio(); ev.__gruno = true; temblar($(".mesa"), true); }
+          const destino = centro(refEl(e.por) || el.closest(".tablero") || el);
+          const o = centro(el);
+          particulas(o.x, o.y, "#7a0010", 14, 40);
+          el.style.zIndex = 30;
+          await el.animate([{ transform: "translate(0,0) scale(1) rotate(0)", filter: "none" },
+            { transform: `translate(${destino.x - o.x}px, ${destino.y - o.y}px) scale(.15) rotate(${Math.random() < 0.5 ? -360 : 360}deg)`, filter: "brightness(.3) sepia(1) hue-rotate(-40deg) saturate(6)" }],
+            { duration: 420, easing: "cubic-bezier(.6,0,.9,.4)" }).finished;
+          el.style.visibility = "hidden";
+          particulas(destino.x, destino.y, "#ff2a2a", 10, 50);
+        } else if (el) { const c = centro(el); particulas(c.x, c.y, "#b44cff", 20, 70); }
+        break;
+      }
       case "muere": {
         const el = refEl(e.uid);
         if (el) {
@@ -347,9 +474,15 @@ async function animar(ev, v, nuevos) {
 // ---------- lo que pasa después de dibujar ----------
 async function despues(ev, v, antes, nuevos) {
   const yo = yoDe(v);
+  let monitos = 0;
   for (const uid of nuevos) {
     const el = refEl(uid);
     if (!el) continue;
+    const inv = ev.find((x) => x.e === "invoca" && x.uid === uid);
+    const c = DB[inv?.carta] || {};
+    if (c.sonido) Sonido.archivo(c.sonido);
+    else if (c.tribu === "tun" && !c.token) Sonido.mono();
+    else if (c.tribu === "tun" && monitos++ < 2) setTimeout(() => Sonido.monito(), monitos * 90);
     Sonido.jugar();
     el.animate([{ transform: "translateY(-50px) scale(1.45)", opacity: 0 }, { transform: "translateY(4px) scale(.95)", opacity: 1, offset: 0.6 },
       { transform: "translateY(0) scale(1)" }], { duration: 380, easing: "cubic-bezier(.3,1.4,.6,1)" });

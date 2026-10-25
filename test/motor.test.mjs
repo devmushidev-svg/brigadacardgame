@@ -85,13 +85,18 @@ for (let k = 0; k < 50; k++) {
 {
   const e = nueva(8); const s = e.turno, r = 1 - s;
   e.j[s].tablero = []; e.j[r].tablero = [];
-  preparar(e, s, ["panama", "cafe"]);
+  preparar(e, s, ["panama"]);
   M.aplicar(e, s, { t: "jugar", uid: "t0" }, db, 0);
-  e.j[s].tablero = [];
-  M.aplicar(e, s, { t: "jugar", uid: "t1" }, db, 0); // cafe: roba 2
-  assert.equal(tuns(e, s), 2, "2 robos = 2 Tun");
+  e.j[s].tablero = []; // Panamá muere: el efecto sigue
   M.aplicar(e, s, { t: "fin" }, db, 0); // el rival roba al empezar
-  assert.equal(tuns(e, r), 1, "el rival tambien recibe su Tun");
+  assert.equal(tuns(e, r), 1, "el rival recibe su Tun");
+  M.aplicar(e, r, { t: "fin" }, db, 0);
+  assert.equal(tuns(e, s), 1, "y yo el mio");
+}
+// --- mazo completo aunque haya pocas cartas diseñadas ---
+for (let k = 0; k < 20; k++) {
+  const e = nueva(300 + k);
+  for (const p of e.j) assert.equal(p.mazo.length + p.mano.filter((c) => c.id !== "moneda" && c.id !== "tun_awarded").length, 20, "mazo de 20");
 }
 // --- Tun Puto: cada Tun que muere pega 1 a un enemigo ---
 {
@@ -108,6 +113,7 @@ for (let k = 0; k < 50; k++) {
   const res = M.aplicar(e, s, { t: "atacar", de: tun.uid, a: "rv" }, db, 0);
   assert.ok(!res.error, res.error);
   assert.ok(res.ev.some((x) => x.e === "dispara"), "Tun Puto se activa");
+  assert.ok(res.ev.some((x) => x.e === "fx" && x.fx === "piedra"), "Tun Puto tira piedra");
   assert.equal(e.j[r].vida + (e.j[r].tablero[0]?.vida ?? 0), antes - 2, "1 del golpe del Tun + 1 de Tun Puto");
 }
 // --- Tun Satánico: se come a los otros Tun y gana +2/+2 por cada uno ---

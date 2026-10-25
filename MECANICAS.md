@@ -12,7 +12,7 @@ Nivel de poder: **absurdo a propósito**, como Hearthstone en sus peores (mejore
 | Maná | sube 1 por turno, máximo 10 |
 | Mano | máximo 10 (si robás con la mano llena, la carta se quema) |
 | Mesa | máximo 7 esbirros por lado |
-| Mazo | 20 cartas: 12 de la clase del héroe + 8 neutrales, al azar |
+| Mazo | 20 cartas: 12 de la clase del héroe + 8 neutrales, al azar. Si no hay neutrales (como ahora), se completa repitiendo las cartas de clase no legendarias |
 | Copias | 2 por carta, **1 si es legendaria** |
 | Mano inicial | el que empieza roba 3, el otro 4 + **La Moneda** |
 | Misión | la misión de tu clase siempre empieza en tu mano |
@@ -86,6 +86,12 @@ Campos: `id`, `nombre`, `coste`, `ataque`, `vida`, `texto`, `arte` (emoji o `/ar
 | `dar_carta` | pone `carta` en tu mano |
 | `global` | crea un efecto permanente con `disparador` y `efectos` |
 | `devorar` | destruye a tus otros esbirros (con `filtro` de tribu) y la carta gana +`ataque`/+`vida` por cada uno |
+
+**Efecto visual (`fx`):** cualquier efecto puede llevar `"fx"` para que el cliente lo dibuje distinto:
+- `"piedra"`: el esbirro tira una piedra en arco al objetivo y revienta en pedazos (Tun Puto)
+- `"devorar"`: los esbirros devorados vuelan girando hacia la carta, con gruñido demoníaco (Tun Satánico)
+
+**Sonidos:** las cartas de Tun suenan a mono al jugarse; los Tun invocados hacen un "uh" corto. Una carta puede llevar `"sonido": "/sonidos/x.mp3"` (archivo en `public/sonidos/`) para usar un audio propio en vez del sintetizado.
 
 **Objetivos:**
 - los elige el jugador con la flecha: `elegido`, `elegido_enemigo`, `elegido_esbirro`, `elegido_aliado`
