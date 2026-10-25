@@ -404,8 +404,10 @@ function aplicarEfectos(estado, s, efectos, elegido, ev, db, fuente, ctx = {}) {
         if (estado.fase !== "jugando") break;
         const c = db[id];
         ev.push({ e: "repite", seat: s, carta: id });
-        if (c.grito) aplicarEfectos(estado, s, c.grito, null, ev, db, null, ctx);
-        if (c.aliento) aplicarEfectos(estado, s, c.aliento, null, ev, db, null, ctx);
+        // como Shudderwock: los efectos salen de Coco Supremo, así que "gana +3/+3" (Cruit Excel) lo buffea a él
+        const f = fuente && buscar(estado, fuente) ? fuente : null;
+        if (c.grito) aplicarEfectos(estado, s, c.grito, null, ev, db, f, ctx);
+        if (c.aliento) aplicarEfectos(estado, s, c.aliento, null, ev, db, f, ctx);
         resolverMuertes(estado, ev, db);
       }
       continue;

@@ -392,6 +392,17 @@ for (let k = 0; k < 20; k++) {
   assert.equal(res.ev.filter((x) => x.e === "repite").length, 2);
   assert.equal(e.j[r].tablero[0].vida, 5, "2 vómitos más");
 }
+{
+  const e = nueva(46, ["cruit", "cruit"]); const s = e.turno;
+  e.j[s].tablero = [];
+  preparar(e, s, ["tarea_uni", "cruit_excel", "coco_supremo"]);
+  M.aplicar(e, s, { t: "jugar", uid: "t0" }, db, 0);
+  M.aplicar(e, s, { t: "jugar", uid: "t1" }, db, 0);
+  e.j[s].mana = 10;
+  M.aplicar(e, s, { t: "jugar", uid: "t2" }, db, 0);
+  const cs = e.j[s].tablero.find((m) => m.id === "coco_supremo");
+  assert.deepEqual([cs.ataque, cs.vida], [10, 8], "el grito de Excel repetido buffea a Coco Supremo (+3/+3 por 1 tarea)");
+}
 
 // --- estrés: miles de partidas con jugadas al azar ---
 let r = 12345;
