@@ -71,6 +71,7 @@ Campos: `id`, `nombre`, `coste`, `ataque`, `vida`, `texto`, `arte` (emoji o `/ar
 | `grito` | grito de batalla: al jugarlo desde la mano |
 | `aliento` | último aliento: al morir |
 | `fin_turno` | al final de cada turno de su dueño |
+| `cuando_ataca_aliado` | `{ "tribu": "tun", "ataque": 1, "vida": 1 }`: cada vez que uno de tus esbirros de esa tribu ataca, gana esos stats antes del golpe |
 | `al_recibir_dano` | cada vez que este esbirro recibe daño (aunque muera por ese golpe) |
 | `cuando_muere` | `{ "tribu": "tun", "efectos": [...] }`: cada vez que muere un esbirro de esa tribu (de cualquier lado) |
 | efecto `global` | por el resto de la partida, aunque la carta muera (ej. `al_robar`) |
@@ -144,6 +145,7 @@ Diseño de Mario. Arquetipo: paladín molesto — llenar la mesa de Tun, buffear
 | **Funeral de Tun** (hechizo legendario) | 10 | — | Un Tun Zombie por cada Tun muerto en la partida; cada uno que no cabe da +1 de ataque o de vida a un Tun al azar | hecho |
 | Tun Zombie (ficha) | — | 1/1 | Lo invoca Funeral de Tun | hecho — **stats provisionales** |
 | **Porque Me Monean** (legendaria) | 7 | 3/5 | Grito: convierte a todos los esbirros del rival en Tun 1/1 | hecho |
+| Tun Amor (sin género) | 5 | 3/5 | Cada vez que uno de tus Tun ataca, gana +1/+1 | hecho |
 | Choza de Monos | 4 | 0/8 | Al final de tu turno, invoca dos Tun | hecho |
 | Tun Satánico | **5** | **3/3** | Grito: destruye a tus otros Tun y gana +2/+2 por cada uno | hecho — **coste y stats provisionales**, falta que Mario los defina |
 

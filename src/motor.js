@@ -682,6 +682,14 @@ export function aplicar(estado, s, accion, db, ahora) {
     if (!puedeAtacar(m)) return { error: m.dormido ? "acaba de entrar, espera un turno" : "no puede atacar" };
     if (!objetivosAtaque(estado, s, m).includes(accion.a)) return { error: m.soloEsbirros && accion.a[0] === "h" ? "con acometida solo puede atacar esbirros este turno" : "tenes que atacar a los de provocar" };
     m.ataques++;
+    // "cuando uno de tus <tribu> ataca": se buffea antes del golpe (ej. Tun Amor)
+    for (const v of [...p.tablero]) {
+      const ca = db[v.id]?.cuando_ataca_aliado;
+      if (!ca || v.vida <= 0 || (ca.tribu && m.tribu !== ca.tribu)) continue;
+      ev.push({ e: "dispara", uid: v.uid, por: "ataque" });
+      m.ataque += ca.ataque || 0; m.vida += ca.vida || 0; m.vidaMax += ca.vida || 0;
+      ev.push({ e: "buff", a: m.uid, ataque: ca.ataque || 0, vida: ca.vida || 0 });
+    }
     chocar(estado, m.uid, accion.a, ev);
     resolverMuertes(estado, ev, db);
     return { ev };

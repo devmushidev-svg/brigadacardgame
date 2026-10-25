@@ -279,6 +279,19 @@ for (let k = 0; k < 20; k++) {
   assert.deepEqual(e.j[r].tablero.map((m) => [m.id, m.ataque, m.vida, !!m.provocar]), [["tun", 1, 1, false], ["tun", 1, 1, false]]);
 }
 
+// --- Tun Amor: tus Tun ganan +1/+1 al atacar ---
+{
+  const e = nueva(37); const s = e.turno, r = 1 - s;
+  e.j[s].tablero = []; e.j[r].tablero = [];
+  preparar(e, s, ["tun_amor"]);
+  M.aplicar(e, s, { t: "jugar", uid: "t0" }, db, 0);
+  M.aplicar(e, s, { t: "poder" }, db, 0);
+  const tun = e.j[s].tablero.find((m) => m.id === "tun"); tun.dormido = false;
+  const v = e.j[r].vida;
+  M.aplicar(e, s, { t: "atacar", de: tun.uid, a: "h" + r }, db, 0);
+  assert.equal(e.j[r].vida, v - 2, "el Tun pega con 2"); assert.equal(tun.vida, 2);
+}
+
 // --- estrés: miles de partidas con jugadas al azar ---
 let r = 12345;
 const rand = () => ((r = (r * 1103515245 + 12345) >>> 0) / 4294967296);

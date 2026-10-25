@@ -478,6 +478,23 @@
      "carta": "tun"
     }
    ]
+  },
+  {
+   "id": "tun_amor",
+   "nombre": "Tun Amor",
+   "tipo": "esbirro",
+   "coste": 5,
+   "ataque": 3,
+   "vida": 5,
+   "tribu": "tun",
+   "clase": "tun",
+   "arte": "/arte/tun_amor.webp",
+   "texto": "Cada vez que uno de tus Tun ataca, gana +1/+1.",
+   "cuando_ataca_aliado": {
+    "tribu": "tun",
+    "ataque": 1,
+    "vida": 1
+   }
   }
  ],
  "heroes": [
