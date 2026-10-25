@@ -423,6 +423,8 @@ for (let k = 0; k < 20; k++) {
   assert.ok(res.ev.some((x) => x.e === "se_lanza"), "el rival robó una caca al empezar su turno");
   assert.equal(e.j[r].vida, vr - 8 - 3, "8 robados + 3 de la caca");
   assert.equal(e.j[r].mano.length, mr + 1, "la caca no va a la mano, roba otra");
+  e.j[s].vida = 29; e.turno = s; M.aplicar(e, s, { t: "fin" }, db, 0);
+  assert.ok(e.j[s].vida > 30 && e.j[s].vidaMax === e.j[s].vida, "robar vida suma, pasa de 30");
 }
 
 // --- estrés: miles de partidas con jugadas al azar ---

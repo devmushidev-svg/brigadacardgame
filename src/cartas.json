@@ -774,7 +774,7 @@
    "tribu": "cruit",
    "clase": "cruit",
    "arte": "/arte/cruit_sangre.webp",
-   "texto": "Al final de tu turno, le roba 3 de vida al enemigo con menos vida y se la da a tu héroe.",
+   "texto": "Al final de tu turno, le roba 3 de vida al enemigo con menos vida y se la suma a tu héroe.",
    "fin_turno": [
     {
      "tipo": "robar_vida",
@@ -789,8 +789,8 @@
    "genero": "no_binario",
    "tipo": "esbirro",
    "coste": 5,
-   "ataque": 4,
-   "vida": 4,
+   "ataque": 3,
+   "vida": 3,
    "tribu": "cruit",
    "clase": "cruit",
    "arte": "/arte/cruit_vampiro.webp",

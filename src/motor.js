@@ -433,7 +433,7 @@ function aplicarEfectos(estado, s, efectos, elegido, ev, db, fuente, ctx = {}) {
       continue;
     }
     if (ef.tipo === "robar_vida") {
-      // daño que cura a tu héroe; cada Cruit Vampiro en tu mesa suma +1 (aumenta_robo_vida)
+      // daño que se suma a la vida de tu héroe; cada Cruit Vampiro en tu mesa suma +1 (aumenta_robo_vida)
       const extra = estado.j[s].tablero.filter((m) => m.vida > 0).reduce((t, m) => t + (db[m.id]?.aumenta_robo_vida || 0), 0);
       for (const ref of objetivos(estado, s, ef, elegido, fuente)) {
         const t = buscar(estado, ref);
@@ -442,7 +442,12 @@ function aplicarEfectos(estado, s, efectos, elegido, ev, db, fuente, ctx = {}) {
         ev.push({ e: "fx", fx: "sangre", de: ref, a: "h" + s });
         danar(estado, ref, n + extra, ev);
         const quitado = escudo ? 0 : Math.max(0, antes - t.obj.vida);
-        if (quitado) curar(estado, "h" + s, quitado, ev);
+        if (quitado) {
+          // robar vida SUMA: puede pasar de 30 (sube la vida máxima)
+          const h = estado.j[s];
+          h.vida += quitado; h.vidaMax = Math.max(h.vidaMax, h.vida);
+          ev.push({ e: "cura", a: "h" + s, n: quitado });
+        }
       }
       continue;
     }

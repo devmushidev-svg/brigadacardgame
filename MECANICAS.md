@@ -97,7 +97,7 @@ Campos: `id`, `nombre`, `coste`, `ataque`, `vida`, `texto`, `arte` (emoji o `/ar
 | `atraer_ataques` | tus otros esbirros (del `filtro`) atacan a esta carta, uno por uno, con choque normal |
 | `repetir_jugados` | repite los gritos y últimos alientos de las cartas del `filtro` que jugaste esta partida, en orden (Coco Supremo). Como Shudderwock: los efectos salen de quien los repite, así que un "gana +3/+3" lo buffea a él |
 | `barajar` | mete N copias de `carta` en lugares al azar del mazo (`lado: "enemigo"` = del rival) |
-| `robar_vida` | daño que cura a tu héroe lo que quitó; cada esbirro tuyo con `aumenta_robo_vida` suma ese número (Cruit Vampiro) |
+| `robar_vida` | daño que se **suma** a la vida de tu héroe (puede pasar de 30, sube la vida máxima); cada esbirro tuyo con `aumenta_robo_vida` suma ese número (Cruit Vampiro) |
 | `moneda` | 50/50: aplica `cara` o `cruz` (listas de efectos) con animación de moneda |
 | `pelea` | como Pelea de Hearthstone: todos los esbirros hacen parkour y solo uno al azar sobrevive |
 | `activar` | si el esbirro elegido es de la tribu del `filtro` (Cruit), repite su grito de batalla y su último aliento |
@@ -192,7 +192,7 @@ Diseño de Mario. Marco azul (provisional). Cruit es no binario: toda carta con 
 | **Coco Supremo** ⚧ (legendaria) | 9 | 7/5 | Grito: repite los gritos y últimos alientos de todos los Cruit que jugaste esta partida | hecho |
 | Estreñido Cruit ⚧ | 1 | 2/3 | Grito: mete 3 Cacas en el mazo del rival (al robarlas: 3 de daño y roba otra) | hecho |
 | Cruit Sangre ⚧ | 2 | 2/3 | Al final de tu turno, roba 3 de vida al enemigo con menos vida | hecho |
-| Cruit Vampiro ⚧ | 5 | **4/4** | Tus Cruit roban +1 de vida. Grito: invoca 2 Cruit Sangre | hecho — **stats provisionales** |
+| Cruit Vampiro ⚧ | 5 | 3/3 | Tus Cruit roban +1 de vida. Grito: invoca 2 Cruit Sangre | hecho |
 | Caca (ficha) | 0 | — | Se lanza al robarla: 3 de daño a quien la roba y roba otra | hecho |
 | Elliot Cruit ⚧ (tribu Cruit, Forsaken) | 2 | 2/2 | Al final de tu turno, una pizza cura 3 a un aliado herido al azar | hecho |
 | Chance Cruit ⚧ (tribu Cruit, Forsaken) | 3 | 3/3 | Grito: moneda. Cara: 6 de daño a un enemigo al azar. Cruz: 3 de daño a tu héroe | hecho |
