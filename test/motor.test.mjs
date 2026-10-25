@@ -412,7 +412,7 @@ for (let k = 0; k < 20; k++) {
   const mazo = e.j[r].mazo.length;
   M.aplicar(e, s, { t: "jugar", uid: "t0" }, db, 0);
   assert.equal(e.j[r].mazo.length, mazo + 3);
-  e.j[r].mazo.unshift("caca");
+  e.j[r].mazo = ["caca", "mauro_sosa", "mauro_sosa"]; // mazo fijo para que la cuenta no dependa del azar
   M.aplicar(e, s, { t: "jugar", uid: "t1" }, db, 0);
   assert.equal(e.j[s].tablero.filter((m) => m.id === "cruit_sangre").length, 2);
   e.j[s].vida = 20;
@@ -467,6 +467,17 @@ for (let k = 0; k < 20; k++) {
   const cv = e.j[s].tablero[0]; cv.dormido = false;
   M.aplicar(e, s, { t: "atacar", de: cv.uid, a: "rv" }, db, 0);
   assert.deepEqual(e.j[s].tablero.map((m) => [m.id, m.ataque, m.vida]), [["verity", 6, 6]]);
+}
+
+// --- Unislop: 3 tareas distintas; cuentan para Cruit Excel ---
+{
+  const e = nueva(51, ["cruit", "cruit"]); const s = e.turno;
+  e.j[s].tablero = [];
+  preparar(e, s, ["unislop"]);
+  M.aplicar(e, s, { t: "jugar", uid: "t0" }, db, 0);
+  const tareas = e.j[s].mano.filter((c) => db[c.id].etiquetas?.includes("tarea_util"));
+  assert.equal(new Set(tareas.map((c) => c.id)).size, 3);
+  for (const id of Object.keys(db).filter((k) => db[k].etiquetas?.includes("tarea_util"))) assert.ok(db[id].token && db[id].efectos.length, id);
 }
 
 // --- estrés: miles de partidas con jugadas al azar ---

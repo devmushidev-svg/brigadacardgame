@@ -536,6 +536,12 @@ function aplicarEfectos(estado, s, efectos, elegido, ev, db, fuente, ctx = {}) {
       }
       continue;
     }
+    if (ef.tipo === "dar_azar") {
+      // N cartas distintas al azar de las que cumplen el filtro (ej. Unislop: 3 tareas universitarias)
+      const lista = Object.values(db).filter((c) => cumpleFiltro(c, ef.filtro)).map((c) => c.id);
+      for (let k = 0; k < n && lista.length; k++) darCarta(estado, s, lista.splice(Math.floor(azar(estado) * lista.length), 1)[0], ev);
+      continue;
+    }
     if (ef.tipo === "dar_carta") { for (let k = 0; k < n; k++) darCarta(estado, s, ef.carta, ev); continue; }
     if (ef.tipo === "devorar") {
       // destruye a tus otros esbirros (de la tribu del filtro) y gana stats por cada uno

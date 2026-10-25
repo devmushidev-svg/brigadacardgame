@@ -905,6 +905,218 @@
    "token": true,
    "arte": "/arte/verity.webp",
    "texto": "Tu amigo ayudante. Ya no tan amigo."
+  },
+  {
+   "id": "unislop",
+   "nombre": "Unislop",
+   "tipo": "esbirro",
+   "coste": 4,
+   "ataque": 3,
+   "vida": 3,
+   "rareza": "legendaria",
+   "clase": "cruit",
+   "arte": "🎓",
+   "texto": "Grito de batalla: obtenés 3 tareas universitarias distintas al azar.",
+   "grito": [
+    {
+     "tipo": "dar_azar",
+     "filtro": {
+      "etiqueta": "tarea_util"
+     },
+     "cantidad": 3
+    }
+   ]
+  },
+  {
+   "id": "t_ensayo",
+   "nombre": "Ensayo",
+   "tipo": "hechizo",
+   "coste": 1,
+   "clase": "cruit",
+   "token": true,
+   "etiquetas": [
+    "tarea",
+    "tarea_util"
+   ],
+   "arte": "📝",
+   "texto": "Tarea. Robás 2 cartas.",
+   "efectos": [
+    {
+     "tipo": "robar",
+     "cantidad": 2
+    }
+   ]
+  },
+  {
+   "id": "t_exposicion",
+   "nombre": "Exposición",
+   "tipo": "hechizo",
+   "coste": 2,
+   "clase": "cruit",
+   "token": true,
+   "etiquetas": [
+    "tarea",
+    "tarea_util"
+   ],
+   "arte": "🎤",
+   "texto": "Tarea. Invoca 2 Cocos.",
+   "efectos": [
+    {
+     "tipo": "invocar",
+     "carta": "coco",
+     "cantidad": 2
+    }
+   ]
+  },
+  {
+   "id": "t_examen",
+   "nombre": "Examen Sorpresa",
+   "tipo": "hechizo",
+   "coste": 2,
+   "clase": "cruit",
+   "token": true,
+   "etiquetas": [
+    "tarea",
+    "tarea_util"
+   ],
+   "arte": "❗",
+   "texto": "Tarea. Inflige 3 de daño a un esbirro.",
+   "efectos": [
+    {
+     "tipo": "dano",
+     "objetivo": "elegido_esbirro",
+     "cantidad": 3
+    }
+   ]
+  },
+  {
+   "id": "t_proyecto",
+   "nombre": "Proyecto Grupal",
+   "tipo": "hechizo",
+   "coste": 3,
+   "clase": "cruit",
+   "token": true,
+   "etiquetas": [
+    "tarea",
+    "tarea_util"
+   ],
+   "arte": "👥",
+   "texto": "Tarea. Dale +2/+2 a tus esbirros.",
+   "efectos": [
+    {
+     "tipo": "buff",
+     "objetivo": "aliados",
+     "ataque": 2,
+     "vida": 2
+    }
+   ]
+  },
+  {
+   "id": "t_laboratorio",
+   "nombre": "Laboratorio",
+   "tipo": "hechizo",
+   "coste": 1,
+   "clase": "cruit",
+   "token": true,
+   "etiquetas": [
+    "tarea",
+    "tarea_util"
+   ],
+   "arte": "🧪",
+   "texto": "Tarea. Obtenés 2 Leches.",
+   "efectos": [
+    {
+     "tipo": "dar_carta",
+     "carta": "leche",
+     "cantidad": 2
+    }
+   ]
+  },
+  {
+   "id": "t_tesis",
+   "nombre": "Tesis",
+   "tipo": "hechizo",
+   "coste": 4,
+   "clase": "cruit",
+   "token": true,
+   "etiquetas": [
+    "tarea",
+    "tarea_util"
+   ],
+   "arte": "📚",
+   "texto": "Tarea. Inflige 6 de daño a un enemigo.",
+   "efectos": [
+    {
+     "tipo": "dano",
+     "objetivo": "elegido_enemigo",
+     "cantidad": 6
+    }
+   ]
+  },
+  {
+   "id": "t_pps",
+   "nombre": "Práctica Profesional",
+   "tipo": "hechizo",
+   "coste": 2,
+   "clase": "cruit",
+   "token": true,
+   "etiquetas": [
+    "tarea",
+    "tarea_util"
+   ],
+   "arte": "💼",
+   "texto": "Tarea. Invoca un Cruit al azar.",
+   "efectos": [
+    {
+     "tipo": "invocar",
+     "azar": {
+      "tribu": "cruit"
+     },
+     "cantidad": 1
+    }
+   ]
+  },
+  {
+   "id": "t_excel",
+   "nombre": "Hoja de Cálculo",
+   "tipo": "hechizo",
+   "coste": 1,
+   "clase": "cruit",
+   "token": true,
+   "etiquetas": [
+    "tarea",
+    "tarea_util"
+   ],
+   "arte": "📊",
+   "texto": "Tarea. Dale +3/+3 a un esbirro.",
+   "efectos": [
+    {
+     "tipo": "buff",
+     "objetivo": "elegido_esbirro",
+     "ataque": 3,
+     "vida": 3
+    }
+   ]
+  },
+  {
+   "id": "t_desvelada",
+   "nombre": "Desvelada",
+   "tipo": "hechizo",
+   "coste": 0,
+   "clase": "cruit",
+   "token": true,
+   "etiquetas": [
+    "tarea",
+    "tarea_util"
+   ],
+   "arte": "☕",
+   "texto": "Tarea. Ganás 2 de maná este turno.",
+   "efectos": [
+    {
+     "tipo": "mana",
+     "cantidad": 2
+    }
+   ]
   }
  ],
  "heroes": [

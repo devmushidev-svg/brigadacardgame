@@ -98,6 +98,7 @@ Campos: `id`, `nombre`, `coste`, `ataque`, `vida`, `texto`, `arte` (emoji o `/ar
 | `repetir_jugados` | repite los gritos y últimos alientos de las cartas del `filtro` que jugaste esta partida, en orden (Coco Supremo). Como Shudderwock: los efectos salen de quien los repite, así que un "gana +3/+3" lo buffea a él |
 | `barajar` | mete N copias de `carta` en lugares al azar del mazo (`lado: "enemigo"` = del rival) |
 | `robar_vida` | daño que se **suma** a la vida de tu héroe (puede pasar de 30, sube la vida máxima); cada esbirro tuyo con `aumenta_robo_vida` suma ese número (Cruit Vampiro) |
+| `dar_azar` | te da N cartas distintas al azar de las que cumplen el `filtro` (Unislop) |
 | `moneda` | 50/50: aplica `cara` o `cruz` (listas de efectos) con animación de moneda |
 | `pelea` | como Pelea de Hearthstone: todos los esbirros hacen parkour y solo uno al azar sobrevive |
 | `activar` | si el esbirro es de la tribu del `filtro` (Cruit), repite su grito de batalla y su último aliento. Un esbirro que ya se está activando no se vuelve a activar (evita bucles) |
@@ -199,10 +200,25 @@ Diseño de Mario. Marco azul (provisional). Cruit es no binario: toda carta con 
 | **Cruit Vaca** ⚧ (legendaria) | 4 | 3/4 | Grito: una Leche a cada uno de tus otros esbirros (+1/+1 y activa a los Cruit) | hecho |
 | **Cruit Verity** ⚧ (legendaria) | 3 | 3/1 | Último aliento: invoca a Verity 6/6 | hecho |
 | Verity ⚧ (ficha, forma monstruosa) | 6 | 6/6 | — | hecho |
+| **Unislop** (legendaria) | 4 | 3/3 | Grito: obtenés 3 tareas universitarias distintas al azar | hecho — **falta imagen y género** |
 | Elliot Cruit ⚧ (tribu Cruit, Forsaken) | 2 | 2/2 | Al final de tu turno, una pizza cura 3 a un aliado herido al azar | hecho |
 | Chance Cruit ⚧ (tribu Cruit, Forsaken) | 3 | 3/3 | Grito: moneda. Cara: 6 de daño a un enemigo al azar. Cruz: 3 de daño a tu héroe | hecho |
 
 Sin mazo armado, el héroe sale al azar.
+
+### Tareas universitarias (fichas de Unislop, etiqueta Tarea: cuentan para Cruit Excel)
+
+| Tarea | Coste | Efecto |
+|---|---|---|
+| Ensayo 📝 | 1 | Robás 2 cartas |
+| Exposición 🎤 | 2 | Invoca 2 Cocos |
+| Examen Sorpresa ❗ | 2 | 3 de daño a un esbirro |
+| Proyecto Grupal 👥 | 3 | +2/+2 a tus esbirros |
+| Laboratorio 🧪 | 1 | Obtenés 2 Leches |
+| Tesis 📚 | 4 | 6 de daño a un enemigo |
+| Práctica Profesional 💼 | 2 | Invoca un Cruit al azar |
+| Hoja de Cálculo 📊 | 1 | +3/+3 a un esbirro |
+| Desvelada ☕ | 0 | +2 de maná este turno |
 
 ## Pendiente de agregar al motor (ideas en discusión)
 
