@@ -428,7 +428,7 @@ const ruta = location.pathname;
 cargarCartas().then(() => {
   if (ruta.startsWith("/p/")) pantallaPartida(ruta.slice(3).replace(/\/$/, ""));
   else if (ruta.startsWith("/cartas")) pantallaColeccion();
-  else if (ruta.startsWith("/mazos")) pantallaMazos();
+  else if (ruta.startsWith("/mazos") && MAZOS_ACTIVOS) pantallaMazos();
   else pantallaLobby();
 });
 
@@ -440,14 +440,17 @@ async function cargarCartas() {
   } catch { toast("no cargaron las cartas"); }
 }
 
+// "Mis mazos" todavía no está habilitado: todos juegan con el mazo meta de su héroe
+const MAZOS_ACTIVOS = false;
+
 function pantallaLobby() {
   app.innerHTML = `<div class="lobby"><div class="lobby-caja">
     <h1 class="logo">PUTO<small>CARTAS</small></h1>
     <input id="nombre" maxlength="20" placeholder="tu nombre" value="${esc(localStorage.getItem("nombre") || "")}">
-    <label class="elige-mazo">Mazo: <select id="mazo">${opcionesMazo()}</select></label>
+    ${MAZOS_ACTIVOS ? `<label class="elige-mazo">Mazo: <select id="mazo">${opcionesMazo()}</select></label>` : ""}
     <button class="boton" id="crear">Crear partida</button>
     <button class="boton" id="bot">Jugar contra el bot</button>
-    <button class="boton sec" id="mazos">Mis mazos</button>
+    ${MAZOS_ACTIVOS ? `<button class="boton sec" id="mazos">Mis mazos</button>` : ""}
     <button class="boton sec" id="ver">Ver cartas</button>
     <div class="ayuda">Creás la partida y le pasás el link a tu rival, o practicás contra el bot.</div>
   </div></div>`;
@@ -461,8 +464,10 @@ function pantallaLobby() {
   $("#crear").onclick = () => crear(false);
   $("#bot").onclick = () => crear(true);
   $("#ver").onclick = () => (location.href = "/cartas");
-  $("#mazos").onclick = () => (location.href = "/mazos");
-  $("#mazo").onchange = (e) => guardarLS("mazoActivo", e.target.value);
+  if (MAZOS_ACTIVOS) {
+    $("#mazos").onclick = () => (location.href = "/mazos");
+    $("#mazo").onchange = (e) => guardarLS("mazoActivo", e.target.value);
+  }
 }
 
 // ================= mazos armados (se guardan en este navegador) =================
@@ -636,7 +641,7 @@ function conectar() {
   ws.onopen = () => {
     intentos = 0;
     ws.send(JSON.stringify({ t: "hola", token: localStorage.getItem("tok_" + PID), nombre: localStorage.getItem("nombre"),
-      bot: new URLSearchParams(location.search).has("bot"), mazo: mazoActivo() }));
+      bot: new URLSearchParams(location.search).has("bot"), mazo: MAZOS_ACTIVOS ? mazoActivo() : null }));
   };
   ws.onmessage = (m) => {
     const d = JSON.parse(m.data);

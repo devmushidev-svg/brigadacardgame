@@ -129,7 +129,8 @@ export function empezar(estado, db, ahora, heroes = {}) {
     const h = heroes[p.heroe] || (lista.length ? elegir(estado, lista) : null); // sin mazo elegido: héroe al azar
     p.heroe = h ? h.id : null;
     p.poder = h?.poder ? copia(h.poder) : null;
-    p.mazo = armarMazo(estado, db, p.heroe, p.mazoElegido?.heroe === p.heroe ? p.mazoElegido.cartas : null);
+    // sin mazo armado se usa el mazo meta del héroe (si tiene), si no uno al azar
+    p.mazo = armarMazo(estado, db, p.heroe, p.mazoElegido?.heroe === p.heroe ? p.mazoElegido.cartas : h?.mazoMeta || null);
   }
   const primero = azar(estado) < 0.5 ? 0 : 1;
   estado.turno = primero;

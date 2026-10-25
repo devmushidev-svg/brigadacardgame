@@ -14,7 +14,7 @@ Meta actual: **100 cartas**. Todos los personajes hasta ahora son hombres salvo 
 | Maná | sube 1 por turno, máximo 10 |
 | Mano | máximo 10 (si robás con la mano llena, la carta se quema) |
 | Mesa | máximo 7 esbirros por lado |
-| Mazo | 20 cartas. Se arma en **Mis mazos** (héroe + cartas de su clase y neutrales; la misión no va, empieza sola en la mano). Sin mazo armado, uno al azar: 12 de clase + 8 neutrales |
+| Mazo | 20 cartas. Por ahora **Mis mazos** está escondido (`MAZOS_ACTIVOS` en `public/app.js`) y cada uno juega con el **mazo meta** de su héroe (`mazoMeta` en `heroes`), con el héroe al azar. Con Mis mazos activo se arma ahí (héroe + cartas de su clase y neutrales; la misión no va, empieza sola en la mano). Sin mazo armado ni meta, uno al azar: 12 de clase + 8 neutrales |
 | Copias | 2 por carta, **1 si es legendaria** |
 | Mano inicial | el que empieza roba 3, el otro 4 + **La Moneda** |
 | Misión | la misión de tu clase siempre empieza en tu mano |
@@ -205,6 +205,14 @@ Diseño de Mario. Marco azul (provisional). Cruit es no binario: toda carta con 
 | Chance Cruit ⚧ (tribu Cruit, Forsaken) | 3 | 3/3 | Grito: moneda. Cara: 6 de daño a un enemigo al azar. Cruz: 3 de daño a tu héroe | hecho |
 
 Sin mazo armado, el héroe sale al azar.
+
+## Mazos meta
+
+**Tun:** 2 Tun Tung Sahur, 2 Plátano, 2 Tunita, 2 Tun Puto, 2 Comida, 2 Choza de Monos, 2 Novia de Tun, 2 Tun Amor, 2 Tun Cool, Porque Me Monean, Funeral de Tun.
+
+**Cruit:** 2 Cruit Tostadora, 2 Estreñido Cruit, 2 Lechero, 2 Leche, 2 Tarea de la U, 2 Cruit Sangre, Chance Cruit, 2 Cruit Baño, Cruit Verity, Cruit Vaca, Unislop, Cruit Excel, Coco Supremo.
+
+Bot contra bot, Cruit le gana a Tun ~94% de las veces (probando otras listas de Tun no pasa del ~15%): la clase Cruit hoy es bastante más fuerte.
 
 ### Tareas universitarias (fichas de Unislop, etiqueta Tarea: cuentan para Cruit Excel)
 

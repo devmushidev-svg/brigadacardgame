@@ -508,3 +508,14 @@ for (let g = 0; g < 2000; g++) {
   ganados[e.ganador === "empate" ? 2 : e.ganador]++;
 }
 console.log(`ok: mecanicas + ${terminadas} partidas al azar, ${(turnosTot / terminadas).toFixed(1)} turnos promedio (max ${maxTurnos}), A/B/empate ${ganados.join("/")}, misiones completadas ${misiones}`);
+
+// --- mazos meta: válidos y se usan cuando no hay mazo armado ---
+for (const h of Object.values(heroes)) {
+  assert.ok(M.validarMazo(db, heroes, { heroe: h.id, cartas: h.mazoMeta }), `mazo meta de ${h.id} valido`);
+  const e = M.crearPartida(db, 9); e.j[0].nombre = "A"; e.j[1].nombre = "B";
+  e.j[0].heroe = h.id;
+  M.empezar(e, db, 0, heroes);
+  const todas = [...e.j[0].mazo, ...e.j[0].mano.map((c) => c.id)].filter((id) => id !== "moneda" && db[id].tipo !== "mision");
+  assert.deepEqual(todas.sort(), h.mazoMeta.slice().sort(), `usa el mazo meta de ${h.id}`);
+}
+console.log("ok: mazos meta");

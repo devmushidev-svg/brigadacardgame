@@ -1121,7 +1121,29 @@
       "cantidad": 1
      }
     ]
-   }
+   },
+   "mazoMeta": [
+    "tun_tung_sahur",
+    "tun_tung_sahur",
+    "platano",
+    "platano",
+    "tunita",
+    "tunita",
+    "tun_puto",
+    "tun_puto",
+    "comida",
+    "comida",
+    "choza_monos",
+    "choza_monos",
+    "novia_tun",
+    "novia_tun",
+    "tun_amor",
+    "tun_amor",
+    "tun_cool",
+    "tun_cool",
+    "porque_me_monean",
+    "funeral_tun"
+   ]
   },
   {
    "id": "cruit",
@@ -1141,7 +1163,29 @@
       "cantidad": 1
      }
     ]
-   }
+   },
+   "mazoMeta": [
+    "cruit_tostadora",
+    "cruit_tostadora",
+    "cruit_estrenido",
+    "cruit_estrenido",
+    "lechero",
+    "lechero",
+    "leche",
+    "leche",
+    "tarea_uni",
+    "tarea_uni",
+    "cruit_sangre",
+    "cruit_sangre",
+    "chance",
+    "cruit_bano",
+    "cruit_bano",
+    "cruit_verity",
+    "cruit_vaca",
+    "unislop",
+    "cruit_excel",
+    "coco_supremo"
+   ]
   }
  ]
 }
