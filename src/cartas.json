@@ -431,11 +431,11 @@
    "id": "funeral_tun",
    "nombre": "Funeral de Tun",
    "tipo": "hechizo",
-   "coste": 8,
+   "coste": 10,
    "rareza": "legendaria",
    "clase": "tun",
    "arte": "/arte/funeral_tun.webp",
-   "texto": "Invoca un Tun Zombie por cada Tun que murió esta partida. Los que no caben le suman sus stats a uno de tus Tun al azar.",
+   "texto": "Invoca un Tun Zombie por cada Tun que murió esta partida. Cada uno que no cabe le da +1 de ataque o de vida a uno de tus Tun al azar.",
    "efectos": [
     {
      "tipo": "invocar_por_muertos",

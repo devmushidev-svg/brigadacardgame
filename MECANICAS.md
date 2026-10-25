@@ -94,7 +94,7 @@ Campos: `id`, `nombre`, `coste`, `ataque`, `vida`, `texto`, `arte` (emoji o `/ar
 | `descubrir` | como Hearthstone: muestra 3 cartas distintas del `filtro` (ej. tribu Tun) y te quedás con una; si se acaba el turno sin elegir, se elige al azar |
 | `atraer_ataques` | tus otros esbirros (del `filtro`) atacan a esta carta, uno por uno, con choque normal |
 | `transformar` | convierte a los esbirros del `objetivo` en `carta` (pierden buffs y claves; quedan en el mismo lugar y del mismo dueño) |
-| `invocar_por_muertos` | invoca `carta` una vez por cada esbirro de la `tribu` que murió en la partida; los que no caben en la mesa le suman sus stats a uno de tus esbirros de esa tribu al azar |
+| `invocar_por_muertos` | invoca `carta` una vez por cada esbirro de la `tribu` que murió en la partida; cada uno que no cabe en la mesa da +1 de ataque o +1 de vida (al azar) a uno de tus esbirros de esa tribu al azar. En la mesa se ve el contador ☠ de Tun muertos, y en la mano la carta dice cuántos van |
 | `mejora_tribu` | por el resto de la partida, tus esbirros de esa `tribu` tienen +`ataque`/+`vida`: los que están en mesa, los de la mano y los que vengan (se ve en la placa del jugador) |
 | `devorar` | destruye a tus otros esbirros (con `filtro` de tribu) y la carta gana +`ataque`/+`vida` por cada uno |
 
@@ -141,7 +141,7 @@ Diseño de Mario. Arquetipo: paladín molesto — llenar la mesa de Tun, buffear
 | Plátano (hechizo) | 1 | — | +2/+2 y provocar a uno de tus Tun | hecho |
 | Tuna (hechizo) | 2 | — | +1 de vida a tus Tun | hecho |
 | Tunita (hechizo) | 2 | — | 1 de daño a un esbirro, +1 por cada Tun que jugaste esta partida | hecho |
-| **Funeral de Tun** (hechizo legendario) | 8 | — | Un Tun Zombie por cada Tun muerto en la partida; los que no caben suman sus stats a un Tun al azar | hecho |
+| **Funeral de Tun** (hechizo legendario) | 10 | — | Un Tun Zombie por cada Tun muerto en la partida; cada uno que no cabe da +1 de ataque o de vida a un Tun al azar | hecho |
 | Tun Zombie (ficha) | — | 1/1 | Lo invoca Funeral de Tun | hecho — **stats provisionales** |
 | **Porque Me Monean** (legendaria) | 7 | 3/5 | Grito: convierte a todos los esbirros del rival en Tun 1/1 | hecho |
 | Choza de Monos | 4 | 0/8 | Al final de tu turno, invoca dos Tun | hecho |

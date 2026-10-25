@@ -714,7 +714,13 @@ function objetivosAtaque(v, s, atacante = null) {
 const puedeAtacar = (m) => !m.noAtaca && m.ataque > 0 && !m.dormido && m.ataques < (m.doble ? 2 : 1);
 // la carta de la mano con su coste real (ej. Tun Cool baja según la mesa)
 const cartaMano = (c) => (DB[c.id] ? { ...DB[c.id], coste: c.coste ?? DB[c.id].coste, ataque: c.ataque ?? DB[c.id].ataque, vida: c.vida ?? DB[c.id].vida,
-  texto: DB[c.id].texto + (c.cantidad != null ? ` (ahora: ${c.cantidad})` : "") } : null);
+  texto: DB[c.id].texto + (c.cantidad != null ? ` (ahora: ${c.cantidad})` : "") + contadorMuertos(DB[c.id]) } : null);
+// cartas que dependen de los Tun muertos muestran cuántos van
+function contadorMuertos(c) {
+  const t = c.descuento?.por === "tribu_muertos" ? c.descuento.tribu : (c.efectos || []).find((e) => e.tipo === "invocar_por_muertos")?.tribu;
+  if (!t || !V) return "";
+  return ` (${t[0].toUpperCase() + t.slice(1)} muertos: ${V.muertosTribu?.[t] || 0})`;
+}
 function jugable(v, c) {
   const p = v.j[v.yo];
   if (!c || c.coste > p.mana) return false;
@@ -779,7 +785,7 @@ function render(v) {
     </div>
     <div class="campo">
       <div class="tablero" data-seat="${riv}">${R.tablero.map((m) => esbirroHTML(m, riv, v)).join("")}</div>
-      <div class="medio">${(v.globales || []).map((g) => `<span class="global" data-carta="${esc(g)}">${artHTML(DB[g]?.arte || "🌐")}</span>`).join("")}<div class="reloj"></div><div class="linea"><div class="cuerda"></div></div><div class="reloj turno-txt">${v.yo < 0 ? "mirando" : ""}</div></div>
+      <div class="medio">${v.muertosTribu?.tun ? `<span class="contador-muertos" title="Tun muertos esta partida (Funeral de Tun, Tun Mastermind)">☠ ${v.muertosTribu.tun}</span>` : ""}${(v.globales || []).map((g) => `<span class="global" data-carta="${esc(g)}">${artHTML(DB[g]?.arte || "🌐")}</span>`).join("")}<div class="reloj"></div><div class="linea"><div class="cuerda"></div></div><div class="reloj turno-txt">${v.yo < 0 ? "mirando" : ""}</div></div>
       <div class="tablero" data-seat="${yo}" id="mi-tablero">${P.tablero.map((m) => esbirroHTML(m, yo, v)).join("")}</div>
     </div>
     <div class="zona yo">

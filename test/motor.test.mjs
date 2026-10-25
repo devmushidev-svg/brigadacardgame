@@ -265,7 +265,7 @@ for (let k = 0; k < 20; k++) {
   M.aplicar(e, s, { t: "jugar", uid: "t0" }, db, 0);
   assert.equal(e.j[s].tablero.length, 7);
   const st = e.j[s].tablero.reduce((t, m) => t + m.ataque + m.vida, 0);
-  assert.equal(st, 20, "7 zombies 1/1 + 3 zombies sumados = 10/10 en total");
+  assert.equal(st, 17, "7 zombies 1/1 (14) + 3 que no caben dan +1 cada uno");
 }
 
 // --- Porque Me Monean: todos los esbirros del rival pasan a Tun 1/1 ---

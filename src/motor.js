@@ -381,16 +381,16 @@ function aplicarEfectos(estado, s, efectos, elegido, ev, db, fuente, ctx = {}) {
       continue;
     }
     if (ef.tipo === "invocar_por_muertos") {
-      // Funeral de Tun: un zombie por cada Tun muerto en la partida; los que no caben
-      // le suman sus stats a uno de tus Tun al azar
+      // Funeral de Tun: un zombie por cada Tun muerto en la partida; cada uno que no cabe
+      // le da +1 de ataque o +1 de vida (al azar) a uno de tus Tun al azar
       const total = estado.muertosTribu?.[ef.tribu] || 0, base = db[ef.carta];
       for (let k = 0; k < total && base; k++) {
         if (invocar(estado, s, ef.carta, ev, db)) continue;
         const mios = estado.j[s].tablero.filter((m) => m.tribu === ef.tribu && m.vida > 0);
         if (!mios.length) break;
-        const m = elegir(estado, mios);
-        m.ataque += base.ataque; m.vida += base.vida; m.vidaMax += base.vida;
-        ev.push({ e: "buff", a: m.uid, ataque: base.ataque, vida: base.vida });
+        const m = elegir(estado, mios), atk = azar(estado) < 0.5;
+        if (atk) m.ataque += 1; else { m.vida += 1; m.vidaMax += 1; }
+        ev.push({ e: "buff", a: m.uid, ataque: atk ? 1 : 0, vida: atk ? 0 : 1 });
       }
       continue;
     }
@@ -712,6 +712,7 @@ export function vista(estado, yo, db0 = {}) {
     yo,
     log: estado.log.slice(-12),
     globales: estado.globales.map((g) => g.origen).filter(Boolean),
+    muertosTribu: estado.muertosTribu || {},
     pendiente: estado.pendiente
       ? { seat: estado.pendiente.seat, tipo: estado.pendiente.tipo,
           opciones: estado.pendiente.seat === yo && estado.pendiente.tipo === "descubrir" ? estado.pendiente.opciones : undefined,
