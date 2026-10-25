@@ -52,7 +52,23 @@ export function costeDe(estado, s, c) {
 const pozo = (db, filtro) => Object.values(db).filter((c) => !c.token && c.tipo === "esbirro" && cumpleFiltro(c, filtro));
 const maxCopias = (c) => (c.rareza === "legendaria" ? 1 : CONFIG.COPIAS_MAX);
 
-function armarMazo(estado, db, clase) {
+// mazo armado por el jugador: héroe válido, 20 cartas de su clase o neutrales, 2 copias (1 si es legendaria)
+export function validarMazo(db, heroes, mazo) {
+  if (!mazo || typeof mazo !== "object" || !Array.isArray(mazo.cartas)) return null;
+  const h = heroes[mazo.heroe];
+  if (!h || mazo.cartas.length !== CONFIG.TAM_MAZO) return null;
+  const copias = {};
+  for (const id of mazo.cartas) {
+    const c = db[id];
+    if (!c || c.token || c.tipo === "mision" || (c.clase && c.clase !== h.id)) return null;
+    copias[id] = (copias[id] || 0) + 1;
+    if (copias[id] > maxCopias(c)) return null;
+  }
+  return { heroe: h.id, cartas: mazo.cartas.slice() };
+}
+
+function armarMazo(estado, db, clase, elegido) {
+  if (elegido) return barajar(estado, elegido.slice());
   const mazo = [];
   const copias = {};
   const meter = (c) => {
@@ -113,7 +129,7 @@ export function empezar(estado, db, ahora, heroes = {}) {
     const h = heroes[p.heroe] || lista[0] || null;
     p.heroe = h ? h.id : null;
     p.poder = h?.poder ? copia(h.poder) : null;
-    p.mazo = armarMazo(estado, db, p.heroe);
+    p.mazo = armarMazo(estado, db, p.heroe, p.mazoElegido?.heroe === p.heroe ? p.mazoElegido.cartas : null);
   }
   const primero = azar(estado) < 0.5 ? 0 : 1;
   estado.turno = primero;

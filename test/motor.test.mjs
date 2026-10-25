@@ -292,6 +292,23 @@ for (let k = 0; k < 20; k++) {
   assert.equal(e.j[r].vida, v - 2, "el Tun pega con 2"); assert.equal(tun.vida, 2);
 }
 
+// --- mazo armado por el jugador ---
+{
+  const ok = { heroe: "tun", cartas: [...Array(10)].flatMap(() => ["tun_puto", "mascotas_tun"]) };
+  assert.ok(!M.validarMazo(db, heroes, ok), "no mas de 2 copias");
+  const cartas = ["tun_puto", "tun_puto", "mascotas_tun", "mascotas_tun", "tun_brawl", "tun_brawl", "comida", "comida", "tuna", "tuna",
+    "tunita", "tunita", "platano", "platano", "tun_cool", "tun_cool", "tun_amor", "tun_amor", "panama", "funeral_tun"];
+  const m = M.validarMazo(db, heroes, { heroe: "tun", cartas });
+  assert.ok(m, "mazo valido");
+  assert.ok(!M.validarMazo(db, heroes, { heroe: "tun", cartas: [...cartas.slice(0, 19), "panama"] }), "legendaria solo 1");
+  assert.ok(!M.validarMazo(db, heroes, { heroe: "tun", cartas: [...cartas.slice(0, 19), "tun"] }), "fichas no");
+  const e = M.crearPartida(db, 5); e.j[0].nombre = "A"; e.j[1].nombre = "B";
+  e.j[0].mazoElegido = m; e.j[0].heroe = "tun";
+  M.empezar(e, db, 0, heroes);
+  const todas = [...e.j[0].mazo, ...e.j[0].mano.map((c) => c.id)].filter((id) => id !== "moneda" && id !== "tun_awarded");
+  assert.deepEqual(todas.sort(), cartas.slice().sort(), "usa el mazo elegido");
+}
+
 // --- estrés: miles de partidas con jugadas al azar ---
 let r = 12345;
 const rand = () => ((r = (r * 1103515245 + 12345) >>> 0) / 4294967296);

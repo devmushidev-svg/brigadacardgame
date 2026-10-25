@@ -137,6 +137,12 @@ export class Partida extends DurableObject {
           this.estado.j[seat].nombre = nombre;
         }
       }
+      // mazo armado por el jugador (si no es válido, se arma uno al azar)
+      if (seat >= 0 && this.estado.fase === "esperando") {
+        const mazo = M.validarMazo(DB, HEROES, msg.mazo);
+        this.estado.j[seat].mazoElegido = mazo;
+        this.estado.j[seat].heroe = mazo ? mazo.heroe : null;
+      }
       ws.serializeAttachment({ seat });
       if (seat >= 0) ws.send(JSON.stringify({ t: "token", token: this.tokens[seat], seat }));
       let ev = [];
@@ -155,9 +161,9 @@ export class Partida extends DurableObject {
       if (this.bot !== null) this.revancha[this.bot] = true;
       let ev = [];
       if (this.revancha[0] && this.revancha[1]) {
-        const nombres = this.estado.j.map((p) => p.nombre);
+        const antes = this.estado.j.map((p) => ({ nombre: p.nombre, mazoElegido: p.mazoElegido || null, heroe: p.mazoElegido?.heroe || null }));
         this.estado = M.crearPartida(DB, crypto.getRandomValues(new Uint32Array(1))[0]);
-        nombres.forEach((n, i) => (this.estado.j[i].nombre = n));
+        antes.forEach((x, i) => Object.assign(this.estado.j[i], x));
         this.revancha = [false, false];
         ev = M.empezar(this.estado, DB, Date.now(), HEROES);
       }

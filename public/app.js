@@ -134,7 +134,7 @@ function cartaHTML(c, { uid = "", clase = "" } = {}) {
   return `<div class="carta ${esH ? "hechizo" : ""} ${c.tipo === "mision" ? "mision" : ""} ${c.rareza === "legendaria" ? "legendaria" : ""} ${clase}" ${uid ? `data-uid="${uid}"` : ""} data-carta="${esc(c.id)}"${marco ? ` style="--marco:${esc(marco)}"` : ""}>
     <div class="arte" style="--fondo:${colorDe(c.arquetipo || c.id)}">${artHTML(c.arte)}</div>
     ${c.contador != null ? `<div class="contador-carta" title="Tun muertos esta partida">☠ ${c.contador}</div>` : ""}
-    <div class="titulo">${esc(c.nombre)}</div>
+    <div class="titulo ${((l) => (l > 19 ? "l4" : l > 15 ? "l3" : l > 12 ? "l2" : ""))((c.nombre || "").length)}">${esc(c.nombre)}</div>
     <div class="texto ${((l) => (l > 115 ? "t4" : l > 85 ? "t3" : l > 50 ? "t2" : ""))((c.texto || "").length)}">${esc(c.texto || "")}</div>
     ${etiqueta ? `<div class="arq">${esc(etiqueta)}</div>` : ""}
     <div class="stat mana ${DB[c.id] && c.coste < DB[c.id].coste ? "rebajado" : ""}">${c.coste}</div>
@@ -335,6 +335,7 @@ const ruta = location.pathname;
 cargarCartas().then(() => {
   if (ruta.startsWith("/p/")) pantallaPartida(ruta.slice(3).replace(/\/$/, ""));
   else if (ruta.startsWith("/cartas")) pantallaColeccion();
+  else if (ruta.startsWith("/mazos")) pantallaMazos();
   else pantallaLobby();
 });
 
@@ -350,8 +351,10 @@ function pantallaLobby() {
   app.innerHTML = `<div class="lobby"><div class="lobby-caja">
     <h1 class="logo">PUTO<small>CARTAS</small></h1>
     <input id="nombre" maxlength="20" placeholder="tu nombre" value="${esc(localStorage.getItem("nombre") || "")}">
+    <label class="elige-mazo">Mazo: <select id="mazo">${opcionesMazo()}</select></label>
     <button class="boton" id="crear">Crear partida</button>
     <button class="boton" id="bot">Jugar contra el bot</button>
+    <button class="boton sec" id="mazos">Mis mazos</button>
     <button class="boton sec" id="ver">Ver cartas</button>
     <div class="ayuda">Creás la partida y le pasás el link a tu rival, o practicás contra el bot.</div>
   </div></div>`;
@@ -365,6 +368,126 @@ function pantallaLobby() {
   $("#crear").onclick = () => crear(false);
   $("#bot").onclick = () => crear(true);
   $("#ver").onclick = () => (location.href = "/cartas");
+  $("#mazos").onclick = () => (location.href = "/mazos");
+  $("#mazo").onchange = (e) => guardarLS("mazoActivo", e.target.value);
+}
+
+// ================= mazos armados (se guardan en este navegador) =================
+const leerLS = (k, def) => { try { return JSON.parse(localStorage.getItem(k)) ?? def; } catch { return def; } };
+const guardarLS = (k, v) => { try { localStorage.setItem(k, JSON.stringify(v)); } catch {} };
+const misMazos = () => leerLS("mazos", []);
+const TAM_MAZO = 20;
+const maxCopias = (c) => (c.rareza === "legendaria" ? 1 : 2);
+// cartas que puede llevar un héroe: las de su clase y las neutrales (sin fichas ni la misión, que va sola a la mano)
+const cartasDe = (heroe) => Object.values(DB).filter((c) => !c.token && c.tipo !== "mision" && (!c.clase || c.clase === heroe))
+  .sort((a, b) => (!!a.clase === !!b.clase ? 0 : a.clase ? -1 : 1) || a.coste - b.coste || a.nombre.localeCompare(b.nombre));
+function mazoValido(m) {
+  if (!m || !HEROES[m.heroe] || m.cartas.length !== TAM_MAZO) return false;
+  const n = {};
+  return m.cartas.every((id) => DB[id] && !DB[id].token && (!DB[id].clase || DB[id].clase === m.heroe) && (n[id] = (n[id] || 0) + 1) <= maxCopias(DB[id]));
+}
+function mazoActivo() {
+  const id = leerLS("mazoActivo", "");
+  const m = misMazos().find((x) => x.id === id);
+  return mazoValido(m) ? { heroe: m.heroe, cartas: m.cartas } : null;
+}
+function opcionesMazo() {
+  const act = leerLS("mazoActivo", "");
+  return `<option value="">Al azar</option>` + misMazos().filter(mazoValido)
+    .map((m) => `<option value="${esc(m.id)}" ${m.id === act ? "selected" : ""}>${esc(m.nombre)} (${esc(HEROES[m.heroe]?.nombre || "")})</option>`).join("");
+}
+
+function pantallaMazos() {
+  const mazos = misMazos(), act = leerLS("mazoActivo", "");
+  app.innerHTML = `<div class="coleccion mazos"><h2>Mis mazos</h2>
+    <div class="lista-mazos">${mazos.map((m) => `<div class="mazo-tile ${m.id === act ? "activo" : ""}" data-id="${esc(m.id)}">
+        <div class="mazo-heroe">${artHTML(HEROES[m.heroe]?.arte)}</div>
+        <div class="mazo-info"><b>${esc(m.nombre)}</b><span>${esc(HEROES[m.heroe]?.nombre || "?")} · ${m.cartas.length}/${TAM_MAZO}${mazoValido(m) ? "" : " · incompleto"}</span></div>
+        <div class="mazo-acc">${mazoValido(m) ? `<button class="mini-btn usar">${m.id === act ? "✔ en uso" : "Usar"}</button>` : ""}
+          <button class="mini-btn editar">Editar</button><button class="mini-btn borrar">🗑</button></div></div>`).join("")
+      || '<div class="ayuda">Todavía no armaste ningún mazo. Sin mazo se juega con uno al azar.</div>'}</div>
+    <div class="botones-mazos"><button class="boton" id="nuevo">Nuevo mazo</button>
+    <button class="boton sec" onclick="location.href='/'">Volver</button></div></div>`;
+  $("#nuevo").onclick = elegirHeroe;
+  $$(".mazo-tile").forEach((t) => {
+    const id = t.dataset.id;
+    $(".editar", t).onclick = () => editorMazo(misMazos().find((m) => m.id === id));
+    $(".borrar", t).onclick = () => confirmar("¿Borrar este mazo?", () => { guardarLS("mazos", misMazos().filter((m) => m.id !== id)); pantallaMazos(); });
+    $(".usar", t) && ($(".usar", t).onclick = () => { guardarLS("mazoActivo", id); toast("este mazo se usa en tus partidas"); pantallaMazos(); });
+  });
+}
+
+function elegirHeroe() {
+  const hs = Object.values(HEROES);
+  if (hs.length === 1) return editorMazo({ id: "m" + Date.now(), nombre: "Mazo de " + hs[0].nombre, heroe: hs[0].id, cartas: [] });
+  app.innerHTML = `<div class="coleccion"><h2>Elegí un héroe</h2><div class="lista-heroes">${hs.map((h) => `<button class="heroe-op" data-h="${esc(h.id)}">
+    <div class="heroe" style="--esb:110px;--fondo:${colorDe(h.id)}"><span class="heroe-arte">${artHTML(h.arte)}</span></div><b>${esc(h.nombre)}</b></button>`).join("")}</div>
+    <button class="boton sec" style="max-width:300px;margin:20px auto" id="volver">Volver</button></div>`;
+  $("#volver").onclick = pantallaMazos;
+  $$(".heroe-op").forEach((b) => (b.onclick = () => editorMazo({ id: "m" + Date.now(), nombre: "Mazo de " + HEROES[b.dataset.h].nombre, heroe: b.dataset.h, cartas: [] })));
+}
+
+function editorMazo(mazo) {
+  mazo = JSON.parse(JSON.stringify(mazo));
+  let filtro = "todas", verLista = false;
+  const h = HEROES[mazo.heroe];
+  const cuenta = (id) => mazo.cartas.filter((x) => x === id).length;
+  const guardar = () => {
+    const todos = misMazos().filter((m) => m.id !== mazo.id);
+    guardarLS("mazos", [...todos, mazo]);
+    if (mazoValido(mazo) && !leerLS("mazoActivo", "")) guardarLS("mazoActivo", mazo.id);
+  };
+  const dibujar = () => {
+    const disponibles = cartasDe(mazo.heroe).filter((c) => filtro === "todas" || (filtro === "clase" ? c.clase : !c.clase) || (filtro.startsWith("m") && (filtro === "m7" ? c.coste >= 7 : c.coste === +filtro.slice(1))));
+    const enMazo = [...new Set(mazo.cartas)].map((id) => DB[id]).filter(Boolean).sort((a, b) => a.coste - b.coste || a.nombre.localeCompare(b.nombre));
+    const curva = [0, 1, 2, 3, 4, 5, 6, 7].map((k) => mazo.cartas.filter((id) => (k === 7 ? DB[id]?.coste >= 7 : DB[id]?.coste === k)).length);
+    const maxC = Math.max(1, ...curva);
+    app.innerHTML = `<div class="editor ${verLista ? "ver-lista" : ""}">
+      <div class="ed-cartas">
+        <div class="ed-filtros">${[["todas", "Todas"], ["clase", h?.nombre || "Clase"], ["neutral", "Neutral"]].map(([k, t]) => `<button class="mini-btn ${filtro === k ? "on" : ""}" data-f="${k}">${esc(t)}</button>`).join("")}
+          ${[0, 1, 2, 3, 4, 5, 6, 7].map((k) => `<button class="gema-filtro ${filtro === "m" + k ? "on" : ""}" data-f="m${k}">${k === 7 ? "7+" : k}</button>`).join("")}</div>
+        <div class="ayuda">Tocá una carta para agregarla. La misión de ${esc(h?.nombre || "tu héroe")} empieza siempre en tu mano, no va en el mazo.</div>
+        <div class="rejilla">${disponibles.map((c) => {
+          const n = cuenta(c.id), lleno = n >= maxCopias(c);
+          return `<div class="ed-op ${lleno ? "lleno" : ""}" data-id="${esc(c.id)}">${cartaHTML(c)}${n ? `<span class="ed-n">${n}/${maxCopias(c)}</span>` : ""}</div>`;
+        }).join("")}</div>
+      </div>
+      <div class="ed-lista">
+        <div class="ed-cab"><div class="mazo-heroe">${artHTML(h?.arte)}</div>
+          <input id="nombre-mazo" maxlength="24" value="${esc(mazo.nombre)}"></div>
+        <div class="ed-filas">${enMazo.map((c) => `<button class="ed-fila ${c.rareza === "legendaria" ? "leg" : ""}" data-id="${esc(c.id)}" style="--arte:url('${/^\//.test(c.arte || "") ? c.arte : ""}')">
+            <span class="ed-coste">${c.coste}</span><span class="ed-nom">${esc(c.nombre)}</span><span class="ed-cant">${c.rareza === "legendaria" ? "★" : cuenta(c.id) > 1 ? "×" + cuenta(c.id) : ""}</span></button>`).join("")
+          || '<div class="ayuda">Vacío. Agregá cartas de la izquierda.</div>'}</div>
+        <div class="ed-curva">${curva.map((n, k) => `<div><i style="height:${(n / maxC) * 100}%"></i><span>${k === 7 ? "7+" : k}</span></div>`).join("")}</div>
+        <div class="ed-total ${mazo.cartas.length === TAM_MAZO ? "listo" : ""}">${mazo.cartas.length}/${TAM_MAZO} cartas</div>
+        <div class="ed-botones"><button class="mini-btn" id="azar">Completar al azar</button><button class="mini-btn" id="vaciar">Vaciar</button></div>
+        <button class="boton" id="listo">Guardar</button>
+      </div>
+      <button class="ed-toggle" id="toggle">${verLista ? "▼ ver cartas" : `▲ mazo ${mazo.cartas.length}/${TAM_MAZO}`}</button>
+    </div>`;
+    $$("[data-f]").forEach((b) => (b.onclick = () => { filtro = filtro === b.dataset.f ? "todas" : b.dataset.f; dibujar(); }));
+    $$(".ed-op").forEach((el) => (el.onclick = () => {
+      const c = DB[el.dataset.id];
+      if (mazo.cartas.length >= TAM_MAZO) return toast(`el mazo ya tiene ${TAM_MAZO} cartas`);
+      if (cuenta(c.id) >= maxCopias(c)) return toast(c.rareza === "legendaria" ? "legendaria: solo 1 copia" : "máximo 2 copias");
+      mazo.cartas.push(c.id); Sonido.carta(); guardar(); dibujar();
+    }));
+    $$(".ed-fila").forEach((b) => (b.onclick = () => { mazo.cartas.splice(mazo.cartas.indexOf(b.dataset.id), 1); guardar(); dibujar(); }));
+    $("#nombre-mazo").onchange = (e) => { mazo.nombre = e.target.value.trim() || "Mazo"; guardar(); };
+    $("#azar").onclick = () => {
+      const pool = cartasDe(mazo.heroe);
+      for (let k = 0; k < 400 && mazo.cartas.length < TAM_MAZO; k++) {
+        const c = pool[Math.floor(Math.random() * pool.length)];
+        if (cuenta(c.id) < maxCopias(c)) mazo.cartas.push(c.id);
+      }
+      guardar(); dibujar();
+    };
+    $("#vaciar").onclick = () => confirmar("¿Vaciar el mazo?", () => { mazo.cartas = []; guardar(); dibujar(); });
+    $("#listo").onclick = () => { mazo.nombre = $("#nombre-mazo").value.trim() || "Mazo"; guardar(); toast(mazoValido(mazo) ? "mazo guardado" : `guardado incompleto (${mazo.cartas.length}/${TAM_MAZO})`); pantallaMazos(); };
+    $("#toggle").onclick = () => { verLista = !verLista; dibujar(); };
+  };
+  guardar();
+  dibujar();
 }
 
 function pantallaColeccion() {
@@ -408,7 +531,7 @@ function conectar() {
   ws.onopen = () => {
     intentos = 0;
     ws.send(JSON.stringify({ t: "hola", token: localStorage.getItem("tok_" + PID), nombre: localStorage.getItem("nombre"),
-      bot: new URLSearchParams(location.search).has("bot") }));
+      bot: new URLSearchParams(location.search).has("bot"), mazo: mazoActivo() }));
   };
   ws.onmessage = (m) => {
     const d = JSON.parse(m.data);
@@ -784,9 +907,9 @@ function render(v) {
       ${cristales(R)}
     </div>
     <div class="campo">
-      <div class="tablero" data-seat="${riv}">${R.tablero.map((m) => esbirroHTML(m, riv, v)).join("")}</div>
+      <div class="tablero" data-seat="${riv}" style="--n:${R.tablero.length}">${R.tablero.map((m) => esbirroHTML(m, riv, v)).join("")}</div>
       <div class="medio">${(v.globales || []).map((g) => `<span class="global" data-carta="${esc(g)}">${artHTML(DB[g]?.arte || "🌐")}</span>`).join("")}<div class="reloj"></div><div class="linea"><div class="cuerda"></div></div><div class="reloj turno-txt">${v.yo < 0 ? "mirando" : ""}</div></div>
-      <div class="tablero" data-seat="${yo}" id="mi-tablero">${P.tablero.map((m) => esbirroHTML(m, yo, v)).join("")}</div>
+      <div class="tablero" data-seat="${yo}" id="mi-tablero" style="--n:${P.tablero.length}">${P.tablero.map((m) => esbirroHTML(m, yo, v)).join("")}</div>
     </div>
     <div class="zona yo">
       <div class="placa"><div class="nombre">${esc(P.nombre)}</div><div class="mazo" title="cartas en el mazo">${P.mazo}</div>${mejorasHTML(P)}</div>
@@ -803,7 +926,10 @@ function render(v) {
     <div class="esquina"><button class="mini-btn" id="log" title="historial">📜</button><button class="mini-btn" id="mudo" title="sonido">${Sonido.mudo ? "🔇" : "🔊"}</button>
       ${v.yo >= 0 && v.fase === "jugando" ? '<button class="mini-btn" id="rendir" title="rendirse">🏳️</button>' : ""}</div>
   </div>`;
-  $("#fin") && ($("#fin").onclick = () => { if (miTurno) { enviar({ t: "fin" }); $("#fin").disabled = true; } });
+  $("#fin") && ($("#fin").onclick = () => {
+    if (!miTurno || recienCerrado() || $(".modal") || gesto?.movio) return;
+    enviar({ t: "fin" }); $("#fin").disabled = true;
+  });
   const bp = $("#poder");
   if (bp) bp.onclick = () => {
     if (!bp.classList.contains("listo")) { if (P.poder) toast(`${P.poder.nombre}: ${P.poder.texto || ""}`, 1800); return; }
@@ -915,8 +1041,10 @@ function mostrarLog() {
   const d = document.createElement("div");
   d.className = "log";
   d.innerHTML = (V.log || []).slice().reverse().map((l) => `<div>${esc(l)}</div>`).join("") || "nada todavía";
-  document.body.append(d);
-  setTimeout(() => addEventListener("pointerdown", () => d.remove(), { once: true }), 0);
+  const capa = document.createElement("div");
+  capa.className = "capa-cierre";
+  capa.onclick = (e) => { e.stopPropagation(); capa.remove(); d.remove(); cerradoEn = Date.now(); };
+  document.body.append(capa, d);
 }
 
 function confirmar(txt, si) {
@@ -970,9 +1098,19 @@ function zoom(idCarta, uid) {
   m.innerHTML = `<div class="modal-caja">${cartaHTML(c, { clase: "grande" })}
     ${puede ? '<button class="boton" id="jugar" style="width:min(56vw,260px)">Jugar</button>' : ""}</div>`;
   document.body.append(m);
-  m.onpointerdown = (e) => { if (e.target === m) m.remove(); };
-  $("#jugar", m) && ($("#jugar", m).onclick = () => { m.remove(); intentarJugar(uid, null, centro(refEl("h" + V.yo))); });
+  const abierto = Date.now();
+  m.onclick = (e) => {
+    e.stopPropagation();
+    if (e.target !== m || Date.now() - abierto < 350) return; // el click del mismo toque que la abrió no la cierra
+    cerrarModal(m);
+  };
+  $("#jugar", m) && ($("#jugar", m).onclick = (e) => { e.stopPropagation(); cerrarModal(m); intentarJugar(uid, null, centro(refEl("h" + V.yo))); });
 }
+// al cerrar algo encima de la mesa, se ignoran los toques un momento (si no, en Android
+// el mismo toque terminaba el turno o jugaba algo que estaba abajo)
+let cerradoEn = 0;
+function cerrarModal(m) { m.remove(); cerradoEn = Date.now(); }
+const recienCerrado = () => Date.now() - cerradoEn < 450;
 
 function intentarJugar(uid, pos, origen, fantasma) {
   const c = DB[V.j[V.yo].mano.find((x) => x.uid === uid)?.id];
@@ -998,7 +1136,7 @@ function posicionEn(x) {
 
 let gesto = null;
 app.addEventListener("pointerdown", (e) => {
-  if (!V || V.fase !== "jugando" || $(".modal")) return;
+  if (!V || V.fase !== "jugando" || $(".modal") || recienCerrado()) return;
   const miTurno = V.turno === V.yo && V.yo >= 0;
 
   // si estamos apuntando con toque: este toque elige el objetivo
@@ -1009,12 +1147,13 @@ app.addEventListener("pointerdown", (e) => {
   }
   const cartaEl = e.target.closest(".mano .carta");
   const esbEl = e.target.closest(".esbirro, .heroe");
-  gesto = { x: e.clientX, y: e.clientY, t: Date.now(), movio: false, cartaEl, esbEl, largo: null };
+  // con el dedo hace falta moverse más para que cuente como arrastre (si no, un toque tembloroso no hacía nada)
+  gesto = { x: e.clientX, y: e.clientY, t: Date.now(), movio: false, cartaEl, esbEl, largo: null, umbral: e.pointerType === "mouse" ? 8 : 16 };
   // mantener presionado = ver carta en grande
   gesto.largo = setTimeout(() => {
     if (gesto && !gesto.movio && !apuntando) {
       const el = gesto.cartaEl || gesto.esbEl;
-      if (el?.dataset.carta) { zoom(el.dataset.carta, null); gesto = null; }
+      if (el?.dataset.carta) { zoom(el.dataset.carta, gesto.cartaEl?.dataset.uid || null); gesto = null; }
     }
   }, 450);
 
@@ -1031,7 +1170,7 @@ app.addEventListener("pointerdown", (e) => {
 
 addEventListener("pointermove", (e) => {
   if (!gesto && !apuntando) return;
-  if (gesto && !gesto.movio && Math.hypot(e.clientX - gesto.x, e.clientY - gesto.y) > 9) {
+  if (gesto && !gesto.movio && Math.hypot(e.clientX - gesto.x, e.clientY - gesto.y) > gesto.umbral) {
     gesto.movio = true;
     clearTimeout(gesto.largo);
     // empezar a arrastrar una carta de la mano
@@ -1109,6 +1248,9 @@ addEventListener("pointerup", (e) => {
   // toque simple sobre una carta de la mano = verla grande (con botón jugar)
   if (g && !g.movio && g.cartaEl && Date.now() - g.t < 450) zoom(g.cartaEl.dataset.carta, g.cartaEl.dataset.uid);
 });
+// que el navegador no arrastre imágenes ni abra el menú de mantener presionado (cortaba el arrastre de cartas)
+addEventListener("dragstart", (e) => e.preventDefault());
+addEventListener("contextmenu", (e) => { if (e.target.closest(".mesa, .modal, .descubrir")) e.preventDefault(); });
 
 // ---------- vista previa al pasar el mouse (PC) ----------
 const conMouse = matchMedia("(hover: hover) and (pointer: fine)").matches;

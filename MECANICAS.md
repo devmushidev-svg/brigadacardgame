@@ -14,7 +14,7 @@ Meta actual: **100 cartas**. Todos los personajes hasta ahora son hombres salvo 
 | Maná | sube 1 por turno, máximo 10 |
 | Mano | máximo 10 (si robás con la mano llena, la carta se quema) |
 | Mesa | máximo 7 esbirros por lado |
-| Mazo | 20 cartas: 12 de la clase del héroe + 8 neutrales, al azar. Si no hay neutrales (como ahora), se completa repitiendo las cartas de clase no legendarias |
+| Mazo | 20 cartas. Se arma en **Mis mazos** (héroe + cartas de su clase y neutrales; la misión no va, empieza sola en la mano). Sin mazo armado, uno al azar: 12 de clase + 8 neutrales |
 | Copias | 2 por carta, **1 si es legendaria** |
 | Mano inicial | el que empieza roba 3, el otro 4 + **La Moneda** |
 | Misión | la misión de tu clase siempre empieza en tu mano |
