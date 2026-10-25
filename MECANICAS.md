@@ -136,7 +136,7 @@ Diseño de Mario. Arquetipo: paladín molesto — llenar la mesa de Tun, buffear
 | Tun Cool | 10 | 6/7 | Cuesta 1 menos por cada otro Tun en el campo (los dos lados) | hecho |
 | Novia de Tun ♀ | 4 | 4/4 | Último aliento: tus Tun tienen +1 de ataque por el resto de la partida | hecho |
 | Tun Mastermind | 25 | 6/3 | Acometida. 1 menos por cada Tun muerto en la partida. Grito: tus Tun tienen +1 de ataque por el resto de la partida | hecho |
-| Comida (hechizo) | 4 | — | Llena tu tablero de Tun 1/1 | hecho |
+| Comida (hechizo) | 3 | — | Invoca 4 Tun 1/1 | hecho |
 | Plátano (hechizo) | 1 | — | +2/+2 y provocar a uno de tus Tun | hecho |
 | Tuna (hechizo) | 2 | — | +1 de vida a tus Tun | hecho |
 | Tunita (hechizo) | 2 | — | 1 de daño a un esbirro, +1 por cada Tun que jugaste esta partida | hecho |

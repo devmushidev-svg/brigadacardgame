@@ -235,7 +235,7 @@ for (let k = 0; k < 20; k++) {
   e.j[s].tablero = [];
   preparar(e, s, ["comida", "platano"]);
   M.aplicar(e, s, { t: "jugar", uid: "t0" }, db, 0);
-  assert.equal(tuns(e, s), 7);
+  assert.equal(tuns(e, s), 4);
   const t = e.j[s].tablero[0].uid;
   assert.ok(!M.aplicar(e, s, { t: "jugar", uid: "t1", objetivo: t }, db, 0).error);
   assert.ok(e.j[s].tablero[0].provocar && e.j[s].tablero[0].ataque === 3);

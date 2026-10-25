@@ -296,15 +296,15 @@
    "id": "comida",
    "nombre": "Comida",
    "tipo": "hechizo",
-   "coste": 4,
+   "coste": 3,
    "clase": "tun",
    "arte": "/arte/comida.webp",
-   "texto": "Llena tu tablero de Tun 1/1.",
+   "texto": "Invoca 4 Tun 1/1.",
    "efectos": [
     {
      "tipo": "invocar",
      "carta": "tun",
-     "cantidad": 7
+     "cantidad": 4
     }
    ]
   },
