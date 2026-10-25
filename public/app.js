@@ -542,11 +542,23 @@ function editorMazo(mazo) {
   dibujar();
 }
 
-function pantallaColeccion() {
-  const cartas = Object.values(DB).filter((c) => !c.token).sort((a, b) => a.coste - b.coste || a.nombre.localeCompare(b.nombre));
-  app.innerHTML = `<div class="coleccion"><h2>Cartas (${cartas.length})</h2>
-    <div class="rejilla">${cartas.map((c) => cartaHTML(c)).join("")}</div>
+// colección filtrada por clase, como Hearthstone: una pestaña por héroe, neutrales y fichas
+function pantallaColeccion(filtro = leerLS("filtroColeccion", "todas")) {
+  const orden = (a, b) => a.coste - b.coste || a.nombre.localeCompare(b.nombre);
+  const grupos = [...Object.values(HEROES).map((h) => ({ k: h.id, t: h.nombre, arte: h.arte, cartas: Object.values(DB).filter((c) => !c.token && c.clase === h.id) })),
+    { k: "neutral", t: "Neutrales", cartas: Object.values(DB).filter((c) => !c.token && !c.clase) },
+    { k: "fichas", t: "Fichas", cartas: Object.values(DB).filter((c) => c.token && c.id !== "moneda") }];
+  grupos.forEach((g) => g.cartas.sort(orden));
+  if (!grupos.some((g) => g.k === filtro)) filtro = "todas";
+  const total = grupos.filter((g) => g.k !== "fichas").reduce((t, g) => t + g.cartas.length, 0);
+  const ver = grupos.filter((g) => (filtro === "todas" ? g.k !== "fichas" : g.k === filtro));
+  app.innerHTML = `<div class="coleccion"><h2>Cartas (${total})</h2>
+    <div class="pestanas">${[{ k: "todas", t: "Todas" }, ...grupos].map((g) => `<button class="pestana ${g.k === filtro ? "on" : ""}" data-k="${g.k}">
+      ${g.arte ? `<span class="pest-arte">${artHTML(g.arte)}</span>` : ""}${esc(g.t)}${g.cartas ? ` <small>${g.cartas.length}</small>` : ""}</button>`).join("")}</div>
+    ${ver.map((g) => `${ver.length > 1 ? `<h3 class="grupo">${esc(g.t)}</h3>` : ""}
+      <div class="rejilla">${g.cartas.map((c) => cartaHTML(c)).join("") || '<div class="ayuda">Todavía no hay cartas.</div>'}</div>`).join("")}
     <button class="boton sec" style="max-width:300px;margin:0 auto 30px" onclick="location.href='/'">Volver</button></div>`;
+  $$(".pestana").forEach((b) => (b.onclick = () => { guardarLS("filtroColeccion", b.dataset.k); pantallaColeccion(b.dataset.k); }));
 }
 
 // ================= partida =================
