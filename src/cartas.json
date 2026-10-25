@@ -32,7 +32,6 @@
   },
   {
    "id": "tun_awarded",
-   "genero": "hombre",
    "nombre": "Tun the Awarded",
    "tipo": "mision",
    "coste": 1,
@@ -254,7 +253,7 @@
    "tribu": "tun",
    "clase": "tun",
    "arte": "/arte/tun_mujer.webp",
-   "texto": "Grito de batalla: tus Tun atacan a este esbirro. Cada vez que recibe daño, inflige 1 de daño a un enemigo al azar.",
+   "texto": "Grito de batalla: tus Tun atacan a este esbirro. Cada vez que recibe daño, inflige 2 de daño a un enemigo al azar.",
    "grito": [
     {
      "tipo": "atraer_ataques",
@@ -267,7 +266,7 @@
     {
      "tipo": "dano",
      "objetivo": "enemigo_azar",
-     "cantidad": 1
+     "cantidad": 2
     }
    ]
   },
@@ -411,6 +410,51 @@
       "por": "tribu_jugados",
       "tribu": "tun"
      }
+    }
+   ]
+  },
+  {
+   "id": "tun_zombie",
+   "nombre": "Tun Zombie",
+   "genero": "hombre",
+   "tipo": "esbirro",
+   "coste": 1,
+   "ataque": 1,
+   "vida": 1,
+   "tribu": "tun",
+   "clase": "tun",
+   "token": true,
+   "arte": "/arte/tun_zombie.webp",
+   "texto": "Volvió del funeral."
+  },
+  {
+   "id": "funeral_tun",
+   "nombre": "Funeral de Tun",
+   "tipo": "hechizo",
+   "coste": 8,
+   "rareza": "legendaria",
+   "clase": "tun",
+   "arte": "/arte/funeral_tun.webp",
+   "texto": "Invoca un Tun Zombie por cada Tun que murió esta partida. Los que no caben le suman sus stats a uno de tus Tun al azar.",
+   "efectos": [
+    {
+     "tipo": "invocar_por_muertos",
+     "tribu": "tun",
+     "carta": "tun_zombie"
+    }
+   ]
+  },
+  {
+   "id": "mascotas_tun",
+   "nombre": "Mascotas de Tun",
+   "tipo": "hechizo",
+   "coste": 2,
+   "arte": "/arte/mascotas_tun.webp",
+   "texto": "Roba 2 cartas.",
+   "efectos": [
+    {
+     "tipo": "robar",
+     "cantidad": 2
     }
    ]
   }

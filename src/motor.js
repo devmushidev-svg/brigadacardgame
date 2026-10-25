@@ -362,6 +362,20 @@ function aplicarEfectos(estado, s, efectos, elegido, ev, db, fuente, ctx = {}) {
       else { estado.pendiente = { seat: s, tipo: "descubrir", opciones: ops }; ev.push({ e: "elegir", seat: s, tipo: "descubrir" }); }
       continue;
     }
+    if (ef.tipo === "invocar_por_muertos") {
+      // Funeral de Tun: un zombie por cada Tun muerto en la partida; los que no caben
+      // le suman sus stats a uno de tus Tun al azar
+      const total = estado.muertosTribu?.[ef.tribu] || 0, base = db[ef.carta];
+      for (let k = 0; k < total && base; k++) {
+        if (invocar(estado, s, ef.carta, ev, db)) continue;
+        const mios = estado.j[s].tablero.filter((m) => m.tribu === ef.tribu && m.vida > 0);
+        if (!mios.length) break;
+        const m = elegir(estado, mios);
+        m.ataque += base.ataque; m.vida += base.vida; m.vidaMax += base.vida;
+        ev.push({ e: "buff", a: m.uid, ataque: base.ataque, vida: base.vida });
+      }
+      continue;
+    }
     if (ef.tipo === "mejora_tribu") {
       // por el resto de la partida: los de esa tribu (en mesa, en mano y los que vengan) ganan stats
       const p = estado.j[s], mej = ((p.mejoras ||= {})[ef.tribu] ||= { ataque: 0, vida: 0 });

@@ -182,7 +182,7 @@ for (let k = 0; k < 20; k++) {
   const mujer = e.j[s].tablero.find((m) => m.id === "tun_mujer");
   assert.equal(mujer.vida, 5, "3 Tun le pegaron 1 cada uno");
   assert.equal(tuns(e, s), 1, "los Tun murieron contra ella (2 de ataque)");
-  assert.equal(e.j[r].vida, vidaRival - 3, "3 golpes = 3 de daño al rival");
+  assert.equal(e.j[r].vida, vidaRival - 6, "3 golpes = 2 de daño cada uno al rival");
 }
 // --- Tun Maestro: 5 Tun al azar, el jugador elige a quién lanza cada uno ---
 {
@@ -254,6 +254,18 @@ for (let k = 0; k < 20; k++) {
   e.j[r].tablero = [{ uid: "rv", id: "x", tribu: null, ataque: 1, vida: 9, vidaMax: 9, ataques: 0 }];
   assert.ok(!M.aplicar(e, s, { t: "jugar", uid: "t3", objetivo: "rv" }, db, 0).error);
   assert.equal(e.j[r].tablero[0].vida, 6);
+}
+
+// --- Funeral de Tun: zombies por cada Tun muerto; los que no caben buffean ---
+{
+  const e = nueva(35); const s = e.turno;
+  e.j[s].tablero = [];
+  preparar(e, s, ["funeral_tun"]);
+  e.muertosTribu = { tun: 10 };
+  M.aplicar(e, s, { t: "jugar", uid: "t0" }, db, 0);
+  assert.equal(e.j[s].tablero.length, 7);
+  const st = e.j[s].tablero.reduce((t, m) => t + m.ataque + m.vida, 0);
+  assert.equal(st, 20, "7 zombies 1/1 + 3 zombies sumados = 10/10 en total");
 }
 
 // --- estrés: miles de partidas con jugadas al azar ---
