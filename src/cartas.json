@@ -651,8 +651,8 @@
   },
   {
    "id": "elliot",
-   "nombre": "Elliot",
-   "genero": "hombre",
+   "nombre": "Elliot Cruit",
+   "genero": "no_binario",
    "tipo": "esbirro",
    "coste": 2,
    "ataque": 2,
@@ -667,12 +667,13 @@
      "cantidad": 3,
      "fx": "pizza"
     }
-   ]
+   ],
+   "tribu": "cruit"
   },
   {
    "id": "chance",
-   "nombre": "Chance",
-   "genero": "hombre",
+   "nombre": "Chance Cruit",
+   "genero": "no_binario",
    "tipo": "esbirro",
    "coste": 3,
    "ataque": 3,

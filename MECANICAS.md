@@ -187,8 +187,8 @@ Diseño de Mario. Marco azul (provisional). Cruit es no binario: toda carta con 
 | Cruit Excel ⚧ (tribu Cruit) | 5 | 2/2 | Grito: +3/+3 por cada Tarea que lanzaste esta partida | hecho |
 | Tarea de la U (hechizo, etiqueta Tarea) | 1 | — | 2 de daño a tu héroe, roba una carta | hecho |
 | **Coco Supremo** ⚧ (legendaria) | 9 | 7/5 | Grito: repite los gritos y últimos alientos de todos los Cruit que jugaste esta partida | hecho |
-| Elliot ♂ (Forsaken) | 2 | 2/2 | Al final de tu turno, una pizza cura 3 a un aliado herido al azar | hecho |
-| Chance ♂ (Forsaken, cuenta como Cruit para la Leche) | 3 | 3/3 | Grito: moneda. Cara: 6 de daño a un enemigo al azar. Cruz: 3 de daño a tu héroe | hecho |
+| Elliot Cruit ⚧ (tribu Cruit, Forsaken) | 2 | 2/2 | Al final de tu turno, una pizza cura 3 a un aliado herido al azar | hecho |
+| Chance Cruit ⚧ (tribu Cruit, Forsaken) | 3 | 3/3 | Grito: moneda. Cara: 6 de daño a un enemigo al azar. Cruz: 3 de daño a tu héroe | hecho |
 
 Sin mazo armado, el héroe sale al azar.
 
