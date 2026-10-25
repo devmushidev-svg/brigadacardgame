@@ -215,7 +215,6 @@
    "ataque": 1,
    "vida": 2,
    "tribu": "tun",
-   "clase": "tun",
    "arte": "/arte/tun_ia.webp",
    "texto": "Grito de batalla: descubre un Tun.",
    "grito": [

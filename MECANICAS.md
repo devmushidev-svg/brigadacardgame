@@ -130,7 +130,6 @@ Diseño de Mario. Arquetipo: paladín molesto — llenar la mesa de Tun, buffear
 | **Tun Maestro del Universo** (legendaria, recompensa) | 5 | 8/8 | Grito: invoca 5 Tun al azar (cualquier Tun del juego) y elegís contra quién se lanza cada uno | hecho |
 | **Panamá** (legendaria) | 1 | 1/1 | Grito: por el resto de la partida, cada vez que un jugador robe, invoca un Tun para él | hecho |
 | Tun Puto | 3 | 1/5 | Cada vez que muere un Tun (de cualquier lado), 1 de daño a un enemigo al azar | hecho |
-| Tun IA | 1 | 1/2 | Grito: descubre un Tun | hecho |
 | Tun Tung Sahur | 1 | 1/1 | Grito: invoca un Tun 1/1 | hecho |
 | Tun Mujer ♀ | 5 | 2/8 | Grito: tus Tun la atacan. Cada vez que recibe daño, 1 de daño a un enemigo al azar | hecho |
 | Tun Cool | 10 | 6/7 | Cuesta 1 menos por cada otro Tun en el campo (los dos lados) | hecho |
@@ -148,6 +147,7 @@ Diseño de Mario. Arquetipo: paladín molesto — llenar la mesa de Tun, buffear
 | Carta | Coste | Stats | Efecto | Estado |
 |---|---|---|---|---|
 | Tun Brawl Stars | 2 | 2/3 | — (tribu Tun: cuenta para la misión y Tun Puto) | hecho |
+| Tun IA | 1 | 1/2 | Grito: descubre un Tun (tribu Tun) | hecho |
 | Mauro Sosa | 2 | 2/3 | Grito: si el rival tiene una mujer en la mano, te la robás | hecho — roba cartas con `"genero": "mujer"` (todavía no hay ninguna) |
 
 ## Animaciones automáticas
