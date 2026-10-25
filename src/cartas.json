@@ -915,7 +915,7 @@
    "vida": 3,
    "rareza": "legendaria",
    "clase": "cruit",
-   "arte": "/arte/unislop-tareas/unislop.svg",
+   "arte": "/arte/unislop.webp",
    "texto": "Grito de batalla: obtenés 3 tareas universitarias distintas al azar.",
    "grito": [
     {
@@ -938,7 +938,7 @@
     "tarea",
     "tarea_util"
    ],
-   "arte": "/arte/unislop-tareas/t_ensayo.svg",
+   "arte": "/arte/t_ensayo.webp",
    "texto": "Tarea. Robás 2 cartas.",
    "efectos": [
     {
@@ -981,7 +981,7 @@
     "tarea",
     "tarea_util"
    ],
-   "arte": "/arte/unislop-tareas/t_examen.svg",
+   "arte": "/arte/t_examen.webp",
    "texto": "Tarea. Destruye un esbirro.",
    "efectos": [
     {
@@ -1070,7 +1070,7 @@
     "tarea",
     "tarea_util"
    ],
-   "arte": "/arte/unislop-tareas/t_excel.svg",
+   "arte": "/arte/t_excel.webp",
    "texto": "Tarea. Dale +3/+3 a un esbirro.",
    "efectos": [
     {
@@ -1092,7 +1092,7 @@
     "tarea",
     "tarea_util"
    ],
-   "arte": "/arte/unislop-tareas/t_desvelada.svg",
+   "arte": "/arte/t_desvelada.webp",
    "texto": "Tarea. Ganás 3 de maná este turno.",
    "efectos": [
     {
