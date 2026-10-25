@@ -1279,7 +1279,7 @@ function guiaTutorial(v) {
     texto = "<b>Tocá una carta de tu mano</b> para verla grande: vas a ver qué hace y qué significa cada número.";
   } else if (!G.verRival && R.tablero.length) {
     foco = refEl(R.tablero[0].uid);
-    texto = "El rival jugó un esbirro. <b>Mantené apretado</b> un esbirro suyo para ver qué hace.";
+    texto = "El rival jugó un esbirro. <b>Tocalo</b> para verlo grande y saber qué hace. Podés hacerlo con cualquier carta del rival que esté en la mesa.";
   } else if (!G.poder && v.numTurno >= 3 && P.poder && !P.poderUsado && P.poder.coste <= P.mana && P.tablero.length < 7) {
     foco = $("#poder");
     texto = `Este círculo es tu <b>poder de héroe</b>. Cada héroe tiene uno distinto y se puede usar <b>una vez por turno</b> pagando su maná. El de Tun cuesta ${P.poder.coste}: ${esc(P.poder.texto || "")} <b>Tocalo.</b>`;
@@ -1669,6 +1669,8 @@ addEventListener("pointerup", (e) => {
 
   // toque simple sobre una carta de la mano = verla grande (con botón jugar)
   if (g && !g.movio && g.cartaEl && Date.now() - g.t < 450) zoom(g.cartaEl.dataset.carta, g.cartaEl.dataset.uid);
+  // toque simple sobre un esbirro del rival = verlo grande
+  else if (g && !g.movio && g.esbEl?.classList.contains("esbirro") && +g.esbEl.dataset.seat !== V.yo && Date.now() - g.t < 450) zoom(g.esbEl.dataset.carta);
 });
 // que el navegador no arrastre imágenes ni abra el menú de mantener presionado (cortaba el arrastre de cartas)
 addEventListener("dragstart", (e) => e.preventDefault());
