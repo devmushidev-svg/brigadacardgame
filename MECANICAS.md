@@ -60,7 +60,9 @@ En el texto de las cartas, las palabras clave salen en **negrita** y al ver la c
 
 ## Tutorial
 
-`/tutorial` (botón **Cómo jugar** en el lobby) explica en 9 pasos: objetivo, maná, cartas, jugar y atacar, poder de héroe, palabras clave, mulligan, misiones y reglas del mazo. Al final ofrece jugar contra el bot.
+**Tutorial** (botón en el lobby): una partida guiada contra el bot. El jugador es Tun y empieza; las cartas salen en un orden fijo (`TUTORIAL` en `src/motor.js`) y el bot es Cruit con un mazo flojo y 12 de vida. No hay mulligan ni misión. Un globo en el medio de la mesa dice qué hacer y la carta, esbirro o botón que hay que usar brilla: jugar esbirros, hechizos, atacar, poder de héroe y terminar turno. Al ganar ofrece jugar contra el bot de verdad.
+
+**Reglas** (`/reglas`): la explicación en texto, en 9 pasos (objetivo, maná, cartas, jugar y atacar, poder de héroe, palabras clave, mulligan, misiones y reglas del mazo).
 
 ## Palabras clave (`claves`)
 

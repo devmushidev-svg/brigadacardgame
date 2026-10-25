@@ -468,7 +468,7 @@ const ruta = location.pathname;
 cargarCartas().then(() => {
   if (ruta.startsWith("/p/")) pantallaPartida(ruta.slice(3).replace(/\/$/, ""));
   else if (ruta.startsWith("/cartas")) pantallaColeccion();
-  else if (ruta.startsWith("/tutorial")) pantallaTutorial();
+  else if (ruta.startsWith("/reglas")) pantallaTutorial();
   else if (ruta.startsWith("/mazos") && MAZOS_ACTIVOS) pantallaMazos();
   else pantallaLobby();
 });
@@ -492,7 +492,8 @@ function pantallaLobby() {
     <button class="boton" id="crear">Crear partida</button>
     <button class="boton" id="bot">Jugar contra el bot</button>
     ${MAZOS_ACTIVOS ? `<button class="boton sec" id="mazos">Mis mazos</button>` : ""}
-    <button class="boton sec ${leerLS("tutorialVisto", false) ? "" : "brilla"}" id="tuto">${leerLS("tutorialVisto", false) ? "Cómo jugar" : "¿Primera vez? Cómo jugar"}</button>
+    <button class="boton sec ${leerLS("tutorialVisto", false) ? "" : "brilla"}" id="tuto">${leerLS("tutorialVisto", false) ? "Tutorial" : "¿Primera vez? Tutorial"}</button>
+    <button class="boton sec" id="reglas">Reglas</button>
     <button class="boton sec" id="ver">Ver cartas</button>
     <div class="ayuda">Creás la partida y le pasás el link a tu rival, o practicás contra el bot.</div>
   </div></div>`;
@@ -506,7 +507,8 @@ function pantallaLobby() {
   $("#crear").onclick = () => crear(false);
   $("#bot").onclick = () => crear(true);
   $("#ver").onclick = () => (location.href = "/cartas");
-  $("#tuto").onclick = () => (location.href = "/tutorial");
+  $("#tuto").onclick = () => empezarTutorial();
+  $("#reglas").onclick = () => (location.href = "/reglas");
   if (MAZOS_ACTIVOS) {
     $("#mazos").onclick = () => (location.href = "/mazos");
     $("#mazo").onchange = (e) => guardarLS("mazoActivo", e.target.value);
@@ -651,7 +653,15 @@ function pantallaColeccion(filtro = leerLS("filtroColeccion", "todas")) {
   $$(".rejilla .carta").forEach((el) => (el.onclick = () => zoom(el.dataset.carta)));
 }
 
-// ================= tutorial: lo básico, paso a paso =================
+// partida guiada contra el bot (ver guiaTutorial)
+async function empezarTutorial() {
+  const n = $("#nombre")?.value.trim() || localStorage.getItem("nombre") || "Novato";
+  localStorage.setItem("nombre", n);
+  const { id } = await (await fetch("/api/crear", { method: "POST" })).json();
+  location.href = "/p/" + id + "?tutorial=1";
+}
+
+// ================= reglas: lo básico, paso a paso =================
 function pantallaTutorial(paso = 0) {
   const ej = (id, extra = {}) => (DB[id] ? cartaHTML({ ...DB[id], ...extra }) : "");
   const pal = (n) => PALABRAS.find((p) => p.n === n);
@@ -704,7 +714,7 @@ function pantallaTutorial(paso = 0) {
     <div class="tuto-puntos">${PASOS.map((_, i) => `<i class="${i === paso ? "on" : ""}" data-i="${i}"></i>`).join("")}</div>
     <div class="tuto-botones">
       <button class="boton sec" id="atras" ${paso ? "" : "disabled"}>Atrás</button>
-      ${ultimo ? '<button class="boton" id="jugar-bot">Jugar contra el bot</button>' : '<button class="boton" id="sig">Siguiente</button>'}
+      ${ultimo ? '<button class="boton" id="jugar-bot">Probar el tutorial</button>' : '<button class="boton" id="sig">Siguiente</button>'}
     </div>
     <button class="mini-btn tuto-salir" onclick="location.href='/'">Salir</button>
   </div></div>`;
@@ -712,11 +722,7 @@ function pantallaTutorial(paso = 0) {
   $("#sig") && ($("#sig").onclick = () => pantallaTutorial(paso + 1));
   $$(".tuto-puntos i").forEach((el) => (el.onclick = () => pantallaTutorial(+el.dataset.i)));
   $$(".tuto-texto .carta").forEach((el) => (el.onclick = () => zoom(el.dataset.carta)));
-  $("#jugar-bot") && ($("#jugar-bot").onclick = async () => {
-    if (!localStorage.getItem("nombre")) localStorage.setItem("nombre", "Novato");
-    const { id } = await (await fetch("/api/crear", { method: "POST" })).json();
-    location.href = "/p/" + id + "?bot=1";
-  });
+  $("#jugar-bot") && ($("#jugar-bot").onclick = empezarTutorial);
 }
 
 // ================= partida =================
@@ -753,7 +759,7 @@ function conectar() {
   ws.onopen = () => {
     intentos = 0;
     ws.send(JSON.stringify({ t: "hola", token: localStorage.getItem("tok_" + PID), nombre: localStorage.getItem("nombre"),
-      bot: new URLSearchParams(location.search).has("bot"), mazo: MAZOS_ACTIVOS ? mazoActivo() : null }));
+      bot: new URLSearchParams(location.search).has("bot"), tutorial: new URLSearchParams(location.search).has("tutorial"), mazo: MAZOS_ACTIVOS ? mazoActivo() : null }));
   };
   ws.onmessage = (m) => {
     const d = JSON.parse(m.data);
@@ -1249,7 +1255,56 @@ function render(v) {
   actualizarReloj();
   pendiente(v);
   mulliganUI(v);
+  guiaTutorial(v);
   if (v.fase === "fin") renderFinal(v);
+}
+
+// ---------- tutorial dentro del juego: un globo dice qué hacer y resalta dónde ----------
+let guiaIntro = false;
+function guiaTutorial(v) {
+  $("#guia")?.remove();
+  if (!v.tutorial || v.yo < 0 || v.fase !== "jugando" || (v.pendiente && v.pendiente.seat === v.yo)) return;
+  const P = v.j[v.yo], R = v.j[1 - v.yo];
+  let texto = "", foco = null, boton = "";
+  if (!guiaIntro) {
+    texto = `<b>¡Bienvenido!</b> Ganás cuando la vida del héroe rival (arriba, <b>${R.vida}</b>) llega a 0. Cada turno tenés <b>maná</b> (los cristales azules) para jugar cartas: empezás con 1 y ganás uno más por turno.`;
+    foco = refEl("h" + (1 - v.yo)); boton = "¡Vamos!";
+  } else if (v.turno !== v.yo) {
+    texto = "Turno del rival. Mirá lo que hace...";
+  } else {
+    const mano = (P.mano || []).map((c) => ({ c, d: cartaMano(c) })).filter((x) => x.d && jugable(v, x.d));
+    const carta = mano.find((x) => x.d.tipo === "esbirro") || mano[0];
+    const atacante = P.tablero.find((m) => puedeAtacar(m) && objetivosAtaque(v, v.yo, m).size);
+    const dormidos = P.tablero.some((m) => m.dormido && !m.carga);
+    const poderListo = P.poder && !P.poderUsado && P.poder.coste <= P.mana && P.tablero.length < 7;
+    if (carta) {
+      const d = carta.d;
+      foco = $(`.mano .carta[data-uid="${carta.c.uid}"]`);
+      texto = d.tipo === "esbirro"
+        ? `<b>Arrastrá ${esc(d.nombre)}</b> a tu mesa. Cuesta <b>${d.coste}</b> de maná (el número azul) y tenés <b>${P.mana}</b>.${d.grito ? " Tiene <b>Grito de batalla</b>: hace algo al jugarlo." : ""}`
+        : pideObjetivo(d) ? `<b>${esc(d.nombre)}</b> es un <b>hechizo</b>: arrastralo sobre el objetivo que quieras.`
+        : `<b>${esc(d.nombre)}</b> es un <b>hechizo</b>: arrastralo hacia arriba para lanzarlo.`;
+      if (v.numTurno >= 3 && !guiaIntro.tip) { guiaIntro.tip = true; texto += " <i>Tip: tocá una carta para verla grande y leer qué hacen sus palabras en negrita.</i>"; }
+    } else if (atacante) {
+      foco = refEl(atacante.uid);
+      const muro = R.tablero.some((m) => m.provocar);
+      texto = `<b>¡A atacar!</b> Arrastrá tu esbirro hasta el <b>héroe rival</b> o hasta un esbirro enemigo. Cuando pelean dos esbirros, <b>los dos se hacen daño</b>.${muro ? " El enemigo tiene <b>Provocar</b>: hay que atacarlo primero." : ""}`;
+    } else if (poderListo) {
+      foco = $("#poder");
+      texto = `<b>Tocá tu poder de héroe</b> (el círculo): ${esc(P.poder.texto || "")} Se usa una vez por turno y cuesta ${P.poder.coste} de maná.`;
+    } else {
+      foco = $("#fin");
+      texto = `No te queda nada por hacer: <b>tocá TERMINAR TURNO</b>.${dormidos ? " Los esbirros recién jugados duermen (zZ) y atacan el turno que viene." : ""}`;
+    }
+  }
+  const g = document.createElement("div");
+  g.id = "guia"; g.className = "guia" + (boton ? " con-boton" : "");
+  g.innerHTML = `<div>${texto}</div>${boton ? `<button class="boton" id="guia-ok">${boton}</button>` : ""}`;
+  app.append(g);
+  const medio = $(".medio");
+  if (medio && !boton) g.style.top = centro(medio).y + "px"; // sobre la línea del medio, entre las dos mesas
+  if (foco) foco.classList.add("guia-foco");
+  if (boton) $("#guia-ok").onclick = () => { guiaIntro = {}; guiaTutorial(V); };
 }
 
 // ---------- mulligan: al empezar, cada uno elige qué cartas de su mano inicial cambiar ----------
@@ -1363,6 +1418,18 @@ function renderEspera(v) {
 
 function renderFinal(v) {
   const gane = v.ganador === v.yo, empate = v.ganador === "empate";
+  if (v.tutorial && v.yo >= 0) {
+    guardarLS("tutorialVisto", true);
+    const m = document.createElement("div");
+    m.className = "modal final";
+    m.innerHTML = `<div class="modal-caja"><h1 class="${gane ? "gano" : "perdio"}">${gane ? "¡TUTORIAL COMPLETO!" : "CASI..."}</h1>
+      <div class="mull-info" style="max-width:340px">${gane ? "Ya sabés jugar. En las partidas de verdad el héroe sale al azar, los mazos son de 30 cartas y al empezar hay <b>mulligan</b>: podés cambiar las cartas que no quieras." : "Esta vez ganó el bot. ¿Otra vez?"}</div>
+      <button class="boton" id="fin-bot">${gane ? "Jugar contra el bot" : "Repetir el tutorial"}</button>
+      <button class="boton sec" onclick="location.href='/'">Salir</button></div>`;
+    app.append(m);
+    $("#fin-bot").onclick = gane ? async () => { const { id } = await (await fetch("/api/crear", { method: "POST" })).json(); location.href = "/p/" + id + "?bot=1"; } : empezarTutorial;
+    return;
+  }
   const pedi = v.yo >= 0 && v.revancha?.[v.yo], rivalPidio = v.yo >= 0 && v.revancha?.[1 - v.yo];
   const m = document.createElement("div");
   m.className = "modal final";

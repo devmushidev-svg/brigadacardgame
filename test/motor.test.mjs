@@ -554,3 +554,16 @@ console.log("ok: mazos meta");
   assert.equal(e.j[p1].manaMax, 1, "empezó el primer turno");
 }
 console.log("ok: mulligan");
+
+// --- tutorial: el jugador empieza con Tun y la mano fija, el bot tiene poca vida, sin mulligan ni misión ---
+{
+  const e = M.crearPartida(db, 3); e.j[0].nombre = "A"; e.j[1].nombre = "Bot";
+  M.empezarTutorial(e, db, 0, heroes);
+  assert.equal(e.fase, "jugando"); assert.equal(e.turno, 0);
+  assert.equal(e.j[0].heroe, "tun"); assert.equal(e.j[1].heroe, "cruit");
+  assert.deepEqual(e.j[0].mano.map((c) => c.id), M.TUTORIAL.jugador.mazo.slice(0, 4), "3 iniciales + la del turno, en orden");
+  assert.equal(e.j[1].vida, M.TUTORIAL.rival.vida);
+  assert.ok(M.vista(e, 0, db).tutorial);
+  for (const t of [M.TUTORIAL.jugador, M.TUTORIAL.rival]) for (const id of t.mazo) assert.ok(db[id], id);
+}
+console.log("ok: tutorial");

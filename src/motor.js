@@ -68,8 +68,8 @@ export function validarMazo(db, heroes, mazo) {
   return { heroe: h.id, cartas: mazo.cartas.slice() };
 }
 
-function armarMazo(estado, db, clase, elegido) {
-  if (elegido) return barajar(estado, elegido.slice());
+function armarMazo(estado, db, clase, elegido, fijo = false) {
+  if (elegido) return fijo ? elegido.slice() : barajar(estado, elegido.slice());
   const mazo = [];
   const copias = {};
   const meter = (c) => {
@@ -132,12 +132,12 @@ export function empezar(estado, db, ahora, heroes = {}, mulligan = true) {
     p.heroe = h ? h.id : null;
     p.poder = h?.poder ? copia(h.poder) : null;
     // sin mazo armado se usa el mazo meta del héroe (si tiene), si no uno al azar
-    p.mazo = armarMazo(estado, db, p.heroe, p.mazoElegido?.heroe === p.heroe ? p.mazoElegido.cartas : h?.mazoMeta || null);
+    p.mazo = armarMazo(estado, db, p.heroe, p.mazoElegido?.heroe === p.heroe ? p.mazoElegido.cartas : h?.mazoMeta || null, !!p.mazoElegido?.fijo);
   }
-  const primero = azar(estado) < 0.5 ? 0 : 1;
+  const primero = estado.tutorial ? 0 : azar(estado) < 0.5 ? 0 : 1;
   estado.turno = primero;
-  // la misión de la clase siempre empieza en la mano
-  for (const s of [primero, otro(primero)]) {
+  // la misión de la clase siempre empieza en la mano (en el tutorial no, para que sea corto)
+  for (const s of estado.tutorial ? [] : [primero, otro(primero)]) {
     const mision = Object.values(db).find((c) => c.tipo === "mision" && c.clase && c.clase === estado.j[s].heroe);
     if (mision) darCarta(estado, s, mision.id, ev);
   }
@@ -151,6 +151,25 @@ export function empezar(estado, db, ahora, heroes = {}, mulligan = true) {
   estado.fase = "mulligan";
   estado.mulligan = [false, false]; // quién ya eligió
   estado.finTurno = ahora + CONFIG.TIEMPO_MULLIGAN * 1000;
+  return ev;
+}
+
+// ---------- tutorial: partida guiada contra el bot, con mazos en orden fijo ----------
+// El jugador (asiento 0) empieza con Tun; el bot tiene un mazo flojo de Cruit y poca vida.
+export const TUTORIAL = {
+  jugador: { heroe: "tun", mazo: ["tun_tung_sahur", "tun_brawl", "platano", "comida", "tunita", "tun_puto", "novia_tun", "tun_amor",
+    "choza_monos", "comida", "tun_brawl", "tun_tung_sahur", "platano", "tunita", "tun_puto"] },
+  rival: { heroe: "cruit", vida: 12, mazo: ["lechero", "tun_brawl", "cruit_tostadora", "elliot", "mauro_sosa", "tun_brawl", "lechero",
+    "elliot", "mauro_sosa", "cruit_tostadora", "tun_brawl", "lechero", "elliot", "mauro_sosa", "cruit_tostadora"] },
+};
+export function empezarTutorial(estado, db, ahora, heroes) {
+  estado.tutorial = true;
+  for (const [s, t] of [[0, TUTORIAL.jugador], [1, TUTORIAL.rival]]) {
+    estado.j[s].heroe = t.heroe;
+    estado.j[s].mazoElegido = { heroe: t.heroe, cartas: t.mazo, fijo: true };
+  }
+  const ev = empezar(estado, db, ahora, heroes, false);
+  estado.j[1].vida = TUTORIAL.rival.vida;
   return ev;
 }
 
@@ -903,6 +922,7 @@ export function vista(estado, yo, db0 = {}) {
     globales: estado.globales.map((g) => g.origen).filter(Boolean),
     muertosTribu: estado.muertosTribu || {},
     mulligan: estado.mulligan || null,
+    tutorial: !!estado.tutorial,
     pendiente: estado.pendiente
       ? { seat: estado.pendiente.seat, tipo: estado.pendiente.tipo,
           opciones: estado.pendiente.seat === yo && estado.pendiente.tipo === "descubrir" ? estado.pendiente.opciones : undefined,

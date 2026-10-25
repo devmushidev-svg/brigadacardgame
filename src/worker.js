@@ -143,10 +143,11 @@ export class Partida extends DurableObject {
       let seat = this.tokens.findIndex((t) => t && t !== "BOT" && t === msg.token);
       const nombre = limpiarNombre(msg.nombre);
       // partida contra el bot: el primero en entrar lo pide, el bot ocupa el otro asiento
-      if (msg.bot && this.estado.fase === "esperando" && !this.tokens[0] && !this.tokens[1] && nombre) {
+      if ((msg.bot || msg.tutorial) && this.estado.fase === "esperando" && !this.tokens[0] && !this.tokens[1] && nombre) {
         this.bot = 1;
         this.tokens[1] = "BOT";
         this.estado.j[1].nombre = "Bot";
+        if (msg.tutorial) this.estado.tutorial = true;
       }
       if (seat < 0 && nombre && this.estado.fase === "esperando") {
         seat = this.tokens.findIndex((t) => !t);
@@ -156,7 +157,7 @@ export class Partida extends DurableObject {
         }
       }
       // mazo armado por el jugador (si no es válido, se arma uno al azar)
-      if (seat >= 0 && this.estado.fase === "esperando") {
+      if (seat >= 0 && this.estado.fase === "esperando" && !this.estado.tutorial) {
         const mazo = M.validarMazo(DB, HEROES, msg.mazo);
         this.estado.j[seat].mazoElegido = mazo;
         this.estado.j[seat].heroe = mazo ? mazo.heroe : null;
@@ -164,7 +165,9 @@ export class Partida extends DurableObject {
       ws.serializeAttachment({ seat });
       if (seat >= 0) ws.send(JSON.stringify({ t: "token", token: this.tokens[seat], seat }));
       let ev = [];
-      if (this.estado.fase === "esperando" && this.tokens[0] && this.tokens[1]) ev = M.empezar(this.estado, DB, Date.now(), HEROES);
+      if (this.estado.fase === "esperando" && this.tokens[0] && this.tokens[1]) {
+        ev = this.estado.tutorial ? M.empezarTutorial(this.estado, DB, Date.now(), HEROES) : M.empezar(this.estado, DB, Date.now(), HEROES);
+      }
       await this.guardar();
       await this.programarAlarma();
       this.difundir(ev);
@@ -174,7 +177,7 @@ export class Partida extends DurableObject {
     if (yo < 0) return; // espectador
 
     if (msg.t === "revancha") {
-      if (this.estado.fase !== "fin") return;
+      if (this.estado.fase !== "fin" || this.estado.tutorial) return;
       this.revancha[yo] = true;
       if (this.bot !== null) this.revancha[this.bot] = true;
       let ev = [];
