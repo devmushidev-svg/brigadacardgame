@@ -409,9 +409,9 @@ function heroeHTML(v, s) {
   const h = HEROES[p.heroe];
   const desc = v.conectados && !v.conectados[s] && v.fase === "jugando";
   const mi = p.mision;
-  return `<div class="heroe ${desc ? "desconectado" : ""}" data-ref="h${s}" data-seat="${s}" style="background:${colorDe(h?.id || p.nombre)}">
+  return `<div class="heroe ${desc ? "desconectado" : ""}" data-ref="h${s}" data-seat="${s}" data-heroe="${esc(p.heroe || "")}" style="--fondo:${colorDe(h?.id || p.nombre)}">
     <span class="heroe-arte">${h ? artHTML(h.arte) : esc((p.nombre || "?")[0].toUpperCase())}</span>
-    ${mi ? `<div class="mision-chip ${mi.completa ? "completa" : ""}" title="${esc(mi.nombre)}">🏆 ${mi.completa ? "✔" : `${mi.progreso}/${mi.meta}`}</div>` : ""}
+    ${mi ? `<div class="mision-chip ${mi.completa ? "completa" : ""}" data-carta="${esc(mi.id)}"><span>🏆</span>${mi.completa ? "✔" : `${mi.progreso}/${mi.meta}`}</div>` : ""}
     <div class="stat hp ${p.vida < p.vidaMax ? "herido" : ""}">${p.vida}</div></div>`;
 }
 function poderHTML(v, s) {
@@ -419,7 +419,7 @@ function poderHTML(v, s) {
   if (!p.poder) return "";
   const mio = s === v.yo && v.turno === s && v.fase === "jugando";
   const listo = mio && !p.poderUsado && p.poder.coste <= p.mana && !(p.tablero.length >= 7 && (p.poder.efectos || []).every((e) => e.tipo === "invocar"));
-  return `<button class="poder ${listo ? "listo" : ""} ${p.poderUsado ? "usado" : ""}" data-poder="${s}" ${s === v.yo ? 'id="poder"' : ""} title="${esc(p.poder.nombre)}: ${esc(p.poder.texto || "")}">
+  return `<button class="poder ${listo ? "listo" : ""} ${p.poderUsado ? "usado" : ""}" data-poder="${s}" ${s === v.yo ? 'id="poder"' : ""}>
     <span>${artHTML(p.poder.arte || "⚡")}</span><div class="stat mana">${p.poder.coste}</div></button>`;
 }
 function esbirroHTML(m, s, v) {
@@ -427,13 +427,14 @@ function esbirroHTML(m, s, v) {
   const mio = v.yo === s && v.turno === s && v.fase === "jugando";
   const cls = [m.provocar && "provocar", m.escudo && "escudo", m.dormido && !m.carga && "dormido", mio && puedeAtacar(m) && "puede"].filter(Boolean).join(" ");
   return `<div class="esbirro ${cls}" data-ref="${m.uid}" data-seat="${s}" data-carta="${esc(m.id)}" style="--fondo:${colorDe(c.arquetipo || c.id)}">
-    <div class="arte">${artHTML(c.arte)}</div>
+    <div class="arte">${artHTML(c.arte)}</div><span class="zz">z z</span>
     <div class="stat atk ${m.ataque > c.ataque ? "subido" : ""}">${m.ataque}</div>
     <div class="stat hp ${m.vida < m.vidaMax ? "herido" : m.vidaMax > c.vida ? "subido" : ""}">${m.vida}</div></div>`;
 }
 
 function render(v) {
   V = v;
+  if (preview) preview.style.display = "none";
   cancelarApuntado(false);
   if (v.fase === "esperando") return renderEspera(v);
   const yo = yoDe(v), riv = 1 - yo, P = v.j[yo], R = v.j[riv];
@@ -442,28 +443,35 @@ function render(v) {
   const n = mano.length;
   const poderListo = miTurno && P.poder && !P.poderUsado && P.poder.coste <= P.mana && !(P.tablero.length >= 7 && (P.poder.efectos || []).every((e) => e.tipo === "invocar"));
   const hayJugadas = miTurno && (mano.some((c) => jugable(v, DB[c.id])) || P.tablero.some(puedeAtacar) || poderListo);
+  const cristales = (q) => `<div class="cristales"><b>${q.mana}/${q.manaMax}</b>${Array.from({ length: 10 }, (_, i) =>
+    `<i class="cristal ${i < q.mana ? "lleno" : i < q.manaMax ? "vacio" : "bloqueado"}"></i>`).join("")}</div>`;
   app.innerHTML = `<div class="mesa">
-    <div class="barra">${heroeHTML(v, riv)}${poderHTML(v, riv)}
-      <div class="info"><div class="nombre">${esc(R.nombre)}</div>
-        <div class="chips"><span class="chip">💧 ${R.mana}/${R.manaMax}</span><span class="chip">🂠 ${R.mazo}</span>
-        ${v.conectados && !v.conectados[riv] ? '<span class="chip">desconectado</span>' : ""}</div></div>
-      <div class="dorsos">${"<div class='dorso'></div>".repeat(R.manoN)}</div></div>
-    <div class="tablero" data-seat="${riv}">${R.tablero.map((m) => esbirroHTML(m, riv, v)).join("")}</div>
-    <div class="medio">${(v.globales || []).map((g) => `<span class="global" title="${esc(DB[g]?.texto || "")}">${artHTML(DB[g]?.arte || "🌐")}</span>`).join("")}<div class="reloj"></div><div class="linea"><div class="cuerda"></div></div><div class="reloj turno-txt">${miTurno ? "tu turno" : v.yo < 0 ? "mirando" : ""}</div></div>
-    <div class="tablero" data-seat="${yo}" id="mi-tablero">${P.tablero.map((m) => esbirroHTML(m, yo, v)).join("")}</div>
-    <div class="barra yo">${heroeHTML(v, yo)}${poderHTML(v, yo)}
-      <div class="info"><div class="nombre">${esc(P.nombre)}</div>
-        <div class="cristales">${Array.from({ length: P.manaMax }, (_, i) => `<div class="cristal ${i < P.mana ? "lleno" : ""}"></div>`).join("")}</div>
-        <div class="chips"><span class="chip">💧 ${P.mana}/${P.manaMax}</span><span class="chip">🂠 ${P.mazo}</span></div></div>
-      ${v.yo >= 0 ? `<button class="fin-turno ${miTurno && !hayJugadas ? "listo" : ""}" id="fin" ${miTurno ? "" : "disabled"}>${miTurno ? "Terminar turno" : "Turno rival"}</button>` : ""}</div>
+    <div class="mano-rival">${Array.from({ length: R.manoN }, (_, i) => `<div class="dorso" style="--o:${i - (R.manoN - 1) / 2}"></div>`).join("")}</div>
+    <div class="zona rival">
+      <div class="placa"><div class="nombre">${esc(R.nombre)}</div><div class="mazo" title="cartas en el mazo">${R.mazo}</div>
+        ${v.conectados && !v.conectados[riv] ? '<div class="aviso">desconectado</div>' : ""}</div>
+      ${heroeHTML(v, riv)}${poderHTML(v, riv)}
+      ${cristales(R)}
+    </div>
+    <div class="campo">
+      <div class="tablero" data-seat="${riv}">${R.tablero.map((m) => esbirroHTML(m, riv, v)).join("")}</div>
+      <div class="medio">${(v.globales || []).map((g) => `<span class="global" data-carta="${esc(g)}">${artHTML(DB[g]?.arte || "🌐")}</span>`).join("")}<div class="reloj"></div><div class="linea"><div class="cuerda"></div></div><div class="reloj turno-txt">${v.yo < 0 ? "mirando" : ""}</div></div>
+      <div class="tablero" data-seat="${yo}" id="mi-tablero">${P.tablero.map((m) => esbirroHTML(m, yo, v)).join("")}</div>
+    </div>
+    <div class="zona yo">
+      <div class="placa"><div class="nombre">${esc(P.nombre)}</div><div class="mazo" title="cartas en el mazo">${P.mazo}</div></div>
+      ${heroeHTML(v, yo)}${poderHTML(v, yo)}
+      ${cristales(P)}
+    </div>
     <div class="mano" style="--n:${Math.max(1, n)};--n1:${Math.max(1, n - 1)}">${mano.map((c, i) => {
       const off = i - (n - 1) / 2;
       const card = DB[c.id] || { nombre: "?", coste: 0 };
       return cartaHTML(card, { uid: c.uid, clase: miTurno && jugable(v, card) ? "jugable" : "" })
-        .replace('class="carta', `style="transform: translateY(${Math.abs(off) * Math.abs(off) * (n > 6 ? 1.2 : 2.2)}px) rotate(${off * Math.min(4, 20 / n)}deg)" class="carta`);
+        .replace('class="carta', `style="--rot:${off * Math.min(4, 20 / n)}deg;--baja:${Math.abs(off) * Math.abs(off) * (n > 6 ? 1.2 : 2.2)}px" class="carta`);
     }).join("")}</div>
-    <div class="esquina"><button class="mini-btn" id="log">📜</button><button class="mini-btn" id="mudo">${Sonido.mudo ? "🔇" : "🔊"}</button>
-      ${v.yo >= 0 && v.fase === "jugando" ? '<button class="mini-btn" id="rendir">🏳️</button>' : ""}</div>
+    ${v.yo >= 0 ? `<button class="fin-turno ${miTurno && !hayJugadas ? "listo" : ""} ${miTurno ? "" : "rival"}" id="fin" ${miTurno ? "" : "disabled"}>${miTurno ? "TERMINAR<br>TURNO" : "TURNO<br>RIVAL"}</button>` : ""}
+    <div class="esquina"><button class="mini-btn" id="log" title="historial">📜</button><button class="mini-btn" id="mudo" title="sonido">${Sonido.mudo ? "🔇" : "🔊"}</button>
+      ${v.yo >= 0 && v.fase === "jugando" ? '<button class="mini-btn" id="rendir" title="rendirse">🏳️</button>' : ""}</div>
   </div>`;
   $("#fin") && ($("#fin").onclick = () => { if (miTurno) { enviar({ t: "fin" }); $("#fin").disabled = true; } });
   const bp = $("#poder");
@@ -708,6 +716,53 @@ addEventListener("pointerup", (e) => {
   // toque simple sobre una carta de la mano = verla grande (con botón jugar)
   if (g && !g.movio && g.cartaEl && Date.now() - g.t < 450) zoom(g.cartaEl.dataset.carta, g.cartaEl.dataset.uid);
 });
+
+// ---------- vista previa al pasar el mouse (PC) ----------
+const conMouse = matchMedia("(hover: hover) and (pointer: fine)").matches;
+const preview = $("#preview");
+function cartaDePoder(p, h) {
+  return { id: "poder", nombre: p.nombre, tipo: "hechizo", coste: p.coste, arte: p.arte || "⚡", texto: p.texto || "", clase: h?.clase };
+}
+function mostrarPreview(el) {
+  if (!V) return;
+  let carta = null, extra = "";
+  if (el.classList.contains("esbirro")) {
+    carta = DB[el.dataset.carta];
+    const m = V.j[+el.dataset.seat]?.tablero.find((x) => x.uid === el.dataset.ref);
+    if (m && carta && (m.ataque !== carta.ataque || m.vida !== carta.vida)) extra = `ahora: ${m.ataque}/${m.vida}`;
+  } else if (el.classList.contains("poder")) {
+    const p = V.j[+el.dataset.poder];
+    if (p?.poder) { carta = cartaDePoder(p.poder, HEROES[p.heroe]); extra = p.poderUsado ? "ya usado este turno" : "poder de héroe (1 vez por turno)"; }
+  } else if (el.classList.contains("mision-chip")) {
+    carta = DB[el.dataset.carta];
+    const mi = V.j.map((p) => p.mision).find((x) => x?.id === el.dataset.carta);
+    if (mi) extra = mi.completa ? "¡completada!" : `progreso: ${mi.progreso}/${mi.meta}`;
+  } else if (el.classList.contains("global")) {
+    carta = DB[el.dataset.carta]; extra = "activo por el resto de la partida";
+  } else if (el.classList.contains("heroe")) {
+    const p = V.j[+el.dataset.seat], h = HEROES[p?.heroe];
+    if (h) { carta = { id: h.id, nombre: h.nombre, tipo: "esbirro", coste: "", ataque: "", vida: p.vida, arte: h.arte, texto: `Poder: ${h.poder?.nombre || "ninguno"}. ${h.poder?.texto || ""}`, clase: h.clase }; extra = p.nombre; }
+  }
+  if (!carta) return;
+  preview.innerHTML = cartaHTML(carta) + (extra ? `<div class="ahora">${esc(extra)}</div>` : "");
+  preview.style.display = "block";
+  const r = el.getBoundingClientRect(), pw = 236, ph = preview.offsetHeight;
+  const x = r.right + 18 + pw < innerWidth ? r.right + 18 : r.left - pw - 18;
+  preview.style.left = Math.max(6, x) + "px";
+  preview.style.top = Math.min(innerHeight - ph - 6, Math.max(6, r.top + r.height / 2 - ph / 2)) + "px";
+}
+if (conMouse) {
+  app.addEventListener("pointerover", (e) => {
+    const el = e.target.closest(".esbirro, .poder, .mision-chip, .global, .heroe");
+    if (!el || apuntando || gesto?.movio) return;
+    mostrarPreview(el);
+  });
+  app.addEventListener("pointerout", (e) => {
+    const el = e.target.closest(".esbirro, .poder, .mision-chip, .global, .heroe");
+    if (el && !el.contains(e.relatedTarget)) preview.style.display = "none";
+  });
+  addEventListener("pointerdown", () => (preview.style.display = "none"));
+}
 
 function resolverApuntado(ref) {
   const a = apuntando;

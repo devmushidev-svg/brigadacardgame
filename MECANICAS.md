@@ -31,6 +31,15 @@ Se definen en `heroes` dentro de `src/cartas.json`:
 
 - **Poder de héroe:** una vez por turno; usa los mismos efectos que las cartas, y puede pedir objetivo.
 
+## Imágenes
+
+Cada carta, héroe o poder puede usar una imagen en vez de emoji:
+
+1. Guardá la imagen en `public/arte/` con el id de la carta, por ejemplo `public/arte/panama.png`.
+2. En `src/cartas.json` poné `"arte": "/arte/panama.png"`.
+
+Recomendado: PNG o WEBP cuadrado de 512×512, con el personaje centrado, porque se recorta en óvalo (esbirros) o en arco (héroes). Sin imagen se usa el emoji.
+
 ## Tipos de carta
 
 | tipo | qué hace |
