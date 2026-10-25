@@ -939,11 +939,11 @@
     "tarea_util"
    ],
    "arte": "📝",
-   "texto": "Tarea. Robás 2 cartas.",
+   "texto": "Tarea. Robás 3 cartas.",
    "efectos": [
     {
      "tipo": "robar",
-     "cantidad": 2
+     "cantidad": 3
     }
    ]
   },
@@ -959,11 +959,13 @@
     "tarea_util"
    ],
    "arte": "🎤",
-   "texto": "Tarea. Invoca 2 Cocos.",
+   "texto": "Tarea. Invoca 2 Cruit al azar.",
    "efectos": [
     {
      "tipo": "invocar",
-     "carta": "coco",
+     "azar": {
+      "tribu": "cruit"
+     },
      "cantidad": 2
     }
    ]
@@ -972,7 +974,7 @@
    "id": "t_examen",
    "nombre": "Examen Sorpresa",
    "tipo": "hechizo",
-   "coste": 2,
+   "coste": 1,
    "clase": "cruit",
    "token": true,
    "etiquetas": [
@@ -980,12 +982,11 @@
     "tarea_util"
    ],
    "arte": "❗",
-   "texto": "Tarea. Inflige 3 de daño a un esbirro.",
+   "texto": "Tarea. Destruye un esbirro.",
    "efectos": [
     {
-     "tipo": "dano",
-     "objetivo": "elegido_esbirro",
-     "cantidad": 3
+     "tipo": "destruir",
+     "objetivo": "elegido_esbirro"
     }
    ]
   },
@@ -993,7 +994,7 @@
    "id": "t_proyecto",
    "nombre": "Proyecto Grupal",
    "tipo": "hechizo",
-   "coste": 3,
+   "coste": 2,
    "clase": "cruit",
    "token": true,
    "etiquetas": [
@@ -1015,7 +1016,7 @@
    "id": "t_laboratorio",
    "nombre": "Laboratorio",
    "tipo": "hechizo",
-   "coste": 1,
+   "coste": 0,
    "clase": "cruit",
    "token": true,
    "etiquetas": [
@@ -1023,12 +1024,12 @@
     "tarea_util"
    ],
    "arte": "🧪",
-   "texto": "Tarea. Obtenés 2 Leches.",
+   "texto": "Tarea. Obtenés 3 Leches.",
    "efectos": [
     {
      "tipo": "dar_carta",
      "carta": "leche",
-     "cantidad": 2
+     "cantidad": 3
     }
    ]
   },
@@ -1036,7 +1037,7 @@
    "id": "t_tesis",
    "nombre": "Tesis",
    "tipo": "hechizo",
-   "coste": 4,
+   "coste": 3,
    "clase": "cruit",
    "token": true,
    "etiquetas": [
@@ -1044,12 +1045,12 @@
     "tarea_util"
    ],
    "arte": "📚",
-   "texto": "Tarea. Inflige 6 de daño a un enemigo.",
+   "texto": "Tarea. Inflige 8 de daño a un enemigo.",
    "efectos": [
     {
      "tipo": "dano",
      "objetivo": "elegido_enemigo",
-     "cantidad": 6
+     "cantidad": 8
     }
    ]
   },
@@ -1057,7 +1058,7 @@
    "id": "t_pps",
    "nombre": "Práctica Profesional",
    "tipo": "hechizo",
-   "coste": 2,
+   "coste": 3,
    "clase": "cruit",
    "token": true,
    "etiquetas": [
@@ -1065,14 +1066,14 @@
     "tarea_util"
    ],
    "arte": "💼",
-   "texto": "Tarea. Invoca un Cruit al azar.",
+   "texto": "Tarea. Activa el grito de batalla y el último aliento de todos tus Cruit.",
    "efectos": [
     {
-     "tipo": "invocar",
-     "azar": {
+     "tipo": "activar",
+     "objetivo": "aliados",
+     "filtro": {
       "tribu": "cruit"
-     },
-     "cantidad": 1
+     }
     }
    ]
   },
@@ -1088,13 +1089,14 @@
     "tarea_util"
    ],
    "arte": "📊",
-   "texto": "Tarea. Dale +3/+3 a un esbirro.",
+   "texto": "Tarea. Dale +4/+4 y provocar a un esbirro.",
    "efectos": [
     {
      "tipo": "buff",
      "objetivo": "elegido_esbirro",
-     "ataque": 3,
-     "vida": 3
+     "ataque": 4,
+     "vida": 4,
+     "provocar": true
     }
    ]
   },
@@ -1110,11 +1112,11 @@
     "tarea_util"
    ],
    "arte": "☕",
-   "texto": "Tarea. Ganás 2 de maná este turno.",
+   "texto": "Tarea. Ganás 3 de maná este turno.",
    "efectos": [
     {
      "tipo": "mana",
-     "cantidad": 2
+     "cantidad": 3
     }
    ]
   }
