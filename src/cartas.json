@@ -849,12 +849,12 @@
    "ataque": 2,
    "vida": 1,
    "arte": "/arte/cruit_bano.webp",
-   "texto": "Último aliento: inflige 2 de daño a todos los enemigos.",
-   "aliento": [
+   "texto": "Grito de batalla: inflige daño igual al ataque de este esbirro, repartido al azar entre todos los enemigos.",
+   "grito": [
     {
-     "tipo": "dano",
-     "objetivo": "todos_enemigos",
-     "cantidad": 2
+     "tipo": "repartir",
+     "cantidad": "ataque",
+     "fx": "agua"
     }
    ]
   },

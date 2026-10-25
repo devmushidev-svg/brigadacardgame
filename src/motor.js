@@ -485,6 +485,16 @@ function aplicarEfectos(estado, s, efectos, elegido, ev, db, fuente, ctx = {}) {
       ev.push({ e: "baraja", seat: lado, carta: ef.carta, n });
       continue;
     }
+    if (ef.tipo === "repartir") {
+      // daño repartido al azar de a 1 punto entre los enemigos vivos; "cantidad": "ataque" usa el ataque de quien lo lanza (Cruit Baño)
+      const total = ef.cantidad === "ataque" ? buscar(estado, fuente)?.obj.ataque || 0 : n;
+      const r = otro(s);
+      for (let k = 0; k < total && estado.j[r].vida > 0; k++) {
+        const vivos = ["h" + r, ...estado.j[r].tablero.filter((m) => m.vida > 0).map((m) => m.uid)];
+        danar(estado, elegir(estado, vivos), 1, ev, { fx: ef.fx, de: fuente });
+      }
+      continue;
+    }
     if (ef.tipo === "robar_vida") {
       // daño que se suma a la vida de tu héroe; cada Cruit Vampiro en tu mesa suma +1 (aumenta_robo_vida)
       const extra = estado.j[s].tablero.filter((m) => m.vida > 0).reduce((t, m) => t + (db[m.id]?.aumenta_robo_vida || 0), 0);

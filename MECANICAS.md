@@ -108,6 +108,7 @@ En el texto de las cartas, las palabras clave salen en **negrita** y al ver la c
 | `atraer_ataques` | tus otros esbirros (del `filtro`) atacan a esta carta, uno por uno, con choque normal |
 | `repetir_jugados` | repite los gritos y últimos alientos de las cartas del `filtro` que jugaste esta partida, en orden (Coco Supremo). Como Shudderwock: los efectos salen de quien los repite, así que un "gana +3/+3" lo buffea a él |
 | `barajar` | mete N copias de `carta` en lugares al azar del mazo (`lado: "enemigo"` = del rival) |
+| `repartir` | daño de a 1 punto a enemigos vivos al azar (héroe o esbirros), `cantidad` veces; `"cantidad": "ataque"` usa el ataque actual de quien lo lanza (Cruit Baño; con Leche pega más, y si lo repite Coco Supremo usa el ataque de Coco) |
 | `robar_vida` | daño que se **suma** a la vida de tu héroe (puede pasar de 30, sube la vida máxima); cada esbirro tuyo con `aumenta_robo_vida` suma ese número (Cruit Vampiro) |
 | `dar_azar` | te da N cartas distintas al azar de las que cumplen el `filtro` (Unislop) |
 | `moneda` | 50/50: aplica `cara` o `cruz` (listas de efectos) con animación de moneda |
@@ -207,7 +208,7 @@ Diseño de Mario. Marco azul (provisional). Cruit es no binario: toda carta con 
 | Cruit Vampiro ⚧ | 5 | 3/3 | Tus Cruit roban +1 de vida. Grito: invoca 2 Cruit Sangre | hecho |
 | Caca (ficha) | 0 | — | Se lanza al robarla: 2 de daño a quien la roba y roba otra | hecho |
 | Cruit Tostadora ⚧ | 1 | 1/2 | Grito: robás una carta | hecho |
-| Cruit Baño ⚧ | 2 | 2/1 | Último aliento: 2 de daño a todos los enemigos | hecho |
+| Cruit Baño ⚧ | 2 | 2/1 | Grito: inflige daño igual a su ataque, repartido al azar entre todos los enemigos (chorros de agua) | hecho |
 | **Cruit Vaca** ⚧ (legendaria, tribu Vaca: no cuenta como Cruit) | 4 | 3/4 | Grito: una Leche a cada uno de tus otros esbirros (+1/+1 y activa a los Cruit) | hecho |
 | **Cruit Verity** ⚧ (legendaria) | 3 | 3/1 | Último aliento: invoca a Verity 5/5 | hecho |
 | Verity ⚧ (ficha, forma monstruosa) | 5 | 5/5 | — | hecho |

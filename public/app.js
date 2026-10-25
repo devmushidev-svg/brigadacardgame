@@ -960,6 +960,7 @@ async function animarUno(e, ev, v, nuevos, yo) {
       case "fx": {
         if (e.fx === "sangre") await lanzarCosa(refEl(e.de), refEl(e.a), "🩸", 30, 520, false);
         if (e.fx === "pizza") await lanzarCosa(refEl(e.de), refEl(e.a), "🍕", 34, 650, true);
+        if (e.fx === "agua") await lanzarCosa(refEl(e.de) || $(".campo"), refEl(e.a), "💧", 30, 420, false);
         if (e.fx === "bala") await disparar(refEl(e.de) || $(`.tablero[data-seat="${V.j[0].tablero.some((m) => m.uid === e.de) ? 0 : 1}"]`) || $(".campo"), refEl(e.a));
         if (e.fx === "vomito") await vomitar(refEl(e.de) || $(`.tablero[data-seat="${e.seat}"]`), (e.a || []).map(refEl).filter(Boolean));
         if (e.fx === "piedra") await tirarPiedra(refEl(e.de) || $(`.tablero[data-seat="${V.j[0].tablero.some((m) => m.uid === e.de) ? 0 : 1}"]`), refEl(e.a));
