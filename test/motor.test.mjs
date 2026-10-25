@@ -44,38 +44,35 @@ for (let k = 0; k < 50; k++) {
     assert.ok(!todo.includes("tun_maestro"), "la recompensa no va en el mazo");
   }
 }
-// --- mision: invoca 15 Tun -> Tun Maestro a la mano ---
+// --- mision: invoca 15 Tun (con el poder y Choza de Monos) -> Tun Maestro a la mano ---
 {
   const e = nueva(5); const s = e.turno;
-  preparar(e, s, ["tun_awarded", ...Array(6).fill("junta_tuns")]);
-  const jugar = (uid) => { e.j[s].mana = 10; const r = M.aplicar(e, s, { t: "jugar", uid }, db, 0); assert.ok(!r.error, r.error); return r; };
-  jugar("t0");
+  preparar(e, s, ["tun_awarded"]);
+  M.aplicar(e, s, { t: "jugar", uid: "t0" }, db, 0);
   assert.equal(e.j[s].mision.meta, 15);
-  jugar("t1"); jugar("t2");
-  assert.equal(e.j[s].mision.progreso, 6);
-  jugar("t3"); // mesa llena: los que no entran no cuentan
-  assert.equal(tuns(e, s), 7);
-  assert.equal(e.j[s].mision.progreso, 7);
-  e.j[s].tablero = []; jugar("t4"); jugar("t5");  // 13
-  assert.equal(e.j[s].mision.progreso, 13);
-  assert.ok(!e.j[s].mision.completa);
-  e.j[s].tablero = []; const res = jugar("t6");   // 16 -> se completa en el 15
-  assert.ok(e.j[s].mision.completa, "mision completa");
-  assert.ok(res.ev.some((x) => x.e === "mision_completa"));
+  let res;
+  for (let k = 0; k < 15; k++) {
+    if (e.j[s].tablero.length >= 7) e.j[s].tablero = []; // mesa llena: los que no entran no cuentan
+    e.j[s].poderUsado = false; e.j[s].mana = 10;
+    res = M.aplicar(e, s, { t: "poder" }, db, 0);
+    assert.ok(!res.error, res.error);
+  }
+  assert.equal(e.j[s].mision.progreso, 15);
+  assert.ok(e.j[s].mision.completa && res.ev.some((x) => x.e === "mision_completa"));
   assert.ok(e.j[s].mano.some((c) => c.id === "tun_maestro"), "Tun Maestro en la mano");
 }
-// --- el poder de héroe también cuenta para la mision ---
+// --- mesa llena: el Tun que no entra no cuenta ---
 {
   const e = nueva(6); const s = e.turno;
   preparar(e, s, ["tun_awarded"]);
   M.aplicar(e, s, { t: "jugar", uid: "t0" }, db, 0);
-  M.aplicar(e, s, { t: "poder" }, db, 0);
-  assert.equal(e.j[s].mision.progreso, 1);
+  e.j[s].tablero = Array.from({ length: 7 }, (_, k) => ({ uid: "z" + k, id: "mae", tribu: null, ataque: 1, vida: 2, vidaMax: 2, ataques: 0 }));
+  assert.equal(M.puedeUsarPoder(e, s), false, "sin espacio no se puede usar el poder");
 }
 // --- Tun Maestro: invoca 5 y los dispara ---
 {
   const e = nueva(7); const s = e.turno, r = 1 - s;
-  e.j[r].tablero = [];
+  e.j[r].tablero = []; e.j[s].tablero = [];
   preparar(e, s, ["tun_maestro"]);
   const vidaAntes = e.j[r].vida;
   const res = M.aplicar(e, s, { t: "jugar", uid: "t0" }, db, 0);
@@ -90,27 +87,50 @@ for (let k = 0; k < 50; k++) {
   e.j[s].tablero = []; e.j[r].tablero = [];
   preparar(e, s, ["panama", "cafe"]);
   M.aplicar(e, s, { t: "jugar", uid: "t0" }, db, 0);
-  e.j[s].tablero = e.j[s].tablero.filter((m) => m.id !== "panama"); // muere
+  e.j[s].tablero = [];
   M.aplicar(e, s, { t: "jugar", uid: "t1" }, db, 0); // cafe: roba 2
   assert.equal(tuns(e, s), 2, "2 robos = 2 Tun");
   M.aplicar(e, s, { t: "fin" }, db, 0); // el rival roba al empezar
   assert.equal(tuns(e, r), 1, "el rival tambien recibe su Tun");
 }
-// --- buff solo a la tribu y fin de turno ---
+// --- Tun Puto: cada Tun que muere pega 1 a un enemigo ---
 {
-  const e = nueva(9); const s = e.turno;
+  const e = nueva(9); const s = e.turno, r = 1 - s;
+  e.j[s].tablero = []; e.j[r].tablero = [];
+  preparar(e, s, ["tun_puto"]);
+  M.aplicar(e, s, { t: "jugar", uid: "t0" }, db, 0);
+  e.j[s].mana = 10; M.aplicar(e, s, { t: "poder" }, db, 0);
+  // el rival tiene un 3/3: el Tun lo ataca y muere
+  e.j[r].tablero = [{ uid: "rv", id: "mae", tribu: null, ataque: 3, vida: 3, vidaMax: 3, ataques: 0 }];
+  const tun = e.j[s].tablero.find((m) => m.id === "tun");
+  tun.dormido = false;
+  const antes = e.j[r].vida + e.j[r].tablero[0].vida;
+  const res = M.aplicar(e, s, { t: "atacar", de: tun.uid, a: "rv" }, db, 0);
+  assert.ok(!res.error, res.error);
+  assert.ok(res.ev.some((x) => x.e === "dispara"), "Tun Puto se activa");
+  assert.equal(e.j[r].vida + (e.j[r].tablero[0]?.vida ?? 0), antes - 2, "1 del golpe del Tun + 1 de Tun Puto");
+}
+// --- Tun Satánico: se come a los otros Tun y gana +2/+2 por cada uno ---
+{
+  const e = nueva(10); const s = e.turno;
   e.j[s].tablero = [];
-  preparar(e, s, ["mae", "tun_bebe", "tun_motivador", "tun_infinito"]);
-  for (const u of ["t0", "t1", "t2"]) M.aplicar(e, s, { t: "jugar", uid: u }, db, 0);
-  const mae = e.j[s].tablero.find((m) => m.id === "mae"), bebe = e.j[s].tablero.find((m) => m.id === "tun_bebe");
-  assert.equal(mae.ataque, 1, "el buff no toca a los que no son Tun");
-  assert.equal(bebe.ataque, 2);
-  e.j[s].tablero = e.j[s].tablero.slice(0, 2);
+  preparar(e, s, ["tun_brawl", "tun_satanico"]);
+  M.aplicar(e, s, { t: "jugar", uid: "t0" }, db, 0);
+  for (let k = 0; k < 2; k++) { e.j[s].poderUsado = false; e.j[s].mana = 10; M.aplicar(e, s, { t: "poder" }, db, 0); }
   e.j[s].mana = 10;
-  assert.ok(!M.aplicar(e, s, { t: "jugar", uid: "t3" }, db, 0).error);
-  const antes = e.j[s].tablero.length;
+  assert.ok(!M.aplicar(e, s, { t: "jugar", uid: "t1" }, db, 0).error);
+  const sat = e.j[s].tablero.find((m) => m.id === "tun_satanico");
+  assert.equal(e.j[s].tablero.length, 1, "solo queda Tun Satanico");
+  assert.equal(sat.ataque, 3 + 6); assert.equal(sat.vida, 3 + 6);
+}
+// --- Choza de Monos: 2 Tun al final del turno ---
+{
+  const e = nueva(11); const s = e.turno;
+  e.j[s].tablero = [];
+  preparar(e, s, ["choza_monos"]);
+  M.aplicar(e, s, { t: "jugar", uid: "t0" }, db, 0);
   M.aplicar(e, s, { t: "fin" }, db, 0);
-  assert.equal(e.j[s].tablero.length, antes + 2, "Tun Infinito invoca 2 al final del turno");
+  assert.equal(tuns(e, s), 2);
 }
 
 // --- estrés: miles de partidas con jugadas al azar ---

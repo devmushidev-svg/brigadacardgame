@@ -67,6 +67,7 @@ Campos: `id`, `nombre`, `coste`, `ataque`, `vida`, `texto`, `arte` (emoji o `/ar
 | `grito` | grito de batalla: al jugarlo desde la mano |
 | `aliento` | último aliento: al morir |
 | `fin_turno` | al final de cada turno de su dueño |
+| `cuando_muere` | `{ "tribu": "tun", "efectos": [...] }`: cada vez que muere un esbirro de esa tribu (de cualquier lado) |
 | efecto `global` | por el resto de la partida, aunque la carta muera (ej. `al_robar`) |
 
 ## Efectos
@@ -84,6 +85,7 @@ Campos: `id`, `nombre`, `coste`, `ataque`, `vida`, `texto`, `arte` (emoji o `/ar
 | `mana` | maná extra este turno |
 | `dar_carta` | pone `carta` en tu mano |
 | `global` | crea un efecto permanente con `disparador` y `efectos` |
+| `devorar` | destruye a tus otros esbirros (con `filtro` de tribu) y la carta gana +`ataque`/+`vida` por cada uno |
 
 **Objetivos:**
 - los elige el jugador con la flecha: `elegido`, `elegido_enemigo`, `elegido_esbirro`, `elegido_aliado`
@@ -103,14 +105,17 @@ Campos: `id`, `nombre`, `coste`, `ataque`, `vida`, `texto`, `arte` (emoji o `/ar
 
 Diseño de Mario. Arquetipo: paladín molesto — llenar la mesa de Tun, buffearlos y estorbar.
 
-| Carta | Estado |
-|---|---|
-| Héroe Tun — poder 1 maná: invoca un Tun 1/1 | hecho |
-| Tun (ficha) 1/1, tribu Tun | hecho |
-| **Tun the Awarded** (misión, legendaria, 1): invoca 15 Tun → Tun Maestro del Universo | hecho |
-| **Tun Maestro del Universo** (5, 8/8, legendaria): Grito: invoca 5 Tun y dispáralos a los enemigos | hecho |
-| **Panamá** (1, 1/1, legendaria): Grito: por el resto de la partida, cada vez que un jugador robe, invoca un Tun para él | hecho |
-| Tun Bebé, Tun Molesto, Primo de Tun, Junta de Tuns, Bendición de Tun, Tun Motivador, Tun Pesado, Tun Infinito | provisionales (propuesta de Claude, se reemplazan por las de Mario) |
+| Carta | Coste | Stats | Efecto | Estado |
+|---|---|---|---|---|
+| Héroe Tun | — | 30 | Poder (1): invoca un Tun 1/1 | hecho |
+| Tun (ficha) | 1 | 1/1 | tribu Tun | hecho |
+| **Tun the Awarded** (misión, legendaria) | 1 | — | Invoca 15 Tun (cuenta todo, incluido el poder) → Tun Maestro del Universo | hecho |
+| **Tun Maestro del Universo** (legendaria, recompensa) | 5 | 8/8 | Grito: invoca 5 Tun y cada uno se lanza contra un enemigo al azar | hecho |
+| **Panamá** (legendaria) | 1 | 1/1 | Grito: por el resto de la partida, cada vez que un jugador robe, invoca un Tun para él | hecho |
+| Tun Puto | 3 | 1/5 | Cada vez que muere un Tun (de cualquier lado), 1 de daño a un enemigo al azar | hecho |
+| Tun Brawl Stars | 2 | 2/3 | — | hecho |
+| Choza de Monos | 4 | 0/8 | Al final de tu turno, invoca dos Tun | hecho |
+| Tun Satánico | **5** | **3/3** | Grito: destruye a tus otros Tun y gana +2/+2 por cada uno | hecho — **coste y stats provisionales**, falta que Mario los defina |
 
 ## Pendiente de agregar al motor (ideas en discusión)
 

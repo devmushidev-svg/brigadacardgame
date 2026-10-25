@@ -296,6 +296,18 @@ function aplicarEfectos(estado, s, efectos, elegido, ev, db, fuente, ctx = {}) {
     if (ef.tipo === "robar") { for (let k = 0; k < n; k++) robar(estado, s, ev, db); continue; }
     if (ef.tipo === "mana") { const p = estado.j[s]; p.mana = Math.min(CONFIG.MAX_MANA, p.mana + n); ev.push({ e: "mana", seat: s, n }); continue; }
     if (ef.tipo === "dar_carta") { for (let k = 0; k < n; k++) darCarta(estado, s, ef.carta, ev); continue; }
+    if (ef.tipo === "devorar") {
+      // destruye a tus otros esbirros (de la tribu del filtro) y gana stats por cada uno
+      const comidos = estado.j[s].tablero.filter((m) => m.uid !== fuente && m.vida > 0 && (!ef.filtro?.tribu || m.tribu === ef.filtro.tribu));
+      for (const m of comidos) { m.vida = 0; ev.push({ e: "destruido", a: m.uid }); }
+      const f = fuente && buscar(estado, fuente);
+      if (f && comidos.length) {
+        const a = (ef.ataque || 0) * comidos.length, v = (ef.vida || 0) * comidos.length;
+        f.obj.ataque += a; f.obj.vida += v; f.obj.vidaMax += v;
+        ev.push({ e: "buff", a: fuente, ataque: a, vida: v });
+      }
+      continue;
+    }
     if (ef.tipo === "global") {
       estado.globales.push({ disparador: ef.disparador, efectos: ef.efectos, origen: ef.origen || null });
       ev.push({ e: "global", seat: s });
@@ -351,6 +363,19 @@ function resolverMuertes(estado, ev, db) {
       ev.push({ e: "muere", uid: m.uid, seat: s });
       const c = db[m.id];
       if (c && c.aliento) aplicarEfectos(estado, s, c.aliento, null, ev, db, null);
+    }
+    // "cada vez que muere un <tribu>": se activa en los esbirros vivos de los dos lados
+    for (const { m } of muertos) {
+      if (!m.tribu) continue;
+      for (const s2 of [0, 1]) {
+        for (const v of [...estado.j[s2].tablero]) {
+          const cm = db[v.id]?.cuando_muere;
+          if (v.vida > 0 && cm && cm.tribu === m.tribu) {
+            ev.push({ e: "dispara", uid: v.uid });
+            aplicarEfectos(estado, s2, cm.efectos, null, ev, db, v.uid);
+          }
+        }
+      }
     }
   }
   const muerto0 = estado.j[0].vida <= 0, muerto1 = estado.j[1].vida <= 0;

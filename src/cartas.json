@@ -408,165 +408,77 @@
    ]
   },
   {
-   "id": "tun_bebe",
-   "nombre": "Tun Bebé",
-   "tipo": "esbirro",
-   "coste": 1,
-   "ataque": 1,
-   "vida": 2,
-   "tribu": "tun",
-   "clase": "tun",
-   "arte": "👶",
-   "provisional": true,
-   "texto": "Grito de batalla: invoca un Tun.",
-   "grito": [
-    {
-     "tipo": "invocar",
-     "carta": "tun",
-     "cantidad": 1
-    }
-   ]
-  },
-  {
-   "id": "tun_molesto",
-   "nombre": "Tun Molesto",
-   "tipo": "esbirro",
-   "coste": 2,
-   "ataque": 2,
-   "vida": 2,
-   "tribu": "tun",
-   "clase": "tun",
-   "claves": [
-    "provocar",
-    "escudo"
-   ],
-   "arte": "😤",
-   "provisional": true,
-   "texto": "Provocar. Escudo divino."
-  },
-  {
-   "id": "primo_tun",
-   "nombre": "Primo de Tun",
-   "tipo": "esbirro",
-   "coste": 2,
-   "ataque": 2,
-   "vida": 3,
-   "tribu": "tun",
-   "clase": "tun",
-   "arte": "🧑‍🤝‍🧑",
-   "provisional": true,
-   "texto": "Último aliento: invoca dos Tun.",
-   "aliento": [
-    {
-     "tipo": "invocar",
-     "carta": "tun",
-     "cantidad": 2
-    }
-   ]
-  },
-  {
-   "id": "junta_tuns",
-   "nombre": "Junta de Tuns",
-   "tipo": "hechizo",
-   "coste": 2,
-   "clase": "tun",
-   "arte": "🫂",
-   "provisional": true,
-   "texto": "Invoca tres Tun.",
-   "efectos": [
-    {
-     "tipo": "invocar",
-     "carta": "tun",
-     "cantidad": 3
-    }
-   ]
-  },
-  {
-   "id": "bendicion_tun",
-   "nombre": "Bendición de Tun",
-   "tipo": "hechizo",
-   "coste": 1,
-   "clase": "tun",
-   "arte": "✨",
-   "provisional": true,
-   "texto": "Da +3/+3 y Provocar a un esbirro.",
-   "efectos": [
-    {
-     "tipo": "buff",
-     "objetivo": "elegido_esbirro",
-     "ataque": 3,
-     "vida": 3,
-     "provocar": true
-    }
-   ]
-  },
-  {
-   "id": "tun_motivador",
-   "nombre": "Tun Motivador",
+   "id": "tun_puto",
+   "nombre": "Tun Puto",
    "tipo": "esbirro",
    "coste": 3,
-   "ataque": 3,
+   "ataque": 1,
+   "vida": 5,
+   "tribu": "tun",
+   "clase": "tun",
+   "arte": "💢",
+   "texto": "Cada vez que muere un Tun, inflige 1 de daño a un enemigo al azar.",
+   "cuando_muere": {
+    "tribu": "tun",
+    "efectos": [
+     {
+      "tipo": "dano",
+      "objetivo": "enemigo_azar",
+      "cantidad": 1
+     }
+    ]
+   }
+  },
+  {
+   "id": "tun_brawl",
+   "nombre": "Tun Brawl Stars",
+   "tipo": "esbirro",
+   "coste": 2,
+   "ataque": 2,
    "vida": 3,
    "tribu": "tun",
    "clase": "tun",
-   "arte": "📣",
-   "provisional": true,
-   "texto": "Grito de batalla: da +1/+1 a tus otros Tun.",
-   "grito": [
-    {
-     "tipo": "buff",
-     "objetivo": "aliados",
-     "filtro": {
-      "tribu": "tun"
-     },
-     "ataque": 1,
-     "vida": 1
-    }
-   ]
+   "arte": "🎮",
+   "texto": ""
   },
   {
-   "id": "tun_pesado",
-   "nombre": "Tun Pesado",
+   "id": "choza_monos",
+   "nombre": "Choza de Monos",
    "tipo": "esbirro",
    "coste": 4,
-   "ataque": 4,
-   "vida": 6,
-   "tribu": "tun",
+   "ataque": 0,
+   "vida": 8,
    "clase": "tun",
-   "claves": [
-    "provocar"
-   ],
-   "arte": "🐘",
-   "provisional": true,
-   "texto": "Provocar. Grito de batalla: da Escudo divino a tus otros Tun.",
-   "grito": [
-    {
-     "tipo": "buff",
-     "objetivo": "aliados",
-     "filtro": {
-      "tribu": "tun"
-     },
-     "escudo": true
-    }
-   ]
-  },
-  {
-   "id": "tun_infinito",
-   "nombre": "Tun Infinito",
-   "tipo": "esbirro",
-   "coste": 6,
-   "ataque": 5,
-   "vida": 7,
-   "tribu": "tun",
-   "clase": "tun",
-   "arte": "♾️",
-   "provisional": true,
+   "arte": "🛖",
    "texto": "Al final de tu turno, invoca dos Tun.",
    "fin_turno": [
     {
      "tipo": "invocar",
      "carta": "tun",
      "cantidad": 2
+    }
+   ]
+  },
+  {
+   "id": "tun_satanico",
+   "nombre": "Tun Satánico",
+   "tipo": "esbirro",
+   "coste": 5,
+   "ataque": 3,
+   "vida": 3,
+   "tribu": "tun",
+   "clase": "tun",
+   "arte": "😈",
+   "statsProvisionales": true,
+   "texto": "Grito de batalla: destruye a tus otros Tun y gana +2/+2 por cada uno.",
+   "grito": [
+    {
+     "tipo": "devorar",
+     "filtro": {
+      "tribu": "tun"
+     },
+     "ataque": 2,
+     "vida": 2
     }
    ]
   }
