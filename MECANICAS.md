@@ -14,7 +14,7 @@ Meta actual: **100 cartas**. Todos los personajes hasta ahora son hombres salvo 
 | Maná | sube 1 por turno, máximo 10 |
 | Mano | máximo 10 (si robás con la mano llena, la carta se quema) |
 | Mesa | máximo 7 esbirros por lado |
-| Mazo | 30 cartas. Por ahora **Mis mazos** está escondido (`MAZOS_ACTIVOS` en `public/app.js`) y cada uno juega con el **mazo meta** de su héroe (`mazoMeta` en `heroes`), con el héroe al azar. Con Mis mazos activo se arma ahí (héroe + cartas de su clase y neutrales; la misión no va, empieza sola en la mano). Sin mazo armado ni meta, uno al azar: 22 de clase + 8 neutrales |
+| Mazo | 30 cartas. Se elige en el lobby o en **Mis mazos**: siempre hay un mazo **precargado** por héroe (su `mazoMeta` en `heroes`; no se borra, se puede copiar para editar) y los que arme cada uno (héroe + cartas de su clase y neutrales; la misión no va, empieza sola en la mano; se guardan en el navegador). Con "Al azar", héroe al azar con su mazo precargado. Sin mazo meta, uno al azar: 22 de clase + 8 neutrales |
 | Copias | 2 por carta, **1 si es legendaria** |
 | Mano inicial | el que empieza roba 3, el otro 4 + **La Moneda** (llega después del mulligan) |
 | Mulligan | antes del primer turno cada uno elige qué cartas de su mano inicial cambiar: vuelven al mazo y se roban otras. La misión no se cambia. 40 segundos; si no elegís, te quedás con tu mano. El bot cambia las cartas de más de 3 de maná |

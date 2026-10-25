@@ -469,7 +469,7 @@ cargarCartas().then(() => {
   if (ruta.startsWith("/p/")) pantallaPartida(ruta.slice(3).replace(/\/$/, ""));
   else if (ruta.startsWith("/cartas")) pantallaColeccion();
   else if (ruta.startsWith("/reglas")) pantallaTutorial();
-  else if (ruta.startsWith("/mazos") && MAZOS_ACTIVOS) pantallaMazos();
+  else if (ruta.startsWith("/mazos")) pantallaMazos();
   else pantallaLobby();
 });
 
@@ -481,17 +481,14 @@ async function cargarCartas() {
   } catch { toast("no cargaron las cartas"); }
 }
 
-// "Mis mazos" todavía no está habilitado: todos juegan con el mazo meta de su héroe
-const MAZOS_ACTIVOS = false;
-
 function pantallaLobby() {
   app.innerHTML = `<div class="lobby"><div class="lobby-caja">
     <h1 class="logo">PUTO<small>CARTAS</small></h1>
     <input id="nombre" maxlength="20" placeholder="tu nombre" value="${esc(localStorage.getItem("nombre") || "")}">
-    ${MAZOS_ACTIVOS ? `<label class="elige-mazo">Mazo: <select id="mazo">${opcionesMazo()}</select></label>` : ""}
+    <label class="elige-mazo">Mazo: <select id="mazo">${opcionesMazo()}</select></label>
     <button class="boton" id="crear">Crear partida</button>
     <button class="boton" id="bot">Jugar contra el bot</button>
-    ${MAZOS_ACTIVOS ? `<button class="boton sec" id="mazos">Mis mazos</button>` : ""}
+    <button class="boton sec" id="mazos">Mis mazos</button>
     <button class="boton sec ${leerLS("tutorialVisto", false) ? "" : "brilla"}" id="tuto">${leerLS("tutorialVisto", false) ? "Tutorial" : "¿Primera vez? Tutorial"}</button>
     <button class="boton sec" id="reglas">Reglas</button>
     <button class="boton sec" id="ver">Ver cartas</button>
@@ -509,16 +506,18 @@ function pantallaLobby() {
   $("#ver").onclick = () => (location.href = "/cartas");
   $("#tuto").onclick = () => empezarTutorial();
   $("#reglas").onclick = () => (location.href = "/reglas");
-  if (MAZOS_ACTIVOS) {
-    $("#mazos").onclick = () => (location.href = "/mazos");
-    $("#mazo").onchange = (e) => guardarLS("mazoActivo", e.target.value);
-  }
+  $("#mazos").onclick = () => (location.href = "/mazos");
+  $("#mazo").onchange = (e) => guardarLS("mazoActivo", e.target.value);
 }
 
 // ================= mazos armados (se guardan en este navegador) =================
 const leerLS = (k, def) => { try { return JSON.parse(localStorage.getItem(k)) ?? def; } catch { return def; } };
 const guardarLS = (k, v) => { try { localStorage.setItem(k, JSON.stringify(v)); } catch {} };
 const misMazos = () => leerLS("mazos", []);
+// mazos precargados: el mazo meta de cada héroe (siempre al día con cartas.json; se pueden usar o copiar, no borrar)
+const mazosFijos = () => Object.values(HEROES).filter((h) => h.mazoMeta)
+  .map((h) => ({ id: "fijo_" + h.id, nombre: "Mazo de " + h.nombre, heroe: h.id, cartas: h.mazoMeta.slice(), fijo: true }));
+const todosMazos = () => [...mazosFijos(), ...misMazos()];
 const TAM_MAZO = 30;
 const maxCopias = (c) => (c.rareza === "legendaria" ? 1 : 2);
 // cartas que puede llevar un héroe: las de su clase y las neutrales (sin fichas ni la misión, que va sola a la mano)
@@ -531,31 +530,36 @@ function mazoValido(m) {
 }
 function mazoActivo() {
   const id = leerLS("mazoActivo", "");
-  const m = misMazos().find((x) => x.id === id);
+  const m = todosMazos().find((x) => x.id === id);
   return mazoValido(m) ? { heroe: m.heroe, cartas: m.cartas } : null;
 }
 function opcionesMazo() {
   const act = leerLS("mazoActivo", "");
-  return `<option value="">Al azar</option>` + misMazos().filter(mazoValido)
+  return `<option value="">Al azar</option>` + todosMazos().filter(mazoValido)
     .map((m) => `<option value="${esc(m.id)}" ${m.id === act ? "selected" : ""}>${esc(m.nombre)} (${esc(HEROES[m.heroe]?.nombre || "")})</option>`).join("");
 }
 
 function pantallaMazos() {
-  const mazos = misMazos(), act = leerLS("mazoActivo", "");
+  const mazos = todosMazos(), act = leerLS("mazoActivo", "");
   app.innerHTML = `<div class="coleccion mazos"><h2>Mis mazos</h2>
     <div class="lista-mazos">${mazos.map((m) => `<div class="mazo-tile ${m.id === act ? "activo" : ""}" data-id="${esc(m.id)}">
         <div class="mazo-heroe">${artHTML(HEROES[m.heroe]?.arte)}</div>
-        <div class="mazo-info"><b>${esc(m.nombre)}</b><span>${esc(HEROES[m.heroe]?.nombre || "?")} · ${m.cartas.length}/${TAM_MAZO}${mazoValido(m) ? "" : " · incompleto"}</span></div>
+        <div class="mazo-info"><b>${esc(m.nombre)}</b><span>${esc(HEROES[m.heroe]?.nombre || "?")} · ${m.cartas.length}/${TAM_MAZO}${m.fijo ? " · precargado" : mazoValido(m) ? "" : " · incompleto"}</span></div>
         <div class="mazo-acc">${mazoValido(m) ? `<button class="mini-btn usar">${m.id === act ? "✔ en uso" : "Usar"}</button>` : ""}
-          <button class="mini-btn editar">Editar</button><button class="mini-btn borrar">🗑</button></div></div>`).join("")
-      || '<div class="ayuda">Todavía no armaste ningún mazo. Sin mazo se juega con uno al azar.</div>'}</div>
+          ${m.fijo ? '<button class="mini-btn copiar" title="copiar para editarlo">Copiar</button>' : '<button class="mini-btn editar">Editar</button><button class="mini-btn borrar">🗑</button>'}</div></div>`).join("")
+      }</div>
+    <div class="ayuda">Los mazos precargados no se borran: copialos para cambiarlos. "Al azar" en el lobby te da un héroe al azar con su mazo precargado.</div>
     <div class="botones-mazos"><button class="boton" id="nuevo">Nuevo mazo</button>
     <button class="boton sec" onclick="location.href='/'">Volver</button></div></div>`;
   $("#nuevo").onclick = elegirHeroe;
   $$(".mazo-tile").forEach((t) => {
     const id = t.dataset.id;
-    $(".editar", t).onclick = () => editorMazo(misMazos().find((m) => m.id === id));
-    $(".borrar", t).onclick = () => confirmar("¿Borrar este mazo?", () => { guardarLS("mazos", misMazos().filter((m) => m.id !== id)); pantallaMazos(); });
+    const fijo = mazosFijos().find((m) => m.id === id);
+    if (fijo) $(".copiar", t).onclick = () => editorMazo({ ...fijo, id: "m" + Date.now(), nombre: "Mi mazo de " + HEROES[fijo.heroe].nombre, fijo: undefined });
+    else {
+      $(".editar", t).onclick = () => editorMazo(misMazos().find((m) => m.id === id));
+      $(".borrar", t).onclick = () => confirmar("¿Borrar este mazo?", () => { guardarLS("mazos", misMazos().filter((m) => m.id !== id)); pantallaMazos(); });
+    }
     $(".usar", t) && ($(".usar", t).onclick = () => { guardarLS("mazoActivo", id); toast("este mazo se usa en tus partidas"); pantallaMazos(); });
   });
 }
@@ -701,7 +705,7 @@ function pantallaTutorial(paso = 0) {
       <li>Mano: máximo <b>10 cartas</b>. Si robás con la mano llena, la carta se quema.</li>
       <li>Mesa: máximo <b>7 esbirros</b> por lado.</li>
       <li><b>Fatiga</b>: si tenés que robar y no te quedan cartas, recibís 1 de daño, después 2, 3...</li>
-      <li>Por ahora cada héroe juega con su <b>mazo armado</b> y el héroe sale al azar.</li></ul>
+      <li>Elegís tu mazo en <b>Mis mazos</b>: hay uno precargado por héroe y podés armar los tuyos. Con "Al azar", el héroe sale al azar con su mazo precargado.</li></ul>
       <p>¡Eso es todo! Lo mejor para aprender es jugar contra el bot.</p>` },
   ];
   paso = Math.max(0, Math.min(PASOS.length - 1, paso));
@@ -759,7 +763,7 @@ function conectar() {
   ws.onopen = () => {
     intentos = 0;
     ws.send(JSON.stringify({ t: "hola", token: localStorage.getItem("tok_" + PID), nombre: localStorage.getItem("nombre"),
-      bot: new URLSearchParams(location.search).has("bot"), tutorial: new URLSearchParams(location.search).has("tutorial"), mazo: MAZOS_ACTIVOS ? mazoActivo() : null }));
+      bot: new URLSearchParams(location.search).has("bot"), tutorial: new URLSearchParams(location.search).has("tutorial"), mazo: mazoActivo() }));
   };
   ws.onmessage = (m) => {
     const d = JSON.parse(m.data);
@@ -1435,7 +1439,7 @@ function renderFinal(v) {
     const m = document.createElement("div");
     m.className = "modal final";
     m.innerHTML = `<div class="modal-caja"><h1 class="${gane ? "gano" : "perdio"}">${gane ? "¡TUTORIAL COMPLETO!" : "CASI..."}</h1>
-      <div class="mull-info" style="max-width:340px">${gane ? "Ya sabés jugar. En las partidas de verdad el héroe sale al azar, los mazos son de 30 cartas y al empezar hay <b>mulligan</b>: podés cambiar las cartas que no quieras." : "Esta vez ganó el bot. ¿Otra vez?"}</div>
+      <div class="mull-info" style="max-width:340px">${gane ? "Ya sabés jugar. En las partidas de verdad elegís tu mazo en <b>Mis mazos</b> (hay uno precargado de cada héroe), los mazos son de 30 cartas y al empezar hay <b>mulligan</b>: podés cambiar las cartas que no quieras." : "Esta vez ganó el bot. ¿Otra vez?"}</div>
       <button class="boton" id="fin-bot">${gane ? "Jugar contra el bot" : "Repetir el tutorial"}</button>
       <button class="boton sec" onclick="location.href='/'">Salir</button></div>`;
     app.append(m);
