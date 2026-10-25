@@ -137,7 +137,7 @@ function cartaHTML(c, { uid = "", clase = "" } = {}) {
     <div class="texto ${((l) => (l > 115 ? "t4" : l > 85 ? "t3" : l > 50 ? "t2" : ""))((c.texto || "").length)}">${esc(c.texto || "")}</div>
     ${etiqueta ? `<div class="arq">${esc(etiqueta)}</div>` : ""}
     <div class="stat mana ${DB[c.id] && c.coste < DB[c.id].coste ? "rebajado" : ""}">${c.coste}</div>
-    ${esH ? "" : `<div class="stat atk">${c.ataque}</div><div class="stat hp">${c.vida}</div>`}
+    ${esH ? "" : `<div class="stat atk ${DB[c.id] && c.ataque > DB[c.id].ataque ? "subido" : ""}">${c.ataque}</div><div class="stat hp ${DB[c.id] && c.vida > DB[c.id].vida ? "subido" : ""}">${c.vida}</div>`}
   </div>`;
 }
 
@@ -468,6 +468,13 @@ async function animarUno(e, ev, v, nuevos, yo) {
         break;
       }
       case "grito": ev.__origen = e.uid; break;
+      case "mejora": {
+        Sonido.logro();
+        toast(`${e.seat === yo ? "Tus" : "Sus"} Tun tienen +${e.ataque} de ataque por el resto de la partida`, 2200);
+        const h = refEl("h" + e.seat); if (h) { const c = centro(h); particulas(c.x, c.y, "#ffb347", 24, 90); onda(c.x, c.y, "#ffb347"); }
+        await esperar(350);
+        break;
+      }
       case "robo": { // una carta pasa de la mano rival a la tuya
         Sonido.robo();
         const desdeEl = e.de === yo ? $(`.mano .carta[data-uid="${e.uid}"]`) || $(".mano") : $(".mano-rival") || refEl("h" + e.de);
@@ -681,18 +688,20 @@ function objetivosCarta(v, s, c) {
     for (const m of v.j[k].tablero) refs.push({ r: m.uid, s: k, h: false });
   }
   return new Set(refs.filter((x) => {
+    if (ef.filtro?.tribu && (x.h || v.j[x.s].tablero.find((m) => m.uid === x.r)?.tribu !== ef.filtro.tribu)) return false;
     if (ef.objetivo === "elegido_enemigo") return x.s !== s;
     if (ef.objetivo === "elegido_aliado") return x.s === s && !x.h;
     return true;
   }).map((x) => x.r));
 }
-function objetivosAtaque(v, s) {
+function objetivosAtaque(v, s, atacante = null) {
   const ene = v.j[1 - s].tablero, prov = ene.filter((m) => m.provocar);
-  return new Set(prov.length ? prov.map((m) => m.uid) : ["h" + (1 - s), ...ene.map((m) => m.uid)]);
+  // acometida: el turno que entra solo puede atacar esbirros
+  return new Set(prov.length ? prov.map((m) => m.uid) : [...(atacante?.soloEsbirros ? [] : ["h" + (1 - s)]), ...ene.map((m) => m.uid)]);
 }
 const puedeAtacar = (m) => !m.noAtaca && m.ataque > 0 && !m.dormido && m.ataques < (m.doble ? 2 : 1);
 // la carta de la mano con su coste real (ej. Tun Cool baja según la mesa)
-const cartaMano = (c) => (DB[c.id] ? { ...DB[c.id], coste: c.coste ?? DB[c.id].coste } : null);
+const cartaMano = (c) => (DB[c.id] ? { ...DB[c.id], coste: c.coste ?? DB[c.id].coste, ataque: c.ataque ?? DB[c.id].ataque, vida: c.vida ?? DB[c.id].vida } : null);
 function jugable(v, c) {
   const p = v.j[v.yo];
   if (!c || c.coste > p.mana) return false;
@@ -725,13 +734,15 @@ function poderHTML(v, s) {
 function esbirroHTML(m, s, v) {
   const c = DB[m.id] || {};
   const mio = v.yo === s && v.turno === s && v.fase === "jugando";
-  const cls = [m.provocar && "provocar", m.escudo && "escudo", m.dormido && !m.carga && "dormido", mio && puedeAtacar(m) && "puede"].filter(Boolean).join(" ");
+  const cls = [m.provocar && "provocar", m.escudo && "escudo", m.dormido && !m.carga && "dormido", mio && puedeAtacar(m) && objetivosAtaque(v, s, m).size && "puede"].filter(Boolean).join(" ");
   return `<div class="esbirro ${cls}" data-ref="${m.uid}" data-seat="${s}" data-carta="${esc(m.id)}" style="--fondo:${colorDe(c.arquetipo || c.id)}">
     <div class="arte">${artHTML(c.arte)}</div><span class="zz">z z</span>
     <div class="stat atk ${m.ataque > c.ataque ? "subido" : ""}">${m.ataque}</div>
     <div class="stat hp ${m.vida < m.vidaMax ? "herido" : m.vidaMax > c.vida ? "subido" : ""}">${m.vida}</div></div>`;
 }
 
+const mejorasHTML = (p) => Object.entries(p.mejoras || {}).filter(([, m]) => m.ataque || m.vida)
+  .map(([t, m]) => `<div class="mejora" title="por el resto de la partida">${esc(t[0].toUpperCase() + t.slice(1))} ${m.ataque ? `+${m.ataque}⚔` : ""}${m.vida ? ` +${m.vida}❤` : ""}</div>`).join("");
 function render(v) {
   V = v;
   if (preview) preview.style.display = "none";
@@ -748,7 +759,7 @@ function render(v) {
   app.innerHTML = `<div class="mesa">
     <div class="mano-rival">${Array.from({ length: R.manoN }, (_, i) => `<div class="dorso" style="--o:${i - (R.manoN - 1) / 2}"></div>`).join("")}</div>
     <div class="zona rival">
-      <div class="placa"><div class="nombre">${esc(R.nombre)}</div><div class="mazo" title="cartas en el mazo">${R.mazo}</div>
+      <div class="placa"><div class="nombre">${esc(R.nombre)}</div><div class="mazo" title="cartas en el mazo">${R.mazo}</div>${mejorasHTML(R)}
         ${v.conectados && !v.conectados[riv] ? '<div class="aviso">desconectado</div>' : ""}</div>
       ${heroeHTML(v, riv)}${poderHTML(v, riv)}
       ${cristales(R)}
@@ -759,7 +770,7 @@ function render(v) {
       <div class="tablero" data-seat="${yo}" id="mi-tablero">${P.tablero.map((m) => esbirroHTML(m, yo, v)).join("")}</div>
     </div>
     <div class="zona yo">
-      <div class="placa"><div class="nombre">${esc(P.nombre)}</div><div class="mazo" title="cartas en el mazo">${P.mazo}</div></div>
+      <div class="placa"><div class="nombre">${esc(P.nombre)}</div><div class="mazo" title="cartas en el mazo">${P.mazo}</div>${mejorasHTML(P)}</div>
       ${heroeHTML(v, yo)}${poderHTML(v, yo)}
       ${cristales(P)}
     </div>
@@ -991,7 +1002,7 @@ app.addEventListener("pointerdown", (e) => {
   if (esbEl && miTurno && esbEl.dataset.seat == V.yo && esbEl.classList.contains("esbirro")) {
     const m = V.j[V.yo].tablero.find((x) => x.uid === esbEl.dataset.ref);
     if (m && puedeAtacar(m)) {
-      const validos = objetivosAtaque(V, V.yo);
+      const validos = objetivosAtaque(V, V.yo, m);
       apuntando = { tipo: "ataque", de: m.uid, origen: centro(esbEl), validos };
       esbEl.classList.add("seleccionado");
       marcar(validos);

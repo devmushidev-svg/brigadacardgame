@@ -55,7 +55,7 @@ export function jugadas(e, s, db) {
       out.push({ t: "jugar", uid: c.uid });
     }
   }
-  for (const m of p.tablero) if (M.puedeAtacar(m)) for (const a of M.objetivosAtaque(e, s)) out.push({ t: "atacar", de: m.uid, a });
+  for (const m of p.tablero) if (M.puedeAtacar(m)) for (const a of M.objetivosAtaque(e, s, m)) out.push({ t: "atacar", de: m.uid, a });
   if (M.puedeUsarPoder(e, s)) {
     if (M.necesitaObjetivo(p.poder)) { for (const r of refs) if (M.objetivoValido(e, s, p.poder, r)) out.push({ t: "poder", objetivo: r }); }
     else out.push({ t: "poder" });

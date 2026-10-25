@@ -45,6 +45,7 @@ export function costeDe(estado, s, c) {
     const lados = d.lados === "propio" ? [s] : [0, 1];
     for (const k of lados) coste -= estado.j[k].tablero.filter((m) => m.tribu === d.tribu && m.vida > 0).length;
   }
+  if (d?.por === "tribu_muertos") coste -= estado.muertosTribu?.[d.tribu] || 0;
   return Math.max(0, coste);
 }
 // cartas que pueden salir al azar o en un descubrir
@@ -178,6 +179,7 @@ function inicioTurno(estado, s, ev, db, ahora) {
   p.poderUsado = false;
   for (const m of p.tablero) {
     m.dormido = false;
+    m.soloEsbirros = false;
     m.ataques = 0;
   }
   ev.push({ e: "turno", seat: s });
@@ -267,10 +269,14 @@ function invocar(estado, s, id, ev, db, pos) {
     escudo: claves.has("escudo"),
     noAtaca: claves.has("no_ataca"),
     doble: claves.has("doble"),
-    dormido: !claves.has("carga"),
+    dormido: !claves.has("carga") && !claves.has("acometida"),
+    soloEsbirros: claves.has("acometida") && !claves.has("carga"), // acometida: el turno que entra solo ataca esbirros
     ataques: 0,
     alRecibirDano: !!c.al_recibir_dano,
   };
+  // "tus Tun tienen +1 de ataque por el resto de la partida"
+  const mej = c.tribu && p.mejoras?.[c.tribu];
+  if (mej) { m.ataque += mej.ataque || 0; m.vida += mej.vida || 0; m.vidaMax += mej.vida || 0; }
   const i = pos == null ? p.tablero.length : Math.max(0, Math.min(pos, p.tablero.length));
   p.tablero.splice(i, 0, m);
   ev.push({ e: "invoca", seat: s, uid: m.uid, carta: id, pos: i });
@@ -347,6 +353,17 @@ function aplicarEfectos(estado, s, efectos, elegido, ev, db, fuente, ctx = {}) {
       if (!ops.length) continue;
       if (estado.pendiente) darCarta(estado, s, elegir(estado, ops), ev); // ya hay otra elección abierta
       else { estado.pendiente = { seat: s, tipo: "descubrir", opciones: ops }; ev.push({ e: "elegir", seat: s, tipo: "descubrir" }); }
+      continue;
+    }
+    if (ef.tipo === "mejora_tribu") {
+      // por el resto de la partida: los de esa tribu (en mesa, en mano y los que vengan) ganan stats
+      const p = estado.j[s], mej = ((p.mejoras ||= {})[ef.tribu] ||= { ataque: 0, vida: 0 });
+      mej.ataque += ef.ataque || 0; mej.vida += ef.vida || 0;
+      for (const m of p.tablero) if (m.tribu === ef.tribu && m.vida > 0) {
+        m.ataque += ef.ataque || 0; m.vida += ef.vida || 0; m.vidaMax += ef.vida || 0;
+        ev.push({ e: "buff", a: m.uid, ataque: ef.ataque || 0, vida: ef.vida || 0 });
+      }
+      ev.push({ e: "mejora", seat: s, tribu: ef.tribu, ataque: mej.ataque, vida: mej.vida });
       continue;
     }
     if (ef.tipo === "atraer_ataques") {
@@ -439,6 +456,7 @@ function resolverMuertes(estado, ev, db) {
     if (!muertos.length) { if (!estado.golpes.length) break; continue; }
     for (const { s, m } of muertos) {
       ev.push({ e: "muere", uid: m.uid, seat: s });
+      if (m.tribu) (estado.muertosTribu ||= {})[m.tribu] = (estado.muertosTribu[m.tribu] || 0) + 1;
       const c = db[m.id];
       if (c && c.aliento) aplicarEfectos(estado, s, c.aliento, null, ev, db, null);
     }
@@ -489,11 +507,11 @@ export function puedeAtacar(m) {
   return !m.noAtaca && m.ataque > 0 && !m.dormido && m.ataques < (m.doble ? 2 : 1);
 }
 
-export function objetivosAtaque(estado, s) {
+export function objetivosAtaque(estado, s, atacante = null) {
   const ene = estado.j[otro(s)].tablero;
   const prov = ene.filter((m) => m.provocar);
   if (prov.length) return prov.map((m) => m.uid);
-  return ["h" + otro(s), ...ene.map((m) => m.uid)];
+  return [...(atacante?.soloEsbirros ? [] : ["h" + otro(s)]), ...ene.map((m) => m.uid)];
 }
 
 export function puedeUsarPoder(estado, s) {
@@ -622,7 +640,7 @@ export function aplicar(estado, s, accion, db, ahora) {
     const m = p.tablero.find((x) => x.uid === accion.de);
     if (!m) return { error: "ese esbirro no es tuyo" };
     if (!puedeAtacar(m)) return { error: m.dormido ? "acaba de entrar, espera un turno" : "no puede atacar" };
-    if (!objetivosAtaque(estado, s).includes(accion.a)) return { error: "tenes que atacar a los de provocar" };
+    if (!objetivosAtaque(estado, s, m).includes(accion.a)) return { error: m.soloEsbirros && accion.a[0] === "h" ? "con acometida solo puede atacar esbirros este turno" : "tenes que atacar a los de provocar" };
     m.ataques++;
     chocar(estado, m.uid, accion.a, ev);
     resolverMuertes(estado, ev, db);
@@ -672,7 +690,11 @@ export function vista(estado, yo, db0 = {}) {
       manaMax: p.manaMax,
       mazo: p.mazo.length,
       manoN: p.mano.length,
-      mano: s === yo ? p.mano.map((c) => ({ ...c, coste: db0[c.id] ? costeDe(estado, s, db0[c.id]) : undefined })) : undefined,
+      mano: s === yo ? p.mano.map((c) => {
+        const d = db0[c.id], mej = d?.tipo === "esbirro" && d.tribu && p.mejoras?.[d.tribu];
+        return { ...c, coste: d ? costeDe(estado, s, d) : undefined, ...(mej ? { ataque: d.ataque + mej.ataque, vida: d.vida + mej.vida } : {}) };
+      }) : undefined,
+      mejoras: p.mejoras || null,
       tablero: p.tablero,
     })),
   };

@@ -196,6 +196,51 @@ for (let k = 0; k < 20; k++) {
   assert.ok(e.j[r].vida < 30 - 4 || e.fase === "fin", "los 5 le pegaron a la cara");
 }
 
+// --- Novia de Tun: al morir, tus Tun tienen +1 de ataque (los de ahora, los de la mano y los que vengan) ---
+{
+  const e = nueva(31); const s = e.turno, r = 1 - s;
+  e.j[s].tablero = []; e.j[r].tablero = [];
+  preparar(e, s, ["novia_tun", "tun_brawl"]);
+  M.aplicar(e, s, { t: "jugar", uid: "t0" }, db, 0);
+  M.aplicar(e, s, { t: "poder" }, db, 0);
+  const novia = e.j[s].tablero.find((m) => m.id === "novia_tun");
+  e.j[r].tablero = [{ uid: "rv", id: "x", tribu: null, ataque: 9, vida: 9, vidaMax: 9, ataques: 0 }];
+  novia.dormido = false;
+  M.aplicar(e, s, { t: "atacar", de: novia.uid, a: "rv" }, db, 0);
+  assert.ok(!e.j[s].tablero.some((m) => m.id === "novia_tun"), "la novia murio");
+  assert.equal(e.j[s].tablero.find((m) => m.id === "tun").ataque, 2, "el Tun que ya estaba gana +1");
+  assert.equal(M.vista(e, s, db).j[s].mano.find((c) => c.id === "tun_brawl").ataque, 3, "en la mano tambien se ve");
+  M.aplicar(e, s, { t: "jugar", uid: "t1" }, db, 0);
+  assert.equal(e.j[s].tablero.find((m) => m.id === "tun_brawl").ataque, 3, "los nuevos salen con +1");
+}
+// --- Tun Mastermind: 1 menos por Tun muerto, acometida, +1 de ataque a tus Tun ---
+{
+  const e = nueva(32); const s = e.turno, r = 1 - s;
+  e.j[s].tablero = []; e.j[r].tablero = [];
+  preparar(e, s, ["tun_mastermind"]);
+  assert.equal(M.costeDe(e, s, db.tun_mastermind), 25);
+  e.muertosTribu = { tun: 18 };
+  assert.equal(M.costeDe(e, s, db.tun_mastermind), 7);
+  e.j[s].mana = 7;
+  e.j[r].tablero = [{ uid: "rv", id: "x", tribu: null, ataque: 1, vida: 9, vidaMax: 9, ataques: 0 }];
+  assert.ok(!M.aplicar(e, s, { t: "jugar", uid: "t0" }, db, 0).error);
+  const mm = e.j[s].tablero.find((m) => m.id === "tun_mastermind");
+  assert.equal(mm.ataque, 7, "se da +1 a si mismo (es Tun)");
+  assert.ok(M.aplicar(e, s, { t: "atacar", de: mm.uid, a: "h" + r }, db, 0).error, "acometida: no a la cara");
+  assert.ok(!M.aplicar(e, s, { t: "atacar", de: mm.uid, a: "rv" }, db, 0).error, "acometida: si a esbirros");
+}
+// --- Comida y Plátano ---
+{
+  const e = nueva(33); const s = e.turno;
+  e.j[s].tablero = [];
+  preparar(e, s, ["comida", "platano"]);
+  M.aplicar(e, s, { t: "jugar", uid: "t0" }, db, 0);
+  assert.equal(tuns(e, s), 7);
+  const t = e.j[s].tablero[0].uid;
+  assert.ok(!M.aplicar(e, s, { t: "jugar", uid: "t1", objetivo: t }, db, 0).error);
+  assert.ok(e.j[s].tablero[0].provocar && e.j[s].tablero[0].ataque === 3);
+}
+
 // --- estrés: miles de partidas con jugadas al azar ---
 let r = 12345;
 const rand = () => ((r = (r * 1103515245 + 12345) >>> 0) / 4294967296);

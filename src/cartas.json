@@ -291,6 +291,90 @@
      "cantidad": 1
     }
    ]
+  },
+  {
+   "id": "comida",
+   "nombre": "Comida",
+   "tipo": "hechizo",
+   "coste": 4,
+   "clase": "tun",
+   "arte": "/arte/comida.webp",
+   "texto": "Llena tu tablero de Tun 1/1.",
+   "efectos": [
+    {
+     "tipo": "invocar",
+     "carta": "tun",
+     "cantidad": 7
+    }
+   ]
+  },
+  {
+   "id": "platano",
+   "nombre": "Plátano",
+   "tipo": "hechizo",
+   "coste": 1,
+   "clase": "tun",
+   "arte": "/arte/platano.webp",
+   "texto": "Dale +2/+2 y provocar a uno de tus Tun.",
+   "efectos": [
+    {
+     "tipo": "buff",
+     "objetivo": "elegido_aliado",
+     "filtro": {
+      "tribu": "tun"
+     },
+     "ataque": 2,
+     "vida": 2,
+     "provocar": true
+    }
+   ]
+  },
+  {
+   "id": "novia_tun",
+   "nombre": "Novia de Tun",
+   "genero": "mujer",
+   "tipo": "esbirro",
+   "coste": 4,
+   "ataque": 4,
+   "vida": 4,
+   "tribu": "tun",
+   "clase": "tun",
+   "arte": "/arte/novia_tun.webp",
+   "texto": "Último aliento: por el resto de la partida, tus Tun tienen +1 de ataque.",
+   "aliento": [
+    {
+     "tipo": "mejora_tribu",
+     "tribu": "tun",
+     "ataque": 1
+    }
+   ]
+  },
+  {
+   "id": "tun_mastermind",
+   "nombre": "Tun Mastermind",
+   "genero": "hombre",
+   "tipo": "esbirro",
+   "coste": 25,
+   "ataque": 6,
+   "vida": 3,
+   "tribu": "tun",
+   "clase": "tun",
+   "arte": "/arte/tun_mastermind.webp",
+   "claves": [
+    "acometida"
+   ],
+   "descuento": {
+    "por": "tribu_muertos",
+    "tribu": "tun"
+   },
+   "texto": "Acometida. Cuesta 1 menos por cada Tun que murió esta partida. Grito de batalla: tus Tun tienen +1 de ataque por el resto de la partida.",
+   "grito": [
+    {
+     "tipo": "mejora_tribu",
+     "tribu": "tun",
+     "ataque": 1
+    }
+   ]
   }
  ],
  "heroes": [
