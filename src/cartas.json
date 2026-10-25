@@ -915,7 +915,7 @@
    "vida": 3,
    "rareza": "legendaria",
    "clase": "cruit",
-   "arte": "🎓",
+   "arte": "/arte/unislop-tareas/unislop.svg",
    "texto": "Grito de batalla: obtenés 3 tareas universitarias distintas al azar.",
    "grito": [
     {
@@ -938,7 +938,7 @@
     "tarea",
     "tarea_util"
    ],
-   "arte": "📝",
+   "arte": "/arte/unislop-tareas/t_ensayo.svg",
    "texto": "Tarea. Robás 2 cartas.",
    "efectos": [
     {
@@ -958,7 +958,7 @@
     "tarea",
     "tarea_util"
    ],
-   "arte": "🎤",
+   "arte": "/arte/unislop-tareas/t_exposicion.svg",
    "texto": "Tarea. Invoca 2 Cruit al azar.",
    "efectos": [
     {
@@ -981,7 +981,7 @@
     "tarea",
     "tarea_util"
    ],
-   "arte": "❗",
+   "arte": "/arte/unislop-tareas/t_examen.svg",
    "texto": "Tarea. Destruye un esbirro.",
    "efectos": [
     {
@@ -1001,7 +1001,7 @@
     "tarea",
     "tarea_util"
    ],
-   "arte": "👥",
+   "arte": "/arte/unislop-tareas/t_proyecto.svg",
    "texto": "Tarea. Dale +2/+2 a tus esbirros.",
    "efectos": [
     {
@@ -1023,7 +1023,7 @@
     "tarea",
     "tarea_util"
    ],
-   "arte": "🧪",
+   "arte": "/arte/unislop-tareas/t_laboratorio.svg",
    "texto": "Tarea. Obtenés 2 Leches.",
    "efectos": [
     {
@@ -1044,7 +1044,7 @@
     "tarea",
     "tarea_util"
    ],
-   "arte": "📚",
+   "arte": "/arte/unislop-tareas/t_tesis.svg",
    "texto": "Tarea. Inflige 2 de daño a tu héroe y 6 de daño a un enemigo.",
    "efectos": [
     {
@@ -1070,7 +1070,7 @@
     "tarea",
     "tarea_util"
    ],
-   "arte": "📊",
+   "arte": "/arte/unislop-tareas/t_excel.svg",
    "texto": "Tarea. Dale +3/+3 a un esbirro.",
    "efectos": [
     {
@@ -1092,7 +1092,7 @@
     "tarea",
     "tarea_util"
    ],
-   "arte": "☕",
+   "arte": "/arte/unislop-tareas/t_desvelada.svg",
    "texto": "Tarea. Ganás 3 de maná este turno.",
    "efectos": [
     {

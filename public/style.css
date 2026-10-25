@@ -137,6 +137,8 @@ button { font-family: var(--f-tit); cursor: pointer; }
   font-size: calc(var(--esb) * .56); line-height: 1; background: var(--ruido), var(--fondo, #555); box-shadow: inset 0 0 16px #000d; pointer-events: none; }
 /* la imagen entera, estirada al marco (a propósito: se ve todo aunque se deforme) */
 .esbirro .arte img, .carta .arte img, .heroe-arte img, .poder > span img, .entrada-fig img, .mision-arte img { width: 100%; height: 100%; object-fit: fill; }
+img[src^="/arte/unislop-tareas/"] { filter: invert(1) drop-shadow(0 2px 3px #000); }
+.esbirro .arte img[src^="/arte/unislop-tareas/"], .carta .arte img[src^="/arte/unislop-tareas/"] { width: 68%; height: 72%; object-fit: contain; }
 .carta .titulo.l2 { font-size: calc(var(--carta-w) * .082); }
 .carta .titulo.l3 { font-size: calc(var(--carta-w) * .07); }
 .carta .titulo.l4 { font-size: calc(var(--carta-w) * .06); }

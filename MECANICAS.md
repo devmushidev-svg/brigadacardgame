@@ -200,7 +200,7 @@ Diseño de Mario. Marco azul (provisional). Cruit es no binario: toda carta con 
 | **Cruit Vaca** ⚧ (legendaria) | 4 | 3/4 | Grito: una Leche a cada uno de tus otros esbirros (+1/+1 y activa a los Cruit) | hecho |
 | **Cruit Verity** ⚧ (legendaria) | 3 | 3/1 | Último aliento: invoca a Verity 6/6 | hecho |
 | Verity ⚧ (ficha, forma monstruosa) | 6 | 6/6 | — | hecho |
-| **Unislop** (legendaria) | 4 | 3/3 | Grito: obtenés 3 tareas universitarias distintas al azar | hecho — **falta imagen y género** |
+| **Unislop** (legendaria) | 4 | 3/3 | Grito: obtenés 3 tareas universitarias distintas al azar | hecho — imagen agregada; falta género |
 | Elliot Cruit ⚧ (tribu Cruit, Forsaken) | 2 | 2/2 | Al final de tu turno, una pizza cura 3 a un aliado herido al azar | hecho |
 | Chance Cruit ⚧ (tribu Cruit, Forsaken) | 3 | 3/3 | Grito: moneda. Cara: 6 de daño a un enemigo al azar. Cruz: 3 de daño a tu héroe | hecho |
 
