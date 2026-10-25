@@ -167,12 +167,12 @@ Diseño de Mario. Arquetipo: paladín molesto — llenar la mesa de Tun, buffear
 
 ## Clase Cruit
 
-Diseño de Mario. Marco azul (provisional).
+Diseño de Mario. Marco azul (provisional). Cruit es no binario: toda carta con su nombre lleva `"genero": "no_binario"` (⚧).
 
 | Carta | Coste | Stats | Efecto | Estado |
 |---|---|---|---|---|
 | Héroe Cruit | — | 30 | Poder (1): invoca un Coco 1/1 con carga que muere al final del turno | hecho — **falta la imagen del héroe** |
-| Coco (ficha) | — | 1/1 | Carga. Muere al final de tu turno | hecho |
+| Coco (ficha) ⚧ | — | 1/1 | Carga. Muere al final de tu turno | hecho |
 
 Sin mazo armado, el héroe sale al azar.
 

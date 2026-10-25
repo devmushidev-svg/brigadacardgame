@@ -515,7 +515,8 @@
      "tipo": "destruir",
      "objetivo": "yo"
     }
-   ]
+   ],
+   "genero": "no_binario"
   }
  ],
  "heroes": [
