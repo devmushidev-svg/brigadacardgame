@@ -210,14 +210,13 @@ Sin mazo armado, el héroe sale al azar.
 
 | Tarea | Coste | Efecto |
 |---|---|---|
-| Ensayo 📝 | 1 | Robás 3 cartas |
+| Ensayo 📝 | 1 | Robás 2 cartas |
 | Exposición 🎤 | 2 | Invoca 2 Cruit al azar |
 | Examen Sorpresa ❗ | 1 | Destruye un esbirro |
 | Proyecto Grupal 👥 | 2 | +2/+2 a tus esbirros |
-| Laboratorio 🧪 | 0 | Obtenés 3 Leches |
-| Tesis 📚 | 3 | 8 de daño a un enemigo |
-| Práctica Profesional 💼 | 3 | Activa el grito y el último aliento de todos tus Cruit |
-| Hoja de Cálculo 📊 | 1 | +4/+4 y provocar a un esbirro |
+| Laboratorio 🧪 | 2 | Obtenés 2 Leches |
+| Tesis 📚 | 3 | 2 de daño a tu héroe y 6 de daño a un enemigo |
+| Hoja de Cálculo 📊 | 2 | +3/+3 a un esbirro |
 | Desvelada ☕ | 0 | +3 de maná este turno |
 
 ## Pendiente de agregar al motor (ideas en discusión)

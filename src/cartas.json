@@ -939,11 +939,11 @@
     "tarea_util"
    ],
    "arte": "📝",
-   "texto": "Tarea. Robás 3 cartas.",
+   "texto": "Tarea. Robás 2 cartas.",
    "efectos": [
     {
      "tipo": "robar",
-     "cantidad": 3
+     "cantidad": 2
     }
    ]
   },
@@ -1016,7 +1016,7 @@
    "id": "t_laboratorio",
    "nombre": "Laboratorio",
    "tipo": "hechizo",
-   "coste": 0,
+   "coste": 2,
    "clase": "cruit",
    "token": true,
    "etiquetas": [
@@ -1024,12 +1024,12 @@
     "tarea_util"
    ],
    "arte": "🧪",
-   "texto": "Tarea. Obtenés 3 Leches.",
+   "texto": "Tarea. Obtenés 2 Leches.",
    "efectos": [
     {
      "tipo": "dar_carta",
      "carta": "leche",
-     "cantidad": 3
+     "cantidad": 2
     }
    ]
   },
@@ -1045,35 +1045,17 @@
     "tarea_util"
    ],
    "arte": "📚",
-   "texto": "Tarea. Inflige 8 de daño a un enemigo.",
+   "texto": "Tarea. Inflige 2 de daño a tu héroe y 6 de daño a un enemigo.",
    "efectos": [
     {
      "tipo": "dano",
-     "objetivo": "elegido_enemigo",
-     "cantidad": 8
-    }
-   ]
-  },
-  {
-   "id": "t_pps",
-   "nombre": "Práctica Profesional",
-   "tipo": "hechizo",
-   "coste": 3,
-   "clase": "cruit",
-   "token": true,
-   "etiquetas": [
-    "tarea",
-    "tarea_util"
-   ],
-   "arte": "💼",
-   "texto": "Tarea. Activa el grito de batalla y el último aliento de todos tus Cruit.",
-   "efectos": [
+     "objetivo": "heroe_propio",
+     "cantidad": 2
+    },
     {
-     "tipo": "activar",
-     "objetivo": "aliados",
-     "filtro": {
-      "tribu": "cruit"
-     }
+     "tipo": "dano",
+     "objetivo": "elegido_enemigo",
+     "cantidad": 6
     }
    ]
   },
@@ -1081,7 +1063,7 @@
    "id": "t_excel",
    "nombre": "Hoja de Cálculo",
    "tipo": "hechizo",
-   "coste": 1,
+   "coste": 2,
    "clase": "cruit",
    "token": true,
    "etiquetas": [
@@ -1089,14 +1071,13 @@
     "tarea_util"
    ],
    "arte": "📊",
-   "texto": "Tarea. Dale +4/+4 y provocar a un esbirro.",
+   "texto": "Tarea. Dale +3/+3 a un esbirro.",
    "efectos": [
     {
      "tipo": "buff",
      "objetivo": "elegido_esbirro",
-     "ataque": 4,
-     "vida": 4,
-     "provocar": true
+     "ataque": 3,
+     "vida": 3
     }
    ]
   },
