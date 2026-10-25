@@ -399,7 +399,7 @@
    "id": "tunita",
    "nombre": "Tunita",
    "tipo": "hechizo",
-   "coste": 1,
+   "coste": 2,
    "clase": "tun",
    "arte": "/arte/tunita.webp",
    "texto": "Inflige 1 de daño a un esbirro. +1 por cada Tun que jugaste esta partida.",

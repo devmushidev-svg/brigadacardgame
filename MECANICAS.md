@@ -139,7 +139,7 @@ Diseño de Mario. Arquetipo: paladín molesto — llenar la mesa de Tun, buffear
 | Comida (hechizo) | 4 | — | Llena tu tablero de Tun 1/1 | hecho |
 | Plátano (hechizo) | 1 | — | +2/+2 y provocar a uno de tus Tun | hecho |
 | Tuna (hechizo) | 2 | — | +1 de vida a tus Tun | hecho |
-| Tunita (hechizo) | **1** | — | 1 de daño a un esbirro, +1 por cada Tun que jugaste esta partida | hecho — **coste provisional** |
+| Tunita (hechizo) | 2 | — | 1 de daño a un esbirro, +1 por cada Tun que jugaste esta partida | hecho |
 | Choza de Monos | 4 | 0/8 | Al final de tu turno, invoca dos Tun | hecho |
 | Tun Satánico | **5** | **3/3** | Grito: destruye a tus otros Tun y gana +2/+2 por cada uno | hecho — **coste y stats provisionales**, falta que Mario los defina |
 
