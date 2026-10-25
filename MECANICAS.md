@@ -102,6 +102,8 @@ Campos: `id`, `nombre`, `coste`, `ataque`, `vida`, `texto`, `arte` (emoji o `/ar
 
 **Sonidos:** las cartas de Tun suenan a mono al jugarse; los Tun invocados hacen un "uh" corto. Una carta puede llevar `"sonido": "/sonidos/x.mp3"` (archivo en `public/sonidos/`) para usar un audio propio en vez del sintetizado.
 
+**Bonus (`bonus`):** `{ "por": "tribu_jugados", "tribu": "tun" }` suma a la `cantidad` 1 por cada carta de esa tribu que jugaste desde la mano esta partida (Tunita). En la mano se ve "(ahora: N)".
+
 **Objetivos:**
 - los elige el jugador con la flecha: `elegido`, `elegido_enemigo`, `elegido_esbirro`, `elegido_aliado`
 - automáticos: `heroe_enemigo`, `heroe_propio`, `esbirro_enemigo_azar`, `esbirros_enemigos`, `todos_esbirros`, `aliado_azar`, `aliados` (tus otros esbirros), `todos_enemigos`, `enemigo_azar`, `yo`
@@ -136,6 +138,8 @@ Diseño de Mario. Arquetipo: paladín molesto — llenar la mesa de Tun, buffear
 | Tun Mastermind | 25 | 6/3 | Acometida. 1 menos por cada Tun muerto en la partida. Grito: tus Tun tienen +1 de ataque por el resto de la partida | hecho |
 | Comida (hechizo) | 4 | — | Llena tu tablero de Tun 1/1 | hecho |
 | Plátano (hechizo) | 1 | — | +2/+2 y provocar a uno de tus Tun | hecho |
+| Tuna (hechizo) | 2 | — | +1 de vida a tus Tun | hecho |
+| Tunita (hechizo) | **1** | — | 1 de daño a un esbirro, +1 por cada Tun que jugaste esta partida | hecho — **coste provisional** |
 | Choza de Monos | 4 | 0/8 | Al final de tu turno, invoca dos Tun | hecho |
 | Tun Satánico | **5** | **3/3** | Grito: destruye a tus otros Tun y gana +2/+2 por cada uno | hecho — **coste y stats provisionales**, falta que Mario los defina |
 

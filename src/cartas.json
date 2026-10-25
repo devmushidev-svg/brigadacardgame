@@ -375,6 +375,45 @@
      "ataque": 1
     }
    ]
+  },
+  {
+   "id": "tuna",
+   "nombre": "Tuna",
+   "tipo": "hechizo",
+   "coste": 2,
+   "clase": "tun",
+   "arte": "/arte/tuna.webp",
+   "texto": "Dale +1 de vida a tus Tun.",
+   "efectos": [
+    {
+     "tipo": "buff",
+     "objetivo": "aliados",
+     "filtro": {
+      "tribu": "tun"
+     },
+     "vida": 1
+    }
+   ]
+  },
+  {
+   "id": "tunita",
+   "nombre": "Tunita",
+   "tipo": "hechizo",
+   "coste": 1,
+   "clase": "tun",
+   "arte": "/arte/tunita.webp",
+   "texto": "Inflige 1 de daño a un esbirro. +1 por cada Tun que jugaste esta partida.",
+   "efectos": [
+    {
+     "tipo": "dano",
+     "objetivo": "elegido_esbirro",
+     "cantidad": 1,
+     "bonus": {
+      "por": "tribu_jugados",
+      "tribu": "tun"
+     }
+    }
+   ]
   }
  ],
  "heroes": [

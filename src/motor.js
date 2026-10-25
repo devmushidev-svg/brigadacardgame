@@ -327,9 +327,16 @@ function objetivos(estado, s, efecto, elegido, fuente) {
   }
 }
 
+// cantidad real de un efecto: "bonus" la sube (ej. Tunita: +1 por cada Tun que jugaste esta partida)
+export function cantidadDe(estado, s, ef) {
+  let n = ef.cantidad ?? 1;
+  if (ef.bonus?.por === "tribu_jugados") n += estado.j[s].jugadosTribu?.[ef.bonus.tribu] || 0;
+  return n;
+}
+
 function aplicarEfectos(estado, s, efectos, elegido, ev, db, fuente, ctx = {}) {
   for (const ef of efectos || []) {
-    const n = ef.cantidad ?? 1;
+    const n = cantidadDe(estado, s, ef);
     if (ef.tipo === "robar") { for (let k = 0; k < n; k++) robar(estado, s, ev, db); continue; }
     if (ef.tipo === "mana") { const p = estado.j[s]; p.mana = Math.min(CONFIG.MAX_MANA, p.mana + n); ev.push({ e: "mana", seat: s, n }); continue; }
     if (ef.tipo === "robar_mano") {
@@ -630,6 +637,7 @@ export function aplicar(estado, s, accion, db, ahora) {
         ev.push({ e: "grito", uid: m.uid, objetivo: accion.objetivo || null });
         aplicarEfectos(estado, s, carta.grito, accion.objetivo, ev, db, m.uid);
       }
+      if (carta.tribu) (p.jugadosTribu ||= {})[carta.tribu] = (p.jugadosTribu[carta.tribu] || 0) + 1;
       avanzarMision(estado, s, "jugar_tribu", carta.tribu || null, ev, db);
     }
     resolverMuertes(estado, ev, db);
@@ -692,7 +700,9 @@ export function vista(estado, yo, db0 = {}) {
       manoN: p.mano.length,
       mano: s === yo ? p.mano.map((c) => {
         const d = db0[c.id], mej = d?.tipo === "esbirro" && d.tribu && p.mejoras?.[d.tribu];
-        return { ...c, coste: d ? costeDe(estado, s, d) : undefined, ...(mej ? { ataque: d.ataque + mej.ataque, vida: d.vida + mej.vida } : {}) };
+        const ef = d && [...(d.efectos || []), ...(d.grito || [])].find((x) => x.bonus);
+        return { ...c, coste: d ? costeDe(estado, s, d) : undefined, ...(mej ? { ataque: d.ataque + mej.ataque, vida: d.vida + mej.vida } : {}),
+          ...(ef ? { cantidad: cantidadDe(estado, s, ef) } : {}) };
       }) : undefined,
       mejoras: p.mejoras || null,
       tablero: p.tablero,

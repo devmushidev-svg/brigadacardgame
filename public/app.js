@@ -701,7 +701,8 @@ function objetivosAtaque(v, s, atacante = null) {
 }
 const puedeAtacar = (m) => !m.noAtaca && m.ataque > 0 && !m.dormido && m.ataques < (m.doble ? 2 : 1);
 // la carta de la mano con su coste real (ej. Tun Cool baja según la mesa)
-const cartaMano = (c) => (DB[c.id] ? { ...DB[c.id], coste: c.coste ?? DB[c.id].coste, ataque: c.ataque ?? DB[c.id].ataque, vida: c.vida ?? DB[c.id].vida } : null);
+const cartaMano = (c) => (DB[c.id] ? { ...DB[c.id], coste: c.coste ?? DB[c.id].coste, ataque: c.ataque ?? DB[c.id].ataque, vida: c.vida ?? DB[c.id].vida,
+  texto: DB[c.id].texto + (c.cantidad != null ? ` (ahora: ${c.cantidad})` : "") } : null);
 function jugable(v, c) {
   const p = v.j[v.yo];
   if (!c || c.coste > p.mana) return false;

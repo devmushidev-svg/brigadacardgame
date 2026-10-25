@@ -241,6 +241,21 @@ for (let k = 0; k < 20; k++) {
   assert.ok(e.j[s].tablero[0].provocar && e.j[s].tablero[0].ataque === 3);
 }
 
+// --- Tuna y Tunita ---
+{
+  const e = nueva(34); const s = e.turno, r = 1 - s;
+  e.j[s].tablero = []; e.j[r].tablero = [];
+  preparar(e, s, ["tun_brawl", "tun_puto", "tuna", "tunita"]);
+  M.aplicar(e, s, { t: "jugar", uid: "t0" }, db, 0);
+  M.aplicar(e, s, { t: "jugar", uid: "t1" }, db, 0);
+  M.aplicar(e, s, { t: "jugar", uid: "t2" }, db, 0);
+  assert.deepEqual(e.j[s].tablero.map((m) => m.vida), [4, 6], "Tuna: +1 de vida a tus Tun");
+  assert.equal(M.vista(e, s, db).j[s].mano.find((c) => c.id === "tunita").cantidad, 3, "1 + 2 Tun jugados");
+  e.j[r].tablero = [{ uid: "rv", id: "x", tribu: null, ataque: 1, vida: 9, vidaMax: 9, ataques: 0 }];
+  assert.ok(!M.aplicar(e, s, { t: "jugar", uid: "t3", objetivo: "rv" }, db, 0).error);
+  assert.equal(e.j[r].tablero[0].vida, 6);
+}
+
 // --- estrés: miles de partidas con jugadas al azar ---
 let r = 12345;
 const rand = () => ((r = (r * 1103515245 + 12345) >>> 0) / 4294967296);
