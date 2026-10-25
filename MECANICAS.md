@@ -197,7 +197,7 @@ Diseño de Mario. Marco azul (provisional). Cruit es no binario: toda carta con 
 | Cruit Tostadora ⚧ | 1 | 1/2 | Grito: robás una carta | hecho |
 | Cruit Baño ⚧ | 3 | 3/2 | Último aliento: 2 de daño a todos los enemigos | hecho |
 | Cruit Vaca ⚧ | 4 | 3/4 | Grito: obtenés 2 Leches | hecho |
-| Cruit Verity ⚧ | 3 | 3/1 | Último aliento: invoca a Verity 6/6 | hecho |
+| **Cruit Verity** ⚧ (legendaria) | 3 | 3/1 | Último aliento: invoca a Verity 6/6 | hecho |
 | Verity ⚧ (ficha, forma monstruosa) | 6 | 6/6 | — | hecho |
 | Elliot Cruit ⚧ (tribu Cruit, Forsaken) | 2 | 2/2 | Al final de tu turno, una pizza cura 3 a un aliado herido al azar | hecho |
 | Chance Cruit ⚧ (tribu Cruit, Forsaken) | 3 | 3/3 | Grito: moneda. Cara: 6 de daño a un enemigo al azar. Cruz: 3 de daño a tu héroe | hecho |
