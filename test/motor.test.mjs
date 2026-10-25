@@ -12,7 +12,7 @@ function nueva(semilla = 1, hs = ["tun", "tun"]) {
   const e = M.crearPartida(db, semilla);
   e.j[0].nombre = "A"; e.j[1].nombre = "B";
   e.j[0].heroe = hs[0]; e.j[1].heroe = hs[1];
-  M.empezar(e, db, 0, heroes);
+  M.empezar(e, db, 0, heroes, false);
   return e;
 }
 // prepara una mesa controlada: turno del jugador s con mucho maná y la mano indicada
@@ -85,7 +85,7 @@ for (let k = 0; k < 50; k++) {
 // --- mazo completo aunque haya pocas cartas diseñadas ---
 for (let k = 0; k < 20; k++) {
   const e = nueva(300 + k);
-  for (const p of e.j) assert.equal(p.mazo.length + p.mano.filter((c) => c.id !== "moneda" && c.id !== "tun_awarded").length, 20, "mazo de 20");
+  for (const p of e.j) assert.equal(p.mazo.length + p.mano.filter((c) => c.id !== "moneda" && c.id !== "tun_awarded").length, M.CONFIG.TAM_MAZO, "mazo de 30");
 }
 // --- Tun Puto: cada Tun que muere pega 1 a un enemigo ---
 // Mauro Sosa: roba una mujer de la mano rival (y no toca lo demás)
@@ -297,17 +297,19 @@ for (let k = 0; k < 20; k++) {
 
 // --- mazo armado por el jugador ---
 {
-  const ok = { heroe: "tun", cartas: [...Array(10)].flatMap(() => ["tun_puto", "mascotas_tun"]) };
+  const ok = { heroe: "tun", cartas: [...Array(15)].flatMap(() => ["tun_puto", "mascotas_tun"]) };
   assert.ok(!M.validarMazo(db, heroes, ok), "no mas de 2 copias");
   const cartas = ["tun_puto", "tun_puto", "mascotas_tun", "mascotas_tun", "tun_brawl", "tun_brawl", "comida", "comida", "tuna", "tuna",
-    "tunita", "tunita", "platano", "platano", "tun_cool", "tun_cool", "tun_amor", "tun_amor", "panama", "funeral_tun"];
+    "tunita", "tunita", "platano", "platano", "tun_cool", "tun_cool", "tun_amor", "tun_amor", "tun_ia", "tun_ia",
+    "tun_tung_sahur", "tun_tung_sahur", "tun_mujer", "tun_mujer", "novia_tun", "novia_tun", "choza_monos", "choza_monos", "panama", "funeral_tun"];
   const m = M.validarMazo(db, heroes, { heroe: "tun", cartas });
   assert.ok(m, "mazo valido");
-  assert.ok(!M.validarMazo(db, heroes, { heroe: "tun", cartas: [...cartas.slice(0, 19), "panama"] }), "legendaria solo 1");
-  assert.ok(!M.validarMazo(db, heroes, { heroe: "tun", cartas: [...cartas.slice(0, 19), "tun"] }), "fichas no");
+  assert.ok(!M.validarMazo(db, heroes, { heroe: "tun", cartas: cartas.slice(0, 20) }), "tiene que tener 30");
+  assert.ok(!M.validarMazo(db, heroes, { heroe: "tun", cartas: [...cartas.slice(0, 29), "panama"] }), "legendaria solo 1");
+  assert.ok(!M.validarMazo(db, heroes, { heroe: "tun", cartas: [...cartas.slice(0, 29), "tun"] }), "fichas no");
   const e = M.crearPartida(db, 5); e.j[0].nombre = "A"; e.j[1].nombre = "B";
   e.j[0].mazoElegido = m; e.j[0].heroe = "tun";
-  M.empezar(e, db, 0, heroes);
+  M.empezar(e, db, 0, heroes, false);
   const todas = [...e.j[0].mazo, ...e.j[0].mano.map((c) => c.id)].filter((id) => id !== "moneda" && id !== "tun_awarded");
   assert.deepEqual(todas.sort(), cartas.slice().sort(), "usa el mazo elegido");
 }
@@ -316,7 +318,7 @@ for (let k = 0; k < 20; k++) {
 {
   const e = M.crearPartida(db, 41); e.j[0].nombre = "A"; e.j[1].nombre = "B";
   e.j[0].heroe = "cruit"; e.j[1].heroe = "cruit";
-  M.empezar(e, db, 0, heroes);
+  M.empezar(e, db, 0, heroes, false);
   const s = e.turno, r = 1 - s;
   assert.equal(e.j[s].heroe, "cruit");
   e.j[s].mana = 1; e.j[r].tablero = [];
@@ -516,8 +518,37 @@ for (const h of Object.values(heroes)) {
   assert.ok(M.validarMazo(db, heroes, { heroe: h.id, cartas: h.mazoMeta }), `mazo meta de ${h.id} valido`);
   const e = M.crearPartida(db, 9); e.j[0].nombre = "A"; e.j[1].nombre = "B";
   e.j[0].heroe = h.id;
-  M.empezar(e, db, 0, heroes);
+  M.empezar(e, db, 0, heroes, false);
   const todas = [...e.j[0].mazo, ...e.j[0].mano.map((c) => c.id)].filter((id) => id !== "moneda" && db[id].tipo !== "mision");
   assert.deepEqual(todas.sort(), h.mazoMeta.slice().sort(), `usa el mazo meta de ${h.id}`);
 }
 console.log("ok: mazos meta");
+
+// --- mulligan: cambia las cartas elegidas, la misión no se toca, La Moneda llega después ---
+{
+  const e = M.crearPartida(db, 12); e.j[0].nombre = "A"; e.j[1].nombre = "B";
+  e.j[0].heroe = "tun"; e.j[1].heroe = "cruit";
+  M.empezar(e, db, 1000, heroes);
+  assert.equal(e.fase, "mulligan");
+  const p1 = e.turno, p2 = 1 - p1;
+  assert.equal(e.j[p1].mano.length, e.j[p1].heroe === "tun" ? 4 : 3, "el primero: 3 + misión si tiene");
+  assert.ok(!e.j[p2].mano.some((c) => c.id === "moneda"), "La Moneda llega después del mulligan");
+  assert.ok(M.aplicar(e, p1, { t: "fin" }, db, 1000).error, "no se puede jugar durante el mulligan");
+  const mano = e.j[p1].mano.map((c) => ({ ...c }));
+  const total = e.j[p1].mazo.length + mano.length;
+  M.aplicar(e, p1, { t: "mulligan", cambiar: mano.map((c) => c.uid) }, db, 1000);
+  assert.equal(e.j[p1].mazo.length + e.j[p1].mano.length, total, "no se pierden ni se crean cartas");
+  for (const [i, c] of mano.entries()) {
+    if (db[c.id].tipo === "mision") assert.equal(e.j[p1].mano[i].id, c.id, "la misión se queda");
+    else assert.notEqual(e.j[p1].mano[i].uid, c.uid, "carta cambiada");
+  }
+  assert.ok(M.aplicar(e, p1, { t: "mulligan", cambiar: [] }, db, 1000).error, "solo una vez");
+  assert.equal(e.fase, "mulligan", "espera al otro");
+  assert.ok(!M.tiempoAgotado(e, db, 2000), "todavía hay tiempo");
+  const ev = M.tiempoAgotado(e, db, 1000 + 41000);
+  assert.ok(ev, "se acabó el tiempo: el otro se queda con su mano");
+  assert.equal(e.fase, "jugando");
+  assert.ok(e.j[p2].mano.some((c) => c.id === "moneda"), "el segundo recibe La Moneda");
+  assert.equal(e.j[p1].manaMax, 1, "empezó el primer turno");
+}
+console.log("ok: mulligan");

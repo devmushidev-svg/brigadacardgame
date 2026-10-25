@@ -408,3 +408,53 @@ img[src^="/arte/unislop-tareas/"] { filter: invert(1) drop-shadow(0 2px 3px #000
 .moneda-cara { width: 120px; height: 120px; border-radius: 50%; display: grid; place-items: center; font: 900 40px var(--f-tit); color: #8a5a0c;
   background: radial-gradient(circle at 35% 30%, #fff6b0, #f4c95d 45%, #b07f2a 80%); box-shadow: inset 0 0 0 6px #d9a53c, inset 0 0 0 9px #8a5a0c, 0 10px 24px #000c; }
 .moneda-txt { position: absolute; top: calc(50% + 80px); font: 900 34px var(--f-tit); color: var(--oro); text-shadow: 0 3px 0 #3a2508, 0 0 18px #000; opacity: 0; }
+
+/* ---------- palabras clave (explicación debajo de la carta) ---------- */
+.carta .texto b { font-weight: 800; color: #1a0f05; }
+.palabras { max-width: min(92vw, 340px); text-align: left; display: grid; gap: 6px; padding: 10px 12px; border-radius: 10px;
+  font: 700 15px/1.25 var(--f-txt); color: var(--pergamino); background: #1a100aee; border: 2px solid var(--oro2); box-shadow: 0 6px 16px #000a; }
+.palabras b { color: var(--oro); }
+#preview .palabras { margin-top: 8px; font-size: 14px; max-width: 236px; }
+
+/* ---------- mulligan ---------- */
+.mulligan { position: fixed; inset: 0; z-index: 58; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 14px;
+  padding: 16px; text-align: center; background: radial-gradient(ellipse at 50% 45%, #2b1a0cee, #000e 75%); }
+.mull-info { font: 700 clamp(15px, 4vw, 19px) var(--f-txt); color: var(--pergamino); max-width: 520px; }
+.mull-cartas { display: flex; flex-wrap: wrap; justify-content: center; gap: clamp(8px, 2.5vw, 24px); }
+.mull-op { position: relative; cursor: pointer; transition: transform .15s; }
+.mull-op .carta { --carta-w: min(21vw, 170px); transition: filter .15s; }
+.mull-op:not(.fija):hover { transform: translateY(-6px); }
+.mull-x { position: absolute; inset: 0; display: none; place-items: center; font-size: min(18vw, 110px); color: #ff3b3b; text-shadow: 0 0 12px #000, 0 0 3px #000; pointer-events: none; }
+.mull-op.cambia .carta { filter: grayscale(.7) brightness(.55); }
+.mull-op.cambia .mull-x { display: grid; }
+.mull-op.fija { cursor: default; }
+.mull-tag { position: absolute; left: 50%; bottom: -10px; transform: translateX(-50%); padding: 2px 10px; border-radius: 10px; white-space: nowrap;
+  font: 800 13px var(--f-txt); color: #1a100a; background: var(--oro); }
+.mull-reloj { font: 900 18px var(--f-tit); color: var(--oro); opacity: .8; }
+
+/* ---------- tutorial ---------- */
+.tutorial { display: grid; place-items: center; }
+.tuto-caja { position: relative; width: min(560px, 100%); padding: 22px 18px 18px; border-radius: 18px; text-align: center;
+  background: var(--ruido), linear-gradient(#3b2a1c, #24170d); border: 3px solid var(--oro2); box-shadow: 0 10px 30px #000c; }
+.tuto-caja h2 { margin: 4px 0 10px; }
+.tuto-paso { font: 800 13px var(--f-txt); opacity: .7; letter-spacing: 1px; text-transform: uppercase; }
+.tuto-texto { text-align: left; font: 700 17px/1.4 var(--f-txt); color: var(--pergamino); }
+.tuto-texto p { margin: 8px 0; }
+.tuto-texto b { color: var(--oro); }
+.tuto-texto .carta b { color: #1a0f05; }
+.tuto-fila { display: flex; gap: 18px; justify-content: center; flex-wrap: wrap; margin: 12px 0 18px; }
+.tuto-fila .carta { --carta-w: min(38vw, 170px); cursor: pointer; }
+.tuto-heroe { display: grid; justify-items: center; gap: 4px; }
+.tuto-cristales { display: flex; align-items: center; gap: 3px; flex-wrap: wrap; margin: 10px 0; }
+.tuto-cristales .cristal { width: 18px; height: 24px; }
+.tuto-cristales span { margin-left: 8px; font-size: 14px; opacity: .8; }
+.tuto-palabras { max-width: none; background: #1a100a99; }
+.tuto-lista { padding-left: 20px; margin: 6px 0; }
+.tuto-lista li { margin: 6px 0; }
+.tuto-puntos { display: flex; justify-content: center; gap: 8px; margin: 16px 0 12px; }
+.tuto-puntos i { width: 10px; height: 10px; border-radius: 50%; background: #ffffff33; cursor: pointer; }
+.tuto-puntos i.on { background: var(--oro); }
+.tuto-botones { display: flex; gap: 10px; }
+.tuto-botones .boton:disabled { opacity: .4; }
+.tuto-salir { position: absolute; top: 10px; right: 10px; font-size: 14px; }
+.boton.brilla { box-shadow: 0 0 0 3px var(--oro), 0 0 18px 4px #ffb300aa; }

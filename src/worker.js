@@ -61,7 +61,7 @@ export class Partida extends DurableObject {
   }
 
   async programarAlarma() {
-    if (this.estado?.fase === "jugando") await this.ctx.storage.setAlarm(this.estado.finTurno + 250);
+    if (this.estado?.fase === "jugando" || this.estado?.fase === "mulligan") await this.ctx.storage.setAlarm(this.estado.finTurno + 250);
     else await this.ctx.storage.setAlarm(Date.now() + 24 * 3600 * 1000); // limpieza de salas viejas
   }
 
@@ -85,7 +85,25 @@ export class Partida extends DurableObject {
       v.ahora = Date.now();
       try { ws.send(JSON.stringify({ t: "estado", ev, v })); } catch {}
     }
+    if (this.bot !== null && this.estado.fase === "mulligan" && !this.estado.mulligan[this.bot]) this.mulliganBot();
     if (this.bot !== null && this.estado.fase === "jugando" && this.estado.turno === this.bot) this.turnoBot();
+  }
+
+  // El bot elige su mulligan después de una pausa corta.
+  async mulliganBot() {
+    if (this.botCorriendo) return;
+    this.botCorriendo = true;
+    let res = null;
+    try {
+      await dormir(1500);
+      if (this.estado.fase !== "mulligan" || this.estado.mulligan[this.bot]) return;
+      res = M.aplicar(this.estado, this.bot, decidir(this.estado, this.bot, DB), DB, Date.now());
+      await this.guardar();
+      await this.programarAlarma();
+    } finally {
+      this.botCorriendo = false;
+    }
+    this.difundir(res.ev || []); // si el bot empieza, esto arranca su turno
   }
 
   // El bot juega su turno acción por acción, con pausas para que se vea.
@@ -190,7 +208,7 @@ export class Partida extends DurableObject {
 
   async alarm() {
     if (!this.estado) return;
-    if (this.estado.fase === "jugando") {
+    if (this.estado.fase === "jugando" || this.estado.fase === "mulligan") {
       const ev = M.tiempoAgotado(this.estado, DB, Date.now());
       if (ev) {
         await this.guardar();

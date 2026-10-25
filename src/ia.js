@@ -71,6 +71,8 @@ function probar(e, s, a, db) {
 
 // Devuelve la próxima acción del bot (o terminar turno).
 export function decidir(e, s, db) {
+  // mulligan: cambia las cartas caras (más de 3 de maná) para tener jugadas los primeros turnos
+  if (e.fase === "mulligan") return { t: "mulligan", cambiar: e.j[s].mano.filter((c) => db[c.id]?.tipo !== "mision" && db[c.id]?.coste > 3).map((c) => c.uid) };
   const base = evaluar(e, s);
   let mejor = null, mejorP = base + 0.05;
   for (const a of jugadas(e, s, db)) {

@@ -13,6 +13,10 @@ function partida(semilla, tipos) {
   const e = M.crearPartida(db, semilla);
   e.j[0].nombre = "A"; e.j[1].nombre = "B";
   M.empezar(e, db, 0, heroes);
+  for (const s of [0, 1]) { // mulligan: el bot elige; el azar se queda con su mano
+    const res = M.aplicar(e, s, tipos[s] === "ia" ? decidir(e, s, db) : { t: "mulligan", cambiar: [] }, db, 0);
+    if (res.error) throw new Error("mulligan invalido: " + res.error);
+  }
   let pasos = 0;
   while (e.fase === "jugando" && pasos++ < 4000) {
     const s = e.turno;

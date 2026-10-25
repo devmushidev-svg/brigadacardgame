@@ -8,10 +8,11 @@ export const CONFIG = {
   MAX_MANA: 10,
   MAX_TABLERO: 7,
   MAX_MANO: 10,
-  TAM_MAZO: 20,
-  CARTAS_DE_CLASE: 12, // cuántas cartas del mazo salen de la clase del héroe
+  TAM_MAZO: 30,
+  CARTAS_DE_CLASE: 22, // cuántas cartas del mazo salen de la clase del héroe
   COPIAS_MAX: 2,
   TIEMPO_TURNO: 75, // segundos
+  TIEMPO_MULLIGAN: 40, // segundos para elegir qué cartas cambiar al empezar
 };
 
 // ---------- azar reproducible (se guarda en el estado) ----------
@@ -121,7 +122,8 @@ export function crearPartida(db, semilla) {
   };
 }
 
-export function empezar(estado, db, ahora, heroes = {}) {
+// mulligan: como Hearthstone, antes del primer turno cada uno puede cambiar cartas de su mano inicial
+export function empezar(estado, db, ahora, heroes = {}, mulligan = true) {
   const ev = [];
   estado.fase = "jugando";
   const lista = Object.values(heroes);
@@ -141,10 +143,41 @@ export function empezar(estado, db, ahora, heroes = {}) {
   }
   for (let k = 0; k < 3; k++) robar(estado, primero, ev, db);
   for (let k = 0; k < 4; k++) robar(estado, otro(primero), ev, db);
-  if (db.moneda) darCarta(estado, otro(primero), "moneda", ev);
   registrar(estado, `${estado.j[primero].nombre} empieza`);
-  inicioTurno(estado, primero, ev, db, ahora);
+  if (!mulligan) {
+    comenzarJuego(estado, db, ahora, ev);
+    return ev;
+  }
+  estado.fase = "mulligan";
+  estado.mulligan = [false, false]; // quién ya eligió
+  estado.finTurno = ahora + CONFIG.TIEMPO_MULLIGAN * 1000;
   return ev;
+}
+
+// después del mulligan: el segundo recibe La Moneda y arranca el primer turno
+function comenzarJuego(estado, db, ahora, ev) {
+  estado.fase = "jugando";
+  estado.mulligan = null;
+  const primero = estado.turno;
+  if (db.moneda) darCarta(estado, otro(primero), "moneda", ev);
+  inicioTurno(estado, primero, ev, db, ahora);
+}
+
+// cambia las cartas elegidas por otras del mazo (la misión no se cambia) y las devuelve al mazo
+function hacerMulligan(estado, s, cambiar, db, ev) {
+  const p = estado.j[s];
+  const devueltas = [];
+  for (const c of p.mano) {
+    if (!cambiar.includes(c.uid) || db[c.id]?.tipo === "mision" || !p.mazo.length) continue;
+    devueltas.push(c.id);
+    c.id = p.mazo.shift();
+    c.uid = "c" + estado.sigId++;
+  }
+  p.mazo.push(...devueltas);
+  barajar(estado, p.mazo);
+  estado.mulligan[s] = true;
+  if (devueltas.length) ev.push({ e: "mulligan", seat: s, n: devueltas.length });
+  registrar(estado, `${p.nombre} cambio ${devueltas.length} carta${devueltas.length === 1 ? "" : "s"}`);
 }
 
 function registrar(estado, texto) {
@@ -724,6 +757,13 @@ function resolverAlAzar(estado, ev, db) {
 // ---------- acciones ----------
 export function aplicar(estado, s, accion, db, ahora) {
   const ev = [];
+  if (estado.fase === "mulligan") {
+    if (accion.t !== "mulligan") return { error: "primero elegí qué cartas cambiar" };
+    if (estado.mulligan[s]) return { error: "ya elegiste" };
+    hacerMulligan(estado, s, Array.isArray(accion.cambiar) ? accion.cambiar : [], db, ev);
+    if (estado.mulligan[0] && estado.mulligan[1]) comenzarJuego(estado, db, ahora, ev);
+    return { ev };
+  }
   if (estado.fase !== "jugando") return { error: "la partida no esta en juego" };
   if (accion.t === "rendirse") {
     estado.j[s].vida = 0;
@@ -834,6 +874,12 @@ export function aplicar(estado, s, accion, db, ahora) {
 
 // Fin de turno por tiempo
 export function tiempoAgotado(estado, db, ahora) {
+  if (estado.fase === "mulligan" && ahora >= estado.finTurno) { // el que no eligió se queda con su mano
+    const ev = [];
+    for (const s of [0, 1]) if (!estado.mulligan[s]) hacerMulligan(estado, s, [], db, ev);
+    comenzarJuego(estado, db, ahora, ev);
+    return ev;
+  }
   if (estado.fase !== "jugando" || ahora < estado.finTurno) return null;
   const s = estado.turno;
   registrar(estado, `a ${estado.j[s].nombre} se le acabo el tiempo`);
@@ -856,6 +902,7 @@ export function vista(estado, yo, db0 = {}) {
     log: estado.log.slice(-12),
     globales: estado.globales.map((g) => g.origen).filter(Boolean),
     muertosTribu: estado.muertosTribu || {},
+    mulligan: estado.mulligan || null,
     pendiente: estado.pendiente
       ? { seat: estado.pendiente.seat, tipo: estado.pendiente.tipo,
           opciones: estado.pendiente.seat === yo && estado.pendiente.tipo === "descubrir" ? estado.pendiente.opciones : undefined,

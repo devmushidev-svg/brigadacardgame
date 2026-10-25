@@ -14,9 +14,10 @@ Meta actual: **100 cartas**. Todos los personajes hasta ahora son hombres salvo 
 | Maná | sube 1 por turno, máximo 10 |
 | Mano | máximo 10 (si robás con la mano llena, la carta se quema) |
 | Mesa | máximo 7 esbirros por lado |
-| Mazo | 20 cartas. Por ahora **Mis mazos** está escondido (`MAZOS_ACTIVOS` en `public/app.js`) y cada uno juega con el **mazo meta** de su héroe (`mazoMeta` en `heroes`), con el héroe al azar. Con Mis mazos activo se arma ahí (héroe + cartas de su clase y neutrales; la misión no va, empieza sola en la mano). Sin mazo armado ni meta, uno al azar: 12 de clase + 8 neutrales |
+| Mazo | 30 cartas. Por ahora **Mis mazos** está escondido (`MAZOS_ACTIVOS` en `public/app.js`) y cada uno juega con el **mazo meta** de su héroe (`mazoMeta` en `heroes`), con el héroe al azar. Con Mis mazos activo se arma ahí (héroe + cartas de su clase y neutrales; la misión no va, empieza sola en la mano). Sin mazo armado ni meta, uno al azar: 22 de clase + 8 neutrales |
 | Copias | 2 por carta, **1 si es legendaria** |
-| Mano inicial | el que empieza roba 3, el otro 4 + **La Moneda** |
+| Mano inicial | el que empieza roba 3, el otro 4 + **La Moneda** (llega después del mulligan) |
+| Mulligan | antes del primer turno cada uno elige qué cartas de su mano inicial cambiar: vuelven al mazo y se roban otras. La misión no se cambia. 40 segundos; si no elegís, te quedás con tu mano. El bot cambia las cartas de más de 3 de maná |
 | Misión | la misión de tu clase siempre empieza en tu mano |
 | Fatiga | robar sin cartas hace 1, luego 2, 3... de daño |
 | Tiempo de turno | 75 segundos |
@@ -52,6 +53,14 @@ Recomendado: PNG o WEBP cuadrado de 512×512, con el personaje centrado, porque 
 | `mision` | queda activa con un contador; al cumplirse aplica su `recompensa` |
 
 Campos: `id`, `nombre`, `coste`, `ataque`, `vida`, `texto`, `arte` (emoji o `/arte/x.png` en `public/arte/`), `clase`, `tribu`, `rareza` (`legendaria`), `token: true` (no entra al mazo; solo se invoca o se da), `arquetipo`, `genero` (`hombre`, `mujer` o `no_binario`; **toda carta de personaje lleva uno**, se pregunta al crearla; sale como ♂ ♀ ⚧ abajo de la carta), `etiquetas` (lista libre, ej. `["mujer"]`, para efectos que buscan cartas por etiqueta), `descuento` (`{ "por": "tribu_en_mesa", "tribu": "tun" }`: cuesta 1 menos por cada esbirro de esa tribu en la mesa, de los dos lados; `"lados": "propio"` solo cuenta los tuyos; `{ "por": "tribu_muertos", "tribu": "tun" }`: 1 menos por cada Tun que murió en la partida, de los dos lados), `entrada` (animación al entrar: `legendaria` —automática en legendarias— o `demonio`).
+
+## Palabras clave en el texto
+
+En el texto de las cartas, las palabras clave salen en **negrita** y al ver la carta grande (o al pasar el mouse en PC) aparece abajo qué significa cada una. La lista con sus explicaciones está en `PALABRAS` al principio de `public/app.js`: Grito de batalla, Último aliento, Provocar, Carga, Acometida, Escudo divino, Viento furioso, No puede atacar, Descubre, Robar vida, Activar, Tarea y Misión. Si agregás una palabra clave nueva, sumala ahí.
+
+## Tutorial
+
+`/tutorial` (botón **Cómo jugar** en el lobby) explica en 9 pasos: objetivo, maná, cartas, jugar y atacar, poder de héroe, palabras clave, mulligan, misiones y reglas del mazo. Al final ofrece jugar contra el bot.
 
 ## Palabras clave (`claves`)
 
@@ -208,11 +217,11 @@ Sin mazo armado, el héroe sale al azar.
 
 ## Mazos meta
 
-**Tun:** 2 Tun Tung Sahur, 2 Plátano, 2 Tunita, 2 Tun Puto, 2 Comida, 2 Choza de Monos, 2 Novia de Tun, 2 Tun Amor, 2 Tun Cool, Porque Me Monean, Funeral de Tun.
+**Tun (30):** 2 Tun Tung Sahur, 2 Tun IA, 2 Plátano, 2 Tunita, 2 Tun Brawl Stars, 2 Mascotas de Tun, 2 Tun Puto, 2 Comida, 2 Choza de Monos, 2 Novia de Tun, 2 Tun Mujer, 2 Tun Amor, 2 Tun Cool, 2 Tun Mastermind, Porque Me Monean, Funeral de Tun.
 
-**Cruit:** 2 Cruit Tostadora, 2 Estreñido Cruit, 2 Lechero, 2 Leche, 2 Tarea de la U, 2 Cruit Sangre, Chance Cruit, 2 Cruit Baño, Cruit Verity, Cruit Vaca, Unislop, Cruit Excel, Coco Supremo.
+**Cruit (30):** 2 Cruit Tostadora, 2 Estreñido Cruit, 2 Lechero, 2 Leche, 2 Tarea de la U, 2 Cruit Intolerante, 2 Elliot Cruit, 2 Cruit Sangre, 2 Tun Brawl Stars, 2 Chance Cruit, 2 Cruit Baño, 2 Cruit Excel, 2 Cruit Vampiro, Cruit Verity, Cruit Vaca, Unislop, Coco Supremo.
 
-Bot contra bot, Cruit le gana a Tun ~68% de las veces (era ~95% antes de los nerfs a Estreñido, Cruit Baño y Cruit Sangre y el buff a Novia de Tun).
+Con los mazos de 20, bot contra bot, Cruit le ganaba a Tun ~68% (era ~95% antes de los nerfs a Estreñido, Cruit Baño y Cruit Sangre y el buff a Novia de Tun). Falta medir con los mazos de 30.
 
 ### Tareas universitarias (fichas de Unislop, etiqueta Tarea: cuentan para Cruit Excel)
 

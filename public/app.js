@@ -149,6 +149,38 @@ function colorDe(t) {
 const artTexto = (arte) => (/^(https?:)?\//.test(arte || "") ? "💩" : arte || "❔");
 const artHTML = (arte) => (/^(https?:)?\//.test(arte || "") ? `<img src="${esc(arte)}" alt="">` : esc(arte || "❔"));
 
+// ---------- palabras clave: salen en negrita en el texto y con su explicación al ver la carta ----------
+const PALABRAS = [
+  { n: "Grito de batalla", re: "gritos? de batalla", d: "Se activa cuando jugás la carta desde tu mano." },
+  { n: "Último aliento", re: "últimos? alientos?", d: "Se activa cuando el esbirro muere." },
+  { n: "Provocar", re: "provocar", clave: "provocar", d: "Los enemigos tienen que atacar primero a este esbirro." },
+  { n: "Carga", re: "carga", clave: "carga", d: "Puede atacar el mismo turno en que lo jugás." },
+  { n: "Acometida", re: "acometida", clave: "acometida", d: "Puede atacar esbirros el turno en que lo jugás; al héroe, recién el turno siguiente." },
+  { n: "Escudo divino", re: "escudo divino", clave: "escudo", d: "Ignora el primer daño que recibe." },
+  { n: "Viento furioso", re: "viento furioso", clave: "doble", d: "Puede atacar dos veces por turno." },
+  { n: "No puede atacar", re: "no puede atacar", clave: "no_ataca", d: "Este esbirro nunca ataca." },
+  { n: "Descubre", re: "descubre|descubrir", d: "Elegís una de tres cartas al azar y va a tu mano." },
+  { n: "Robar vida", re: "roban? (?:\\+?\\d+ )?de vida", d: "Hace ese daño y lo suma a la vida de tu héroe (puede pasar de 30)." },
+  { n: "Activar", re: "activan?|activar", d: "Repite el grito de batalla y el último aliento del esbirro." },
+  { n: "Tarea", re: "tareas?", d: "Hechizo universitario. Algunas cartas (como Cruit Excel) se hacen más fuertes por cada Tarea que lanzaste." },
+  { n: "Misión", re: "misión", d: "Empieza siempre en tu mano. Al jugarla queda activa y, cuando cumplís el objetivo, recibís la recompensa." },
+];
+const RE_PALABRAS = new RegExp(`(?<![\\p{L}])(${PALABRAS.map((p) => p.re).join("|")})(?![\\p{L}])`, "giu");
+const palabraDe = (txt) => PALABRAS.find((p) => new RegExp(`^(?:${p.re})$`, "iu").test(txt));
+const textoHTML = (t) => esc(t).replace(RE_PALABRAS, "<b>$1</b>");
+// las palabras clave que tiene una carta (por su texto o sus claves), con su explicación
+function palabrasDe(c) {
+  const vistas = new Set();
+  for (const m of String(c.texto || "").matchAll(RE_PALABRAS)) { const p = palabraDe(m[1]); if (p) vistas.add(p); }
+  for (const k of c.claves || []) { const p = PALABRAS.find((x) => x.clave === k); if (p) vistas.add(p); }
+  if (c.tipo === "mision") vistas.add(PALABRAS.find((p) => p.n === "Misión"));
+  return [...vistas];
+}
+const palabrasHTML = (c) => {
+  const ps = palabrasDe(c);
+  return ps.length ? `<div class="palabras">${ps.map((p) => `<div><b>${esc(p.n)}:</b> ${esc(p.d)}</div>`).join("")}</div>` : "";
+};
+
 function cartaHTML(c, { uid = "", clase = "" } = {}) {
   const esH = c.tipo === "hechizo" || c.tipo === "mision";
   const etiqueta = [c.clase ? HEROES[c.clase]?.nombre || c.clase : (c.token ? "" : "Neutral"), c.arquetipo || "", c.tribu && c.tribu !== c.clase ? c.tribu[0].toUpperCase() + c.tribu.slice(1) : "", { hombre: "♂", mujer: "♀", no_binario: "⚧" }[c.genero] || ""].filter(Boolean).join(" · ");
@@ -158,7 +190,7 @@ function cartaHTML(c, { uid = "", clase = "" } = {}) {
     <div class="arte" style="--fondo:${colorDe(c.arquetipo || c.id)}">${artHTML(c.arte)}</div>
     ${c.contador != null ? `<div class="contador-carta" title="Tun muertos esta partida">☠ ${c.contador}</div>` : ""}
     <div class="titulo ${((l) => (l > 19 ? "l4" : l > 15 ? "l3" : l > 12 ? "l2" : ""))((c.nombre || "").length)}">${esc(c.nombre)}</div>
-    <div class="texto ${((l) => (l > 115 ? "t4" : l > 85 ? "t3" : l > 50 ? "t2" : ""))((c.texto || "").length)}">${esc(c.texto || "")}</div>
+    <div class="texto ${((l) => (l > 115 ? "t4" : l > 85 ? "t3" : l > 50 ? "t2" : ""))((c.texto || "").length)}"><span>${textoHTML(c.texto || "")}</span></div>
     ${etiqueta ? `<div class="arq">${esc(etiqueta)}</div>` : ""}
     <div class="stat mana ${DB[c.id] && c.coste < DB[c.id].coste ? "rebajado" : ""}">${c.coste}</div>
     ${esH ? "" : `<div class="stat atk ${DB[c.id] && c.ataque > DB[c.id].ataque ? "subido" : ""}">${c.ataque}</div><div class="stat hp ${DB[c.id] && c.vida > DB[c.id].vida ? "subido" : ""}">${c.vida}</div>`}
@@ -428,6 +460,7 @@ const ruta = location.pathname;
 cargarCartas().then(() => {
   if (ruta.startsWith("/p/")) pantallaPartida(ruta.slice(3).replace(/\/$/, ""));
   else if (ruta.startsWith("/cartas")) pantallaColeccion();
+  else if (ruta.startsWith("/tutorial")) pantallaTutorial();
   else if (ruta.startsWith("/mazos") && MAZOS_ACTIVOS) pantallaMazos();
   else pantallaLobby();
 });
@@ -451,6 +484,7 @@ function pantallaLobby() {
     <button class="boton" id="crear">Crear partida</button>
     <button class="boton" id="bot">Jugar contra el bot</button>
     ${MAZOS_ACTIVOS ? `<button class="boton sec" id="mazos">Mis mazos</button>` : ""}
+    <button class="boton sec ${leerLS("tutorialVisto", false) ? "" : "brilla"}" id="tuto">${leerLS("tutorialVisto", false) ? "Cómo jugar" : "¿Primera vez? Cómo jugar"}</button>
     <button class="boton sec" id="ver">Ver cartas</button>
     <div class="ayuda">Creás la partida y le pasás el link a tu rival, o practicás contra el bot.</div>
   </div></div>`;
@@ -464,6 +498,7 @@ function pantallaLobby() {
   $("#crear").onclick = () => crear(false);
   $("#bot").onclick = () => crear(true);
   $("#ver").onclick = () => (location.href = "/cartas");
+  $("#tuto").onclick = () => (location.href = "/tutorial");
   if (MAZOS_ACTIVOS) {
     $("#mazos").onclick = () => (location.href = "/mazos");
     $("#mazo").onchange = (e) => guardarLS("mazoActivo", e.target.value);
@@ -474,7 +509,7 @@ function pantallaLobby() {
 const leerLS = (k, def) => { try { return JSON.parse(localStorage.getItem(k)) ?? def; } catch { return def; } };
 const guardarLS = (k, v) => { try { localStorage.setItem(k, JSON.stringify(v)); } catch {} };
 const misMazos = () => leerLS("mazos", []);
-const TAM_MAZO = 20;
+const TAM_MAZO = 30;
 const maxCopias = (c) => (c.rareza === "legendaria" ? 1 : 2);
 // cartas que puede llevar un héroe: las de su clase y las neutrales (sin fichas ni la misión, que va sola a la mano)
 const cartasDe = (heroe) => Object.values(DB).filter((c) => !c.token && c.tipo !== "mision" && (!c.clase || c.clase === heroe))
@@ -605,6 +640,75 @@ function pantallaColeccion(filtro = leerLS("filtroColeccion", "todas")) {
       <div class="rejilla">${g.cartas.map((c) => cartaHTML(c)).join("") || '<div class="ayuda">Todavía no hay cartas.</div>'}</div>`).join("")}
     <button class="boton sec" style="max-width:300px;margin:0 auto 30px" onclick="location.href='/'">Volver</button></div>`;
   $$(".pestana").forEach((b) => (b.onclick = () => { guardarLS("filtroColeccion", b.dataset.k); pantallaColeccion(b.dataset.k); }));
+  $$(".rejilla .carta").forEach((el) => (el.onclick = () => zoom(el.dataset.carta)));
+}
+
+// ================= tutorial: lo básico, paso a paso =================
+function pantallaTutorial(paso = 0) {
+  const ej = (id, extra = {}) => (DB[id] ? cartaHTML({ ...DB[id], ...extra }) : "");
+  const pal = (n) => PALABRAS.find((p) => p.n === n);
+  const PASOS = [
+    { t: "¿De qué se trata?", h: `<p>Puto Cartas es un juego de cartas 1 contra 1, como Hearthstone.</p>
+      <p>Cada jugador es un <b>héroe</b> con <b>30 de vida</b>. <b>Ganás cuando la vida del héroe rival llega a 0.</b></p>
+      <p>Para eso jugás cartas: <b>esbirros</b> que pelean en la mesa y <b>hechizos</b> que hacen efectos.</p>
+      <div class="tuto-fila">${Object.values(HEROES).map((h) => `<div class="tuto-heroe"><div class="mazo-heroe">${artHTML(h.arte)}</div><b>${esc(h.nombre)}</b></div>`).join("")}</div>` },
+    { t: "El maná", h: `<p>Las cartas cuestan <b>maná</b> (el número azul arriba a la izquierda de cada carta).</p>
+      <p>Empezás con <b>1 cristal</b> y cada turno ganás uno más, hasta <b>10</b>. Al empezar tu turno se te rellenan todos.</p>
+      <div class="tuto-cristales">${Array.from({ length: 10 }, (_, i) => `<i class="cristal ${i < 4 ? "lleno" : "vacio"}"></i>`).join("")}<span>turno 4: 4 de maná</span></div>
+      <p>El maná que no usás se pierde, así que intentá gastarlo todo cada turno.</p>` },
+    { t: "Las cartas", h: `<div class="tuto-fila">${ej("tun_puto")}${ej("mascotas_tun")}</div>
+      <p><b>Esbirro</b> (izquierda): entra a tu mesa. Abajo tiene su <b>ataque</b> (amarillo) y su <b>vida</b> (rojo).</p>
+      <p><b>Hechizo</b> (derecha): hace su efecto y se va.</p>
+      <p>Tocá cualquier carta para verla grande; abajo te explica sus <b>palabras clave</b>.</p>` },
+    { t: "Jugar y atacar", h: `<p><b>Arrastrá</b> una carta de tu mano a la mesa para jugarla. Las que podés pagar brillan en verde.</p>
+      <p>Un esbirro recién jugado <b>espera un turno</b> antes de atacar (salvo que tenga Carga o Acometida).</p>
+      <p>Para atacar, <b>arrastrá tu esbirro</b> hasta un esbirro enemigo o hasta el héroe rival. Cada esbirro ataca una vez por turno.</p>
+      <p>Cuando dos esbirros pelean, <b>los dos se hacen daño</b> con su ataque. Si la vida llega a 0, muere.</p>
+      <p>Cuando no tengas nada más que hacer, tocá <b>TERMINAR TURNO</b>. Tenés 75 segundos por turno.</p>` },
+    { t: "Poder de héroe", h: `<p>Cada héroe tiene un <b>poder</b> (el círculo al lado del retrato) que podés usar <b>una vez por turno</b> pagando su maná.</p>
+      ${Object.values(HEROES).map((h) => `<p><b>${esc(h.nombre)}</b>, ${esc(h.poder?.nombre || "")} (${h.poder?.coste ?? ""}): ${esc(h.poder?.texto || "")}</p>`).join("")}
+      <p>Si te sobra maná, usar el poder casi siempre conviene.</p>` },
+    { t: "Palabras clave", h: `<p>Algunas cartas tienen palabras en <b>negrita</b>. Significan esto:</p>
+      <div class="palabras tuto-palabras">${["Grito de batalla", "Último aliento", "Provocar", "Carga", "Acometida", "Descubre", "Robar vida", "Activar", "Tarea"].map(pal).filter(Boolean)
+        .map((p) => `<div><b>${esc(p.n)}:</b> ${esc(p.d)}</div>`).join("")}</div>` },
+    { t: "Empezar: el mulligan", h: `<p>Se tira una moneda para ver quién empieza.</p>
+      <p>El que empieza roba <b>3 cartas</b>; el otro roba <b>4</b> y además recibe <b>La Moneda</b> (0 maná: te da 1 de maná extra ese turno).</p>
+      <p>Antes del primer turno viene el <b>mulligan</b>: tocá las cartas que no quieras y se cambian por otras del mazo. Conviene cambiar las cartas caras para tener algo que jugar en los primeros turnos.</p>` },
+    { t: "Misiones", h: `<div class="tuto-fila">${ej("tun_awarded")}</div>
+      <p>Algunos héroes tienen una <b>misión</b> que empieza siempre en tu mano (no cuenta como carta del mazo).</p>
+      <p>Al jugarla queda arriba de tu retrato con un contador. Cuando cumplís el objetivo, te da una recompensa muy fuerte.</p>` },
+    { t: "Mazo y reglas", h: `<ul class="tuto-lista">
+      <li>El mazo tiene <b>30 cartas</b>: de la clase de tu héroe y neutrales. Máximo <b>2 copias</b> de cada carta y <b>1</b> si es legendaria (★).</li>
+      <li>Robás 1 carta al empezar cada turno.</li>
+      <li>Mano: máximo <b>10 cartas</b>. Si robás con la mano llena, la carta se quema.</li>
+      <li>Mesa: máximo <b>7 esbirros</b> por lado.</li>
+      <li><b>Fatiga</b>: si tenés que robar y no te quedan cartas, recibís 1 de daño, después 2, 3...</li>
+      <li>Por ahora cada héroe juega con su <b>mazo armado</b> y el héroe sale al azar.</li></ul>
+      <p>¡Eso es todo! Lo mejor para aprender es jugar contra el bot.</p>` },
+  ];
+  paso = Math.max(0, Math.min(PASOS.length - 1, paso));
+  const ultimo = paso === PASOS.length - 1;
+  if (ultimo) guardarLS("tutorialVisto", true);
+  app.innerHTML = `<div class="coleccion tutorial"><div class="tuto-caja">
+    <div class="tuto-paso">Paso ${paso + 1} de ${PASOS.length}</div>
+    <h2>${esc(PASOS[paso].t)}</h2>
+    <div class="tuto-texto">${PASOS[paso].h}</div>
+    <div class="tuto-puntos">${PASOS.map((_, i) => `<i class="${i === paso ? "on" : ""}" data-i="${i}"></i>`).join("")}</div>
+    <div class="tuto-botones">
+      <button class="boton sec" id="atras" ${paso ? "" : "disabled"}>Atrás</button>
+      ${ultimo ? '<button class="boton" id="jugar-bot">Jugar contra el bot</button>' : '<button class="boton" id="sig">Siguiente</button>'}
+    </div>
+    <button class="mini-btn tuto-salir" onclick="location.href='/'">Salir</button>
+  </div></div>`;
+  $("#atras").onclick = () => pantallaTutorial(paso - 1);
+  $("#sig") && ($("#sig").onclick = () => pantallaTutorial(paso + 1));
+  $$(".tuto-puntos i").forEach((el) => (el.onclick = () => pantallaTutorial(+el.dataset.i)));
+  $$(".tuto-texto .carta").forEach((el) => (el.onclick = () => zoom(el.dataset.carta)));
+  $("#jugar-bot") && ($("#jugar-bot").onclick = async () => {
+    if (!localStorage.getItem("nombre")) localStorage.setItem("nombre", "Novato");
+    const { id } = await (await fetch("/api/crear", { method: "POST" })).json();
+    location.href = "/p/" + id + "?bot=1";
+  });
 }
 
 // ================= partida =================
@@ -1112,7 +1216,39 @@ function render(v) {
   $("#rendir") && ($("#rendir").onclick = () => confirmar("¿Rendirse?", () => enviar({ t: "rendirse" })));
   actualizarReloj();
   pendiente(v);
+  mulliganUI(v);
   if (v.fase === "fin") renderFinal(v);
+}
+
+// ---------- mulligan: al empezar, cada uno elige qué cartas de su mano inicial cambiar ----------
+let mullCambiar = new Set();
+function mulliganUI(v) {
+  if (v.fase !== "mulligan") { mullCambiar = new Set(); return; }
+  const yo = yoDe(v), listo = v.yo < 0 || v.mulligan?.[yo];
+  const mano = v.j[yo].mano || [];
+  const o = document.createElement("div");
+  o.id = "mulligan"; o.className = "mulligan";
+  o.innerHTML = `<div class="desc-titulo">MULLIGAN</div>
+    <div class="mull-info">${v.turno === yo ? "Empezás vos: robás 3 cartas." : "Vas segundo: robás 4 cartas y, al terminar el mulligan, La Moneda."}</div>
+    ${v.yo < 0 ? '<div class="mull-info">Los jugadores están eligiendo sus cartas...</div>' : `
+    <div class="mull-cartas">${mano.map((c) => {
+      const d = DB[c.id] || {}, fija = d.tipo === "mision";
+      return `<div class="mull-op ${mullCambiar.has(c.uid) ? "cambia" : ""} ${fija ? "fija" : ""}" data-uid="${c.uid}">${cartaHTML(cartaMano(c) || d)}
+        ${fija ? '<span class="mull-tag">se queda</span>' : '<span class="mull-x">✖</span>'}</div>`;
+    }).join("")}</div>
+    <div class="mull-info">${listo ? "Listo. Esperando a tu rival..." : "Tocá las cartas que quieras cambiar: vuelven al mazo y robás otras."}</div>
+    ${listo ? "" : `<button class="boton" id="mull-ok" style="max-width:280px">${mullCambiar.size ? `Cambiar ${mullCambiar.size} y empezar` : "Me quedo con estas"}</button>`}`}
+    <div class="mull-reloj" id="mull-reloj"></div>`;
+  app.append(o);
+  if (listo) return;
+  $$(".mull-op:not(.fija)", o).forEach((el) => (el.onclick = () => {
+    const uid = el.dataset.uid;
+    if (mullCambiar.has(uid)) mullCambiar.delete(uid); else mullCambiar.add(uid);
+    Sonido.carta();
+    $("#mulligan")?.remove(); mulliganUI(V);
+  }));
+  $("#mull-ok", o).onclick = () => { enviar({ t: "mulligan", cambiar: [...mullCambiar] }); mullCambiar = new Set(); $("#mull-ok").disabled = true; };
+  actualizarReloj();
 }
 
 // ---------- elecciones: descubrir (como Hearthstone) y a quién lanzar cada Tun ----------
@@ -1228,6 +1364,7 @@ function confirmar(txt, si) {
 }
 
 function actualizarReloj() {
+  if (V?.fase === "mulligan" && $("#mull-reloj")) $("#mull-reloj").textContent = Math.max(0, Math.ceil((V.finTurno - (Date.now() + desfase)) / 1000)) + "s";
   if (!V || V.fase !== "jugando") return;
   const resta = Math.max(0, (V.finTurno - (Date.now() + desfase)) / 1000);
   const cuerda = $(".cuerda"), reloj = $(".reloj");
@@ -1265,7 +1402,7 @@ function zoom(idCarta, uid) {
   const puede = uid && V && V.yo >= 0 && V.turno === V.yo && V.fase === "jugando" && jugable(V, c);
   const m = document.createElement("div");
   m.className = "modal";
-  m.innerHTML = `<div class="modal-caja">${cartaHTML(c, { clase: "grande" })}
+  m.innerHTML = `<div class="modal-caja">${cartaHTML(c, { clase: "grande" })}${palabrasHTML(c)}
     ${puede ? '<button class="boton" id="jugar" style="width:min(56vw,260px)">Jugar</button>' : ""}</div>`;
   document.body.append(m);
   const abierto = Date.now();
@@ -1449,7 +1586,7 @@ function mostrarPreview(el) {
     if (h) { carta = { id: h.id, nombre: h.nombre, tipo: "esbirro", coste: "", ataque: "", vida: p.vida, arte: h.arte, texto: `Poder: ${h.poder?.nombre || "ninguno"}. ${h.poder?.texto || ""}`, clase: h.clase }; extra = p.nombre; }
   }
   if (!carta) return;
-  preview.innerHTML = cartaHTML(carta) + (extra ? `<div class="ahora">${esc(extra)}</div>` : "");
+  preview.innerHTML = cartaHTML(carta) + (extra ? `<div class="ahora">${esc(extra)}</div>` : "") + palabrasHTML(carta);
   preview.style.display = "block";
   const r = el.getBoundingClientRect(), pw = 236, ph = preview.offsetHeight;
   const x = r.right + 18 + pw < innerWidth ? r.right + 18 : r.left - pw - 18;
