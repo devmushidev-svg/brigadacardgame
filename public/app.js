@@ -127,7 +127,7 @@ const artHTML = (arte) => (/^(https?:)?\//.test(arte || "") ? `<img src="${esc(a
 
 function cartaHTML(c, { uid = "", clase = "" } = {}) {
   const esH = c.tipo === "hechizo" || c.tipo === "mision";
-  const etiqueta = [c.clase ? HEROES[c.clase]?.nombre || c.clase : (c.token ? "" : "Neutral"), c.arquetipo || "", c.tribu && c.tribu !== c.clase ? c.tribu[0].toUpperCase() + c.tribu.slice(1) : ""].filter(Boolean).join(" · ");
+  const etiqueta = [c.clase ? HEROES[c.clase]?.nombre || c.clase : (c.token ? "" : "Neutral"), c.arquetipo || "", c.tribu && c.tribu !== c.clase ? c.tribu[0].toUpperCase() + c.tribu.slice(1) : "", { hombre: "♂", mujer: "♀", no_binario: "⚧" }[c.genero] || ""].filter(Boolean).join(" · ");
   // como en Hearthstone: las cartas de clase llevan el marco del color de su héroe; las neutrales, piedra gris
   const marco = c.clase && c.tipo !== "mision" ? HEROES[c.clase]?.marco : null;
   return `<div class="carta ${esH ? "hechizo" : ""} ${c.tipo === "mision" ? "mision" : ""} ${c.rareza === "legendaria" ? "legendaria" : ""} ${clase}" ${uid ? `data-uid="${uid}"` : ""} data-carta="${esc(c.id)}"${marco ? ` style="--marco:${esc(marco)}"` : ""}>

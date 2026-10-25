@@ -4,6 +4,8 @@ Registro vivo de todo lo que el juego sabe hacer. Si una carta nueva necesita al
 
 Nivel de poder: **absurdo a propósito**, como Hearthstone en sus peores (mejores) momentos.
 
+Meta actual: **100 cartas**. Todas las cartas de Tun hasta ahora son hombres.
+
 ## Reglas base
 
 | Regla | Valor |
@@ -49,7 +51,7 @@ Recomendado: PNG o WEBP cuadrado de 512×512, con el personaje centrado, porque 
 | `hechizo` | aplica `efectos` y se va |
 | `mision` | queda activa con un contador; al cumplirse aplica su `recompensa` |
 
-Campos: `id`, `nombre`, `coste`, `ataque`, `vida`, `texto`, `arte` (emoji o `/arte/x.png` en `public/arte/`), `clase`, `tribu`, `rareza` (`legendaria`), `token: true` (no entra al mazo; solo se invoca o se da), `arquetipo`, `etiquetas` (lista libre, ej. `["mujer"]`, para efectos que buscan cartas por etiqueta), `entrada` (animación al entrar: `legendaria` —automática en legendarias— o `demonio`).
+Campos: `id`, `nombre`, `coste`, `ataque`, `vida`, `texto`, `arte` (emoji o `/arte/x.png` en `public/arte/`), `clase`, `tribu`, `rareza` (`legendaria`), `token: true` (no entra al mazo; solo se invoca o se da), `arquetipo`, `genero` (`hombre`, `mujer` o `no_binario`; **toda carta de personaje lleva uno**, se pregunta al crearla; sale como ♂ ♀ ⚧ abajo de la carta), `etiquetas` (lista libre, ej. `["mujer"]`, para efectos que buscan cartas por etiqueta), `entrada` (animación al entrar: `legendaria` —automática en legendarias— o `demonio`).
 
 ## Palabras clave (`claves`)
 
@@ -86,7 +88,7 @@ Campos: `id`, `nombre`, `coste`, `ataque`, `vida`, `texto`, `arte` (emoji o `/ar
 | `mana` | maná extra este turno |
 | `dar_carta` | pone `carta` en tu mano |
 | `global` | crea un efecto permanente con `disparador` y `efectos` |
-| `robar_mano` | te robás N cartas de la mano rival que cumplan el `filtro` (`{ "etiqueta": "mujer" }` o `{ "tribu": ... }`); si no hay, no pasa nada |
+| `robar_mano` | te robás N cartas de la mano rival que cumplan el `filtro` (`{ "genero": "mujer" }`, `{ "etiqueta": ... }` o `{ "tribu": ... }`); si no hay, no pasa nada |
 | `devorar` | destruye a tus otros esbirros (con `filtro` de tribu) y la carta gana +`ataque`/+`vida` por cada uno |
 
 **Efecto visual (`fx`):** cualquier efecto puede llevar `"fx"` para que el cliente lo dibuje distinto:
@@ -129,7 +131,7 @@ Diseño de Mario. Arquetipo: paladín molesto — llenar la mesa de Tun, buffear
 | Carta | Coste | Stats | Efecto | Estado |
 |---|---|---|---|---|
 | Tun Brawl Stars | 2 | 2/3 | — (tribu Tun: cuenta para la misión y Tun Puto) | hecho |
-| Mauro Sosa | 2 | 2/3 | Grito: si el rival tiene una mujer en la mano, te la robás | hecho — falta marcar qué cartas son mujer (`"etiquetas": ["mujer"]`) |
+| Mauro Sosa | 2 | 2/3 | Grito: si el rival tiene una mujer en la mano, te la robás | hecho — roba cartas con `"genero": "mujer"` (todavía no hay ninguna) |
 
 ## Animaciones automáticas
 

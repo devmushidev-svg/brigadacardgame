@@ -102,7 +102,7 @@ for (let k = 0; k < 20; k++) {
 // Mauro Sosa: roba una mujer de la mano rival (y no toca lo demás)
 {
   const e = nueva(11); const s = e.turno, r = 1 - s;
-  db.prueba_mujer = { id: "prueba_mujer", nombre: "Mujer", tipo: "esbirro", coste: 1, ataque: 1, vida: 1, etiquetas: ["mujer"], token: true };
+  db.prueba_mujer = { id: "prueba_mujer", nombre: "Mujer", tipo: "esbirro", coste: 1, ataque: 1, vida: 1, genero: "mujer", token: true };
   e.j[r].mano = [{ uid: "x1", id: "tun_brawl" }, { uid: "x2", id: "prueba_mujer" }];
   preparar(e, s, ["mauro_sosa"]);
   const res = M.aplicar(e, s, { t: "jugar", uid: "t0" }, db, 0);

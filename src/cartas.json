@@ -18,6 +18,7 @@
   },
   {
    "id": "tun",
+   "genero": "hombre",
    "nombre": "Tun",
    "tipo": "esbirro",
    "coste": 1,
@@ -31,6 +32,7 @@
   },
   {
    "id": "tun_awarded",
+   "genero": "hombre",
    "nombre": "Tun the Awarded",
    "tipo": "mision",
    "coste": 1,
@@ -52,6 +54,7 @@
   },
   {
    "id": "tun_maestro",
+   "genero": "hombre",
    "nombre": "Tun Maestro del Universo",
    "tipo": "esbirro",
    "coste": 5,
@@ -74,6 +77,7 @@
   },
   {
    "id": "panama",
+   "genero": "hombre",
    "nombre": "Panamá",
    "tipo": "esbirro",
    "coste": 1,
@@ -101,6 +105,7 @@
   },
   {
    "id": "tun_puto",
+   "genero": "hombre",
    "nombre": "Tun Puto",
    "tipo": "esbirro",
    "coste": 3,
@@ -124,6 +129,7 @@
   },
   {
    "id": "tun_brawl",
+   "genero": "hombre",
    "nombre": "Tun Brawl Stars",
    "tipo": "esbirro",
    "coste": 2,
@@ -135,6 +141,7 @@
   },
   {
    "id": "choza_monos",
+   "genero": "hombre",
    "nombre": "Choza de Monos",
    "tipo": "esbirro",
    "coste": 4,
@@ -160,10 +167,11 @@
    "vida": 3,
    "texto": "Grito de batalla: si el rival tiene una mujer en la mano, te la robás.",
    "arte": "/arte/mauro_sosa.webp",
-   "grito": [{ "tipo": "robar_mano", "filtro": { "etiqueta": "mujer" }, "cantidad": 1 }]
+   "grito": [{ "tipo": "robar_mano", "filtro": { "genero": "mujer" }, "cantidad": 1 }]
   },
   {
    "id": "tun_satanico",
+   "genero": "hombre",
    "nombre": "Tun Satánico",
    "entrada": "demonio",
    "tipo": "esbirro",

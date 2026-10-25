@@ -121,10 +121,11 @@ function registrar(estado, texto) {
   if (estado.log.length > 30) estado.log.shift();
 }
 
-// filtro: { etiqueta: "mujer" } o { tribu: "tun" } (sobre la carta de la base)
+// filtro: { genero: "mujer" }, { etiqueta: ... } o { tribu: "tun" } (sobre la carta de la base)
 function cumpleFiltro(c, f) {
   if (!c) return false;
   if (f?.etiqueta && !(c.etiquetas || []).includes(f.etiqueta)) return false;
+  if (f?.genero && c.genero !== f.genero) return false;
   if (f?.tribu && c.tribu !== f.tribu) return false;
   return true;
 }
