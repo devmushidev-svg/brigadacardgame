@@ -85,7 +85,7 @@ button { font-family: var(--f-tit); cursor: pointer; }
   box-shadow: 0 0 0 2px #2a1806, 0 8px 18px #000c; }
 .heroe-arte { display: grid; place-items: center; width: 100%; height: 100%; overflow: hidden; font-size: calc(var(--esb) * 0.62); line-height: 1;
   border-radius: inherit; background: var(--ruido), var(--fondo, #555); box-shadow: inset 0 0 18px #000c; }
-.heroe-arte img { width: 100%; height: 100%; object-fit: cover; }
+.heroe-arte img { width: 100%; height: 100%; object-fit: fill; }
 .heroe .stat.hp { right: -12px; bottom: -8px; width: calc(var(--esb) * .44); height: calc(var(--esb) * .5); font-size: calc(var(--esb) * .26); }
 .heroe.desconectado { filter: grayscale(.9) brightness(.6); }
 /* misión: medallón arriba al centro del retrato, con anillo de progreso (como Hearthstone) */
@@ -94,7 +94,7 @@ button { font-family: var(--f-tit); cursor: pointer; }
   background: conic-gradient(#ffd34f calc(var(--p, 0) * 360deg), #2a1806 0); box-shadow: 0 0 0 2px #2a1806, 0 0 0 4px var(--oro2), 0 4px 10px #000c; }
 .mision-arte { display: grid; place-items: center; width: 100%; height: 100%; border-radius: 50%; overflow: hidden; font-size: 16px;
   background: radial-gradient(circle at 40% 30%, #6b4a1a, #2a1806); box-shadow: inset 0 0 8px #000; }
-.mision-arte img { width: 100%; height: 100%; object-fit: cover; }
+.mision-arte img { width: 100%; height: 100%; object-fit: fill; }
 .mision-chip b { position: absolute; left: 50%; bottom: -9px; transform: translateX(-50%); white-space: nowrap; padding: 0 6px; border-radius: 9px;
   font: 900 11px/16px var(--f-tit); color: var(--oro); background: #2a1806; border: 1.5px solid var(--oro2); }
 .mision-chip.completa { box-shadow: 0 0 0 2px #2a1806, 0 0 0 4px #ffe9a0, 0 0 18px #ffd34f; }
@@ -106,8 +106,8 @@ button { font-family: var(--f-tit); cursor: pointer; }
   font-size: calc(var(--esb) * .34); transition: transform .2s, filter .2s; }
 .poder > span { display: grid; place-items: center; width: 100%; height: 100%; border-radius: 50%; background: radial-gradient(circle at 40% 35%, #5d7aa8, #1d2b45); box-shadow: inset 0 0 8px #000; }
 .poder > span { overflow: hidden; }
-.poder > span img { width: 100%; height: 100%; object-fit: cover; }
-.global img { width: 100%; height: 100%; object-fit: cover; border-radius: 50%; }
+.poder > span img { width: 100%; height: 100%; object-fit: fill; }
+.global img { width: 100%; height: 100%; object-fit: fill; border-radius: 50%; }
 .poder .stat.mana { left: 50%; top: -12px; transform: translateX(-50%); width: 24px; height: 26px; font-size: 14px; }
 .poder.listo { box-shadow: 0 0 0 2px #2a1806, 0 0 0 4px var(--verde), 0 0 18px 4px #5cff86aa; }
 .poder.listo:hover { transform: scale(1.08); }
@@ -134,7 +134,8 @@ button { font-family: var(--f-tit); cursor: pointer; }
   box-shadow: 0 0 0 2px #2a1d10, 0 8px 12px #000a; }
 .esbirro .arte { display: grid; place-items: center; width: 100%; height: 100%; border-radius: 50%; overflow: hidden;
   font-size: calc(var(--esb) * .56); line-height: 1; background: var(--ruido), var(--fondo, #555); box-shadow: inset 0 0 16px #000d; pointer-events: none; }
-.esbirro .arte img, .carta .arte img { width: 100%; height: 100%; object-fit: cover; object-position: 50% 30%; }
+/* la imagen entera, estirada al marco (a propósito: se ve todo aunque se deforme) */
+.esbirro .arte img, .carta .arte img, .heroe-arte img, .poder > span img, .entrada-fig img, .mision-arte img { width: 100%; height: 100%; object-fit: fill; }
 .carta .texto.t2 { font-size: calc(var(--carta-w) * .072); line-height: 1.1; }
 .carta .texto.t3 { font-size: calc(var(--carta-w) * .063); line-height: 1.08; }
 .carta .texto.t4 { font-size: calc(var(--carta-w) * .056); line-height: 1.05; }
@@ -286,7 +287,7 @@ button { font-family: var(--f-tit); cursor: pointer; }
   background: linear-gradient(145deg, #fff0b0, var(--oro) 30%, var(--oro2) 60%, #ffe08a 80%, var(--oro3)); box-shadow: 0 0 0 2px #2a1806, 0 0 40px #ffd34f, 0 14px 30px #000; }
 .entrada-fig.rojo { background: linear-gradient(145deg, #ff8a7a, #a3121a 40%, #3a0006 75%, #ff4a3a); box-shadow: 0 0 0 2px #1a0000, 0 0 50px #ff2a2a, 0 14px 30px #000; }
 .entrada-fig span { display: grid; place-items: center; width: 100%; height: 100%; border-radius: 50%; overflow: hidden; font-size: 54px; background: var(--ruido), var(--fondo, #555); }
-.entrada-fig img { width: 100%; height: 100%; object-fit: cover; }
+.entrada-fig img { width: 100%; height: 100%; object-fit: fill; }
 .runa { position: fixed; width: 110px; height: 110px; border-radius: 50%; pointer-events: none; border: 3px dashed #ffd34f; box-shadow: 0 0 16px #ffd34f, inset 0 0 16px #ffd34f88; }
 .popup-carta { position: fixed; z-index: 64; pointer-events: none; filter: drop-shadow(0 10px 20px #000c); }
 .popup-carta .carta { --carta-w: min(34vw, 170px); }
