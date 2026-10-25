@@ -1,0 +1,25 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no">
+  <meta name="theme-color" content="#1b1410">
+  <title>Puto Cartas</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Lilita+One&family=Nunito:wght@600;800&display=swap">
+  <link rel="stylesheet" href="/style.css">
+</head>
+<body>
+  <div id="app"></div>
+  <svg id="flecha" aria-hidden="true">
+    <defs>
+      <marker id="punta" viewBox="0 0 10 10" refX="5" refY="5" markerWidth="5" markerHeight="5" orient="auto-start-reverse">
+        <path d="M0,0 L10,5 L0,10 z" fill="#ff4d2e"/>
+      </marker>
+    </defs>
+    <path id="flecha-linea" d="" marker-end="url(#punta)"/>
+  </svg>
+  <div id="fx"></div>
+  <script type="module" src="/app.js"></script>
+</body>
+</html>

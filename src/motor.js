@@ -1,0 +1,404 @@
+// Motor del juego: reglas tipo Hearthstone simple.
+// Todo el estado es JSON plano para poder guardarlo en el Durable Object.
+// El servidor es la única autoridad: el cliente solo manda intenciones.
+
+export const CONFIG = {
+  VIDA_HEROE: 30,
+  MAX_MANA: 10,
+  MAX_TABLERO: 7,
+  MAX_MANO: 10,
+  TAM_MAZO: 20,
+  COPIAS_MAX: 2,
+  TIEMPO_TURNO: 75, // segundos
+};
+
+// ---------- azar reproducible (se guarda en el estado) ----------
+function azar(estado) {
+  let t = (estado.rng = (estado.rng + 0x6d2b79f5) >>> 0);
+  t = Math.imul(t ^ (t >>> 15), t | 1);
+  t ^= t + Math.imul(t ^ (t >>> 7), t | 61);
+  return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+}
+const elegir = (estado, lista) => lista[Math.floor(azar(estado) * lista.length)];
+function barajar(estado, lista) {
+  for (let i = lista.length - 1; i > 0; i--) {
+    const j = Math.floor(azar(estado) * (i + 1));
+    [lista[i], lista[j]] = [lista[j], lista[i]];
+  }
+  return lista;
+}
+
+// ---------- utilidades ----------
+const otro = (s) => 1 - s;
+const nuevoUid = (estado) => "m" + estado.sigId++;
+export const necesitaObjetivo = (carta) =>
+  [...(carta.grito || []), ...(carta.efectos || [])].some((e) => (e.objetivo || "").startsWith("elegido"));
+
+function armarMazo(estado, db) {
+  const pool = Object.values(db).filter((c) => !c.token);
+  const mazo = [];
+  const copias = {};
+  let intentos = 0;
+  while (mazo.length < CONFIG.TAM_MAZO && intentos++ < 1000) {
+    const c = elegir(estado, pool);
+    if ((copias[c.id] || 0) >= CONFIG.COPIAS_MAX) continue;
+    copias[c.id] = (copias[c.id] || 0) + 1;
+    mazo.push(c.id);
+  }
+  return barajar(estado, mazo);
+}
+
+// ---------- crear partida ----------
+export function crearPartida(db, semilla) {
+  const estado = {
+    fase: "esperando",
+    turno: 0,
+    numTurno: 0,
+    ganador: null,
+    sigId: 1,
+    rng: semilla >>> 0,
+    finTurno: 0,
+    log: [],
+    j: [0, 1].map(() => ({
+      nombre: null,
+      vida: CONFIG.VIDA_HEROE,
+      vidaMax: CONFIG.VIDA_HEROE,
+      mana: 0,
+      manaMax: 0,
+      mazo: [],
+      mano: [],
+      tablero: [],
+      fatiga: 0,
+    })),
+  };
+  return estado;
+}
+
+export function empezar(estado, db, ahora) {
+  const ev = [];
+  estado.fase = "jugando";
+  for (const p of estado.j) p.mazo = armarMazo(estado, db);
+  const primero = azar(estado) < 0.5 ? 0 : 1;
+  estado.turno = primero;
+  for (let k = 0; k < 3; k++) robar(estado, primero, ev, db);
+  for (let k = 0; k < 4; k++) robar(estado, otro(primero), ev, db);
+  if (db.moneda) darCarta(estado, otro(primero), "moneda", ev);
+  registrar(estado, `${estado.j[primero].nombre} empieza`);
+  inicioTurno(estado, primero, ev, db, ahora);
+  return ev;
+}
+
+function registrar(estado, texto) {
+  estado.log.push(texto);
+  if (estado.log.length > 30) estado.log.shift();
+}
+
+function darCarta(estado, s, id, ev) {
+  const p = estado.j[s];
+  if (p.mano.length >= CONFIG.MAX_MANO) {
+    ev.push({ e: "quemada", seat: s, carta: id });
+    return;
+  }
+  p.mano.push({ uid: "c" + estado.sigId++, id });
+  ev.push({ e: "roba", seat: s });
+}
+
+function robar(estado, s, ev, db) {
+  const p = estado.j[s];
+  if (!p.mazo.length) {
+    p.fatiga++;
+    ev.push({ e: "fatiga", seat: s, n: p.fatiga });
+    danarHeroe(estado, s, p.fatiga, ev);
+    return;
+  }
+  darCarta(estado, s, p.mazo.shift(), ev);
+}
+
+function inicioTurno(estado, s, ev, db, ahora) {
+  const p = estado.j[s];
+  estado.turno = s;
+  estado.numTurno++;
+  p.manaMax = Math.min(CONFIG.MAX_MANA, p.manaMax + 1);
+  p.mana = p.manaMax;
+  for (const m of p.tablero) {
+    m.dormido = false;
+    m.ataques = 0;
+  }
+  ev.push({ e: "turno", seat: s });
+  robar(estado, s, ev, db);
+  estado.finTurno = ahora + CONFIG.TIEMPO_TURNO * 1000;
+  resolverMuertes(estado, ev, db);
+}
+
+// ---------- referencias a objetivos ----------
+// "h0"/"h1" = héroes, "mX" = esbirros
+function buscar(estado, ref) {
+  if (ref === "h0" || ref === "h1") return { tipo: "heroe", seat: +ref[1], obj: estado.j[+ref[1]] };
+  for (const s of [0, 1]) {
+    const m = estado.j[s].tablero.find((x) => x.uid === ref);
+    if (m) return { tipo: "esbirro", seat: s, obj: m };
+  }
+  return null;
+}
+
+function danarHeroe(estado, s, n, ev) {
+  if (n <= 0) return;
+  estado.j[s].vida -= n;
+  ev.push({ e: "dano", a: "h" + s, n });
+}
+
+function danar(estado, ref, n, ev) {
+  const t = buscar(estado, ref);
+  if (!t || n <= 0) return;
+  if (t.tipo === "heroe") return danarHeroe(estado, t.seat, n, ev);
+  if (t.obj.escudo) {
+    t.obj.escudo = false;
+    ev.push({ e: "escudo_roto", a: ref });
+    return;
+  }
+  t.obj.vida -= n;
+  ev.push({ e: "dano", a: ref, n });
+}
+
+function curar(estado, ref, n, ev) {
+  const t = buscar(estado, ref);
+  if (!t) return;
+  const antes = t.obj.vida;
+  t.obj.vida = Math.min(t.obj.vidaMax, t.obj.vida + n);
+  if (t.obj.vida > antes) ev.push({ e: "cura", a: ref, n: t.obj.vida - antes });
+}
+
+function invocar(estado, s, id, ev, db, pos) {
+  const p = estado.j[s];
+  const c = db[id];
+  if (!c || p.tablero.length >= CONFIG.MAX_TABLERO) return null;
+  const claves = new Set(c.claves || []);
+  const m = {
+    uid: nuevoUid(estado),
+    id,
+    ataque: c.ataque,
+    vida: c.vida,
+    vidaMax: c.vida,
+    provocar: claves.has("provocar"),
+    carga: claves.has("carga"),
+    escudo: claves.has("escudo"),
+    noAtaca: claves.has("no_ataca"),
+    doble: claves.has("doble"),
+    dormido: !claves.has("carga"),
+    ataques: 0,
+  };
+  const i = pos == null ? p.tablero.length : Math.max(0, Math.min(pos, p.tablero.length));
+  p.tablero.splice(i, 0, m);
+  ev.push({ e: "invoca", seat: s, uid: m.uid, carta: id, pos: i });
+  return m;
+}
+
+// ---------- efectos ----------
+// objetivo: elegido | elegido_enemigo | elegido_esbirro | elegido_aliado | heroe_enemigo | heroe_propio |
+//           esbirro_enemigo_azar | esbirros_enemigos | todos_esbirros | aliado_azar | aliados | todos_enemigos | yo
+function objetivos(estado, s, efecto, elegido, fuente) {
+  const yo = estado.j[s].tablero.map((m) => m.uid).filter((u) => u !== fuente);
+  const ene = estado.j[otro(s)].tablero.map((m) => m.uid);
+  switch (efecto.objetivo) {
+    case "elegido":
+    case "elegido_enemigo":
+    case "elegido_esbirro":
+    case "elegido_aliado":
+      return elegido ? [elegido] : [];
+    case "heroe_enemigo": return ["h" + otro(s)];
+    case "heroe_propio": return ["h" + s];
+    case "esbirro_enemigo_azar": return ene.length ? [elegir(estado, ene)] : [];
+    case "esbirros_enemigos": return ene;
+    case "todos_esbirros": return [...yo, ...ene];
+    case "aliado_azar": return yo.length ? [elegir(estado, yo)] : [];
+    case "aliados": return yo;
+    case "todos_enemigos": return ["h" + otro(s), ...ene];
+    case "yo": return fuente ? [fuente] : [];
+    default: return [];
+  }
+}
+
+function aplicarEfectos(estado, s, efectos, elegido, ev, db, fuente) {
+  for (const ef of efectos || []) {
+    const n = ef.cantidad ?? 1;
+    if (ef.tipo === "robar") { for (let k = 0; k < n; k++) robar(estado, s, ev, db); continue; }
+    if (ef.tipo === "mana") { const p = estado.j[s]; p.mana = Math.min(CONFIG.MAX_MANA, p.mana + n); ev.push({ e: "mana", seat: s, n }); continue; }
+    if (ef.tipo === "invocar") {
+      const lado = ef.lado === "enemigo" ? otro(s) : s;
+      for (let k = 0; k < n; k++) invocar(estado, lado, ef.carta, ev, db);
+      continue;
+    }
+    for (const ref of objetivos(estado, s, ef, elegido, fuente)) {
+      const t = buscar(estado, ref);
+      if (!t) continue;
+      if (ef.tipo === "dano") danar(estado, ref, n, ev);
+      else if (ef.tipo === "curar") curar(estado, ref, n, ev);
+      else if (ef.tipo === "destruir" && t.tipo === "esbirro") { t.obj.vida = 0; ev.push({ e: "destruido", a: ref }); }
+      else if (ef.tipo === "buff" && t.tipo === "esbirro") {
+        t.obj.ataque += ef.ataque || 0;
+        t.obj.vida += ef.vida || 0;
+        t.obj.vidaMax += ef.vida || 0;
+        if (ef.provocar) t.obj.provocar = true;
+        if (ef.escudo) t.obj.escudo = true;
+        ev.push({ e: "buff", a: ref, ataque: ef.ataque || 0, vida: ef.vida || 0 });
+      }
+    }
+  }
+}
+
+function resolverMuertes(estado, ev, db) {
+  for (let vuelta = 0; vuelta < 20; vuelta++) {
+    const muertos = [];
+    for (const s of [0, 1]) {
+      const p = estado.j[s];
+      for (const m of p.tablero) if (m.vida <= 0) muertos.push({ s, m });
+      p.tablero = p.tablero.filter((m) => m.vida > 0);
+    }
+    if (!muertos.length) break;
+    for (const { s, m } of muertos) {
+      ev.push({ e: "muere", uid: m.uid, seat: s });
+      const c = db[m.id];
+      if (c && c.aliento) aplicarEfectos(estado, s, c.aliento, null, ev, db, null);
+    }
+  }
+  const muerto0 = estado.j[0].vida <= 0, muerto1 = estado.j[1].vida <= 0;
+  if ((muerto0 || muerto1) && estado.fase === "jugando") {
+    estado.fase = "fin";
+    estado.ganador = muerto0 && muerto1 ? "empate" : muerto0 ? 1 : 0;
+    ev.push({ e: "fin", ganador: estado.ganador });
+    registrar(estado, estado.ganador === "empate" ? "empate" : `gana ${estado.j[estado.ganador].nombre}`);
+  }
+}
+
+// ---------- validación de objetivos elegidos ----------
+function objetivoValido(estado, s, carta, ref) {
+  const ef = [...(carta.grito || []), ...(carta.efectos || [])].find((e) => (e.objetivo || "").startsWith("elegido"));
+  if (!ef) return true;
+  const t = buscar(estado, ref);
+  if (!t) return false;
+  if (ef.objetivo === "elegido_enemigo") return t.seat !== s;
+  if (ef.objetivo === "elegido_aliado") return t.seat === s && t.tipo === "esbirro";
+  if (ef.objetivo === "elegido_esbirro") return t.tipo === "esbirro";
+  if (ef.tipo === "buff" || ef.tipo === "destruir") return t.tipo === "esbirro";
+  return true;
+}
+
+export function hayObjetivos(estado, s, carta) {
+  const refs = ["h0", "h1", ...estado.j[0].tablero.map((m) => m.uid), ...estado.j[1].tablero.map((m) => m.uid)];
+  return refs.some((r) => objetivoValido(estado, s, carta, r));
+}
+
+export function puedeAtacar(m) {
+  return !m.noAtaca && m.ataque > 0 && !m.dormido && m.ataques < (m.doble ? 2 : 1);
+}
+
+export function objetivosAtaque(estado, s) {
+  const ene = estado.j[otro(s)].tablero;
+  const prov = ene.filter((m) => m.provocar);
+  if (prov.length) return prov.map((m) => m.uid);
+  return ["h" + otro(s), ...ene.map((m) => m.uid)];
+}
+
+// ---------- acciones ----------
+export function aplicar(estado, s, accion, db, ahora) {
+  const ev = [];
+  if (estado.fase !== "jugando") return { error: "la partida no esta en juego" };
+  if (accion.t === "rendirse") {
+    estado.j[s].vida = 0;
+    registrar(estado, `${estado.j[s].nombre} se rindio`);
+    resolverMuertes(estado, ev, db);
+    return { ev };
+  }
+  if (estado.turno !== s) return { error: "no es tu turno" };
+  const p = estado.j[s];
+
+  if (accion.t === "fin") {
+    registrar(estado, `${p.nombre} termino su turno`);
+    inicioTurno(estado, otro(s), ev, db, ahora);
+    return { ev };
+  }
+
+  if (accion.t === "jugar") {
+    const i = p.mano.findIndex((c) => c.uid === accion.uid);
+    if (i < 0) return { error: "esa carta no esta en tu mano" };
+    const carta = db[p.mano[i].id];
+    if (!carta) return { error: "carta desconocida" };
+    if (carta.coste > p.mana) return { error: "no te alcanza el mana" };
+    if (carta.tipo !== "hechizo" && p.tablero.length >= CONFIG.MAX_TABLERO) return { error: "tablero lleno" };
+    const pide = necesitaObjetivo(carta);
+    if (pide && hayObjetivos(estado, s, carta)) {
+      if (!accion.objetivo || !objetivoValido(estado, s, carta, accion.objetivo)) return { error: "objetivo invalido" };
+    } else if (carta.tipo === "hechizo" && pide) {
+      return { error: "no hay objetivos para este hechizo" };
+    }
+    p.mana -= carta.coste;
+    p.mano.splice(i, 1);
+    registrar(estado, `${p.nombre} jugo ${carta.nombre}`);
+    if (carta.tipo === "hechizo") {
+      ev.push({ e: "hechizo", seat: s, carta: carta.id, objetivo: accion.objetivo || null });
+      aplicarEfectos(estado, s, carta.efectos, accion.objetivo, ev, db, null);
+    } else {
+      const m = invocar(estado, s, carta.id, ev, db, accion.pos);
+      if (carta.grito) {
+        ev.push({ e: "grito", uid: m.uid, objetivo: accion.objetivo || null });
+        aplicarEfectos(estado, s, carta.grito, accion.objetivo, ev, db, m.uid);
+      }
+    }
+    resolverMuertes(estado, ev, db);
+    return { ev };
+  }
+
+  if (accion.t === "atacar") {
+    const m = p.tablero.find((x) => x.uid === accion.de);
+    if (!m) return { error: "ese esbirro no es tuyo" };
+    if (!puedeAtacar(m)) return { error: m.dormido ? "acaba de entrar, espera un turno" : "no puede atacar" };
+    if (!objetivosAtaque(estado, s).includes(accion.a)) return { error: "tenes que atacar a los de provocar" };
+    m.ataques++;
+    const t = buscar(estado, accion.a);
+    ev.push({ e: "ataque", de: m.uid, a: accion.a });
+    if (t.tipo === "esbirro") {
+      const golpeRecibido = t.obj.ataque;
+      danar(estado, accion.a, m.ataque, ev);
+      danar(estado, m.uid, golpeRecibido, ev);
+    } else {
+      danar(estado, accion.a, m.ataque, ev);
+    }
+    resolverMuertes(estado, ev, db);
+    return { ev };
+  }
+  return { error: "accion desconocida" };
+}
+
+// Fin de turno por tiempo
+export function tiempoAgotado(estado, db, ahora) {
+  if (estado.fase !== "jugando" || ahora < estado.finTurno) return null;
+  const s = estado.turno;
+  registrar(estado, `a ${estado.j[s].nombre} se le acabo el tiempo`);
+  const ev = [];
+  inicioTurno(estado, otro(s), ev, db, ahora);
+  return ev;
+}
+
+// ---------- lo que ve cada jugador ----------
+export function vista(estado, yo) {
+  return {
+    fase: estado.fase,
+    turno: estado.turno,
+    numTurno: estado.numTurno,
+    ganador: estado.ganador,
+    finTurno: estado.finTurno,
+    yo,
+    log: estado.log.slice(-12),
+    j: estado.j.map((p, s) => ({
+      nombre: p.nombre,
+      vida: p.vida,
+      vidaMax: p.vidaMax,
+      mana: p.mana,
+      manaMax: p.manaMax,
+      mazo: p.mazo.length,
+      manoN: p.mano.length,
+      mano: s === yo ? p.mano : undefined,
+      tablero: p.tablero,
+    })),
+  };
+}
