@@ -197,7 +197,7 @@ for (let k = 0; k < 20; k++) {
   assert.ok(e.j[r].vida < 30 - 4 || e.fase === "fin", "los 5 le pegaron a la cara");
 }
 
-// --- Novia de Tun: al morir, tus Tun tienen +1 de ataque (los de ahora, los de la mano y los que vengan) ---
+// --- Novia de Tun: al morir, tus Tun tienen +1/+1 (los de ahora, los de la mano y los que vengan) ---
 {
   const e = nueva(31); const s = e.turno, r = 1 - s;
   e.j[s].tablero = []; e.j[r].tablero = [];
@@ -209,7 +209,9 @@ for (let k = 0; k < 20; k++) {
   novia.dormido = false;
   M.aplicar(e, s, { t: "atacar", de: novia.uid, a: "rv" }, db, 0);
   assert.ok(!e.j[s].tablero.some((m) => m.id === "novia_tun"), "la novia murio");
-  assert.equal(e.j[s].tablero.find((m) => m.id === "tun").ataque, 2, "el Tun que ya estaba gana +1");
+  const tun = e.j[s].tablero.find((m) => m.id === "tun");
+  assert.equal(tun.ataque, 2, "el Tun que ya estaba gana +1");
+  assert.equal(tun.vida, 2, "y +1 de vida");
   assert.equal(M.vista(e, s, db).j[s].mano.find((c) => c.id === "tun_brawl").ataque, 3, "en la mano tambien se ve");
   M.aplicar(e, s, { t: "jugar", uid: "t1" }, db, 0);
   assert.equal(e.j[s].tablero.find((m) => m.id === "tun_brawl").ataque, 3, "los nuevos salen con +1");
@@ -411,7 +413,7 @@ for (let k = 0; k < 20; k++) {
   preparar(e, s, ["cruit_estrenido", "cruit_vampiro"]);
   const mazo = e.j[r].mazo.length;
   M.aplicar(e, s, { t: "jugar", uid: "t0" }, db, 0);
-  assert.equal(e.j[r].mazo.length, mazo + 3);
+  assert.equal(e.j[r].mazo.length, mazo + 2);
   e.j[r].mazo = ["caca", "mauro_sosa", "mauro_sosa"]; // mazo fijo para que la cuenta no dependa del azar
   M.aplicar(e, s, { t: "jugar", uid: "t1" }, db, 0);
   assert.equal(e.j[s].tablero.filter((m) => m.id === "cruit_sangre").length, 2);
@@ -421,7 +423,7 @@ for (let k = 0; k < 20; k++) {
   // 2 Cruit Sangre con un Vampiro: roban 4 cada uno al enemigo con menos vida (el héroe rival, sin esbirros)
   assert.equal(e.j[s].vida, 28, "+8 de vida");
   assert.ok(res.ev.some((x) => x.e === "se_lanza"), "el rival robó una caca al empezar su turno");
-  assert.equal(e.j[r].vida, vr - 8 - 3, "8 robados + 3 de la caca");
+  assert.equal(e.j[r].vida, vr - 8 - 2, "8 robados + 2 de la caca");
   assert.equal(e.j[r].mano.length, mr + 1, "la caca no va a la mano, roba otra");
   e.j[s].vida = 29; e.turno = s; M.aplicar(e, s, { t: "fin" }, db, 0);
   assert.ok(e.j[s].vida > 30 && e.j[s].vidaMax === e.j[s].vida, "robar vida suma, pasa de 30");

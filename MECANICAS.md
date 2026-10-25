@@ -147,7 +147,7 @@ Diseño de Mario. Arquetipo: paladín molesto — llenar la mesa de Tun, buffear
 | Tun Tung Sahur | 1 | 1/1 | Grito: invoca un Tun 1/1 | hecho |
 | Tun Mujer ♀ | 5 | 2/8 | Grito: tus Tun la atacan. Cada vez que recibe daño, 2 de daño a un enemigo al azar | hecho |
 | Tun Cool | 10 | 6/7 | Cuesta 1 menos por cada otro Tun en el campo (los dos lados) | hecho |
-| Novia de Tun ♀ | 4 | 4/4 | Último aliento: tus Tun tienen +1 de ataque por el resto de la partida | hecho |
+| Novia de Tun ♀ | 4 | 4/4 | Último aliento: tus Tun tienen +1/+1 por el resto de la partida | hecho |
 | Tun Mastermind | 25 | 6/3 | Acometida. 1 menos por cada Tun muerto en la partida. Grito: tus Tun tienen +1 de ataque por el resto de la partida | hecho |
 | Comida (hechizo) | 3 | — | Invoca 4 Tun 1/1 | hecho |
 | Plátano (hechizo) | 1 | — | +2/+2 y provocar a uno de tus Tun | hecho |
@@ -191,12 +191,12 @@ Diseño de Mario. Marco azul (provisional). Cruit es no binario: toda carta con 
 | Cruit Excel ⚧ (tribu Cruit) | 5 | 2/2 | Grito: +3/+3 por cada Tarea que lanzaste esta partida | hecho |
 | Tarea de la U (hechizo, etiqueta Tarea) | 1 | — | 2 de daño a tu héroe, roba una carta | hecho |
 | **Coco Supremo** ⚧ (legendaria) | 9 | 7/5 | Grito: repite los gritos y últimos alientos de todos los Cruit que jugaste esta partida | hecho |
-| Estreñido Cruit ⚧ | 1 | 2/3 | Grito: mete 3 Cacas en el mazo del rival (al robarlas: 3 de daño y roba otra) | hecho |
+| Estreñido Cruit ⚧ | 1 | 1/2 | Grito: mete 2 Cacas en el mazo del rival (al robarlas: 2 de daño y roba otra) | hecho |
 | Cruit Sangre ⚧ | 2 | 2/3 | Al final de tu turno, roba 3 de vida al enemigo con menos vida | hecho |
 | Cruit Vampiro ⚧ | 5 | 3/3 | Tus Cruit roban +1 de vida. Grito: invoca 2 Cruit Sangre | hecho |
-| Caca (ficha) | 0 | — | Se lanza al robarla: 3 de daño a quien la roba y roba otra | hecho |
+| Caca (ficha) | 0 | — | Se lanza al robarla: 2 de daño a quien la roba y roba otra | hecho |
 | Cruit Tostadora ⚧ | 1 | 1/2 | Grito: robás una carta | hecho |
-| Cruit Baño ⚧ | 3 | 3/2 | Último aliento: 2 de daño a todos los enemigos | hecho |
+| Cruit Baño ⚧ | 4 | 3/2 | Último aliento: 2 de daño a todos los enemigos | hecho |
 | **Cruit Vaca** ⚧ (legendaria) | 4 | 3/4 | Grito: una Leche a cada uno de tus otros esbirros (+1/+1 y activa a los Cruit) | hecho |
 | **Cruit Verity** ⚧ (legendaria) | 3 | 3/1 | Último aliento: invoca a Verity 6/6 | hecho |
 | Verity ⚧ (ficha, forma monstruosa) | 6 | 6/6 | — | hecho |
@@ -212,7 +212,7 @@ Sin mazo armado, el héroe sale al azar.
 
 **Cruit:** 2 Cruit Tostadora, 2 Estreñido Cruit, 2 Lechero, 2 Leche, 2 Tarea de la U, 2 Cruit Sangre, Chance Cruit, 2 Cruit Baño, Cruit Verity, Cruit Vaca, Unislop, Cruit Excel, Coco Supremo.
 
-Bot contra bot, Cruit le gana a Tun ~94% de las veces (probando otras listas de Tun no pasa del ~15%): la clase Cruit hoy es bastante más fuerte.
+Bot contra bot, Cruit le gana a Tun ~81% de las veces (era ~95% antes del nerf a Estreñido y Cruit Baño y el buff a Novia de Tun).
 
 ### Tareas universitarias (fichas de Unislop, etiqueta Tarea: cuentan para Cruit Excel)
 

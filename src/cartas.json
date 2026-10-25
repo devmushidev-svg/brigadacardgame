@@ -338,12 +338,13 @@
    "tribu": "tun",
    "clase": "tun",
    "arte": "/arte/novia_tun.webp",
-   "texto": "Último aliento: por el resto de la partida, tus Tun tienen +1 de ataque.",
+   "texto": "Último aliento: por el resto de la partida, tus Tun tienen +1/+1.",
    "aliento": [
     {
      "tipo": "mejora_tribu",
      "tribu": "tun",
-     "ataque": 1
+     "ataque": 1,
+     "vida": 1
     }
    ]
   },
@@ -732,12 +733,12 @@
    "coste": 0,
    "token": true,
    "arte": "💩",
-   "texto": "Se lanza al robarla: te hace 3 de daño y robas otra carta.",
+   "texto": "Se lanza al robarla: te hace 2 de daño y robas otra carta.",
    "al_robarse": [
     {
      "tipo": "dano",
      "objetivo": "heroe_propio",
-     "cantidad": 3,
+     "cantidad": 2,
      "fx": "caca"
     }
    ]
@@ -748,17 +749,17 @@
    "genero": "no_binario",
    "tipo": "esbirro",
    "coste": 1,
-   "ataque": 2,
-   "vida": 3,
+   "ataque": 1,
+   "vida": 2,
    "tribu": "cruit",
    "clase": "cruit",
    "arte": "/arte/cruit_estrenido.webp",
-   "texto": "Grito de batalla: mete 3 Cacas en el mazo del rival. Al robarlas, recibe 3 de daño.",
+   "texto": "Grito de batalla: mete 2 Cacas en el mazo del rival. Al robarlas, recibe 2 de daño.",
    "grito": [
     {
      "tipo": "barajar",
      "carta": "caca",
-     "cantidad": 3,
+     "cantidad": 2,
      "lado": "enemigo"
     }
    ]
@@ -830,7 +831,7 @@
    "clase": "cruit",
    "id": "cruit_bano",
    "nombre": "Cruit Baño",
-   "coste": 3,
+   "coste": 4,
    "ataque": 3,
    "vida": 2,
    "arte": "/arte/cruit_bano.webp",
