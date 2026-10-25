@@ -268,6 +268,17 @@ for (let k = 0; k < 20; k++) {
   assert.equal(st, 20, "7 zombies 1/1 + 3 zombies sumados = 10/10 en total");
 }
 
+// --- Porque Me Monean: todos los esbirros del rival pasan a Tun 1/1 ---
+{
+  const e = nueva(36); const s = e.turno, r = 1 - s;
+  e.j[s].tablero = [];
+  preparar(e, s, ["porque_me_monean"]);
+  e.j[r].tablero = [{ uid: "a1", id: "tun_cool", tribu: "tun", ataque: 6, vida: 7, vidaMax: 7, ataques: 0, provocar: true },
+                    { uid: "a2", id: "mauro_sosa", tribu: null, ataque: 2, vida: 3, vidaMax: 3, ataques: 0 }];
+  assert.ok(!M.aplicar(e, s, { t: "jugar", uid: "t0" }, db, 0).error);
+  assert.deepEqual(e.j[r].tablero.map((m) => [m.id, m.ataque, m.vida, !!m.provocar]), [["tun", 1, 1, false], ["tun", 1, 1, false]]);
+}
+
 // --- estrés: miles de partidas con jugadas al azar ---
 let r = 12345;
 const rand = () => ((r = (r * 1103515245 + 12345) >>> 0) / 4294967296);

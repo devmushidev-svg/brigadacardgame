@@ -252,14 +252,12 @@ function chocar(estado, de, a, ev) {
   if (devuelve) danar(estado, de, devuelve, ev);
 }
 
-function invocar(estado, s, id, ev, db, pos) {
-  const p = estado.j[s];
-  const c = db[id];
-  if (!c || p.tablero.length >= CONFIG.MAX_TABLERO) return null;
+// un esbirro nuevo a partir de su carta (sin mejoras de tribu)
+function esbirroDe(estado, c) {
   const claves = new Set(c.claves || []);
-  const m = {
+  return {
     uid: nuevoUid(estado),
-    id,
+    id: c.id,
     tribu: c.tribu || null,
     ataque: c.ataque,
     vida: c.vida,
@@ -274,6 +272,13 @@ function invocar(estado, s, id, ev, db, pos) {
     ataques: 0,
     alRecibirDano: !!c.al_recibir_dano,
   };
+}
+
+function invocar(estado, s, id, ev, db, pos) {
+  const p = estado.j[s];
+  const c = db[id];
+  if (!c || p.tablero.length >= CONFIG.MAX_TABLERO) return null;
+  const m = esbirroDe(estado, c);
   // "tus Tun tienen +1 de ataque por el resto de la partida"
   const mej = c.tribu && p.mejoras?.[c.tribu];
   if (mej) { m.ataque += mej.ataque || 0; m.vida += mej.vida || 0; m.vidaMax += mej.vida || 0; }
@@ -360,6 +365,19 @@ function aplicarEfectos(estado, s, efectos, elegido, ev, db, fuente, ctx = {}) {
       if (!ops.length) continue;
       if (estado.pendiente) darCarta(estado, s, elegir(estado, ops), ev); // ya hay otra elección abierta
       else { estado.pendiente = { seat: s, tipo: "descubrir", opciones: ops }; ev.push({ e: "elegir", seat: s, tipo: "descubrir" }); }
+      continue;
+    }
+    if (ef.tipo === "transformar") {
+      // convierte esbirros en otra carta (ej. Porque Me Monean: todos los del rival en Tun 1/1)
+      const c = db[ef.carta];
+      for (const ref of objetivos(estado, s, ef, elegido, fuente)) {
+        const t = buscar(estado, ref);
+        if (!c || !t || t.tipo !== "esbirro") continue;
+        const lista = estado.j[t.seat].tablero, i = lista.indexOf(t.obj);
+        const nuevo = { ...esbirroDe(estado, c), dormido: t.obj.dormido };
+        lista[i] = nuevo;
+        ev.push({ e: "transforma", de: ref, uid: nuevo.uid, carta: c.id, seat: t.seat, pos: i });
+      }
       continue;
     }
     if (ef.tipo === "invocar_por_muertos") {

@@ -457,6 +457,27 @@
      "cantidad": 2
     }
    ]
+  },
+  {
+   "id": "porque_me_monean",
+   "nombre": "Porque Me Monean",
+   "genero": "hombre",
+   "tipo": "esbirro",
+   "coste": 7,
+   "ataque": 3,
+   "vida": 5,
+   "tribu": "tun",
+   "clase": "tun",
+   "rareza": "legendaria",
+   "arte": "/arte/porque_me_monean.webp",
+   "texto": "Grito de batalla: convierte a todos los esbirros del rival en Tun 1/1.",
+   "grito": [
+    {
+     "tipo": "transformar",
+     "objetivo": "esbirros_enemigos",
+     "carta": "tun"
+    }
+   ]
   }
  ],
  "heroes": [

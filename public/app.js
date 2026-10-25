@@ -468,6 +468,18 @@ async function animarUno(e, ev, v, nuevos, yo) {
         break;
       }
       case "grito": ev.__origen = e.uid; break;
+      case "transforma": { // nube de humo y en su lugar aparece el Tun
+        nuevos.add(e.uid);
+        const el = refEl(e.de);
+        if (el) {
+          const c = centro(el);
+          if (!ev.__humo) { ev.__humo = true; Sonido.hechizo(); }
+          particulas(c.x, c.y, "#e8e0d0", 18, 55); particulas(c.x, c.y, "#c0703a", 8, 40);
+          await el.animate([{ transform: "scale(1) rotate(0)", filter: "none" }, { transform: "scale(1.2) rotate(-8deg)", filter: "brightness(2.5)", offset: 0.4 },
+            { transform: "scale(0) rotate(30deg)", filter: "brightness(3)" }], { duration: 260, easing: "ease-in", fill: "forwards" }).finished;
+        }
+        break;
+      }
       case "mejora": {
         Sonido.logro();
         toast(`${e.seat === yo ? "Tus" : "Sus"} Tun tienen +${e.ataque} de ataque por el resto de la partida`, 2200);
@@ -635,7 +647,7 @@ async function despues(ev, v, antes, nuevos) {
   for (const uid of nuevos) {
     const el = refEl(uid);
     if (!el) continue;
-    const inv = ev.find((x) => x.e === "invoca" && x.uid === uid);
+    const inv = ev.find((x) => (x.e === "invoca" || x.e === "transforma") && x.uid === uid);
     const c = DB[inv?.carta] || {};
     if (c.sonido) Sonido.archivo(c.sonido);
     else if (c.tribu === "tun" && !c.token) Sonido.mono();

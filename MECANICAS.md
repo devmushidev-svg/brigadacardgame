@@ -93,6 +93,7 @@ Campos: `id`, `nombre`, `coste`, `ataque`, `vida`, `texto`, `arte` (emoji o `/ar
 | `robar_mano` | te robás N cartas de la mano rival que cumplan el `filtro` (`{ "genero": "mujer" }`, `{ "etiqueta": ... }` o `{ "tribu": ... }`); si no hay, no pasa nada |
 | `descubrir` | como Hearthstone: muestra 3 cartas distintas del `filtro` (ej. tribu Tun) y te quedás con una; si se acaba el turno sin elegir, se elige al azar |
 | `atraer_ataques` | tus otros esbirros (del `filtro`) atacan a esta carta, uno por uno, con choque normal |
+| `transformar` | convierte a los esbirros del `objetivo` en `carta` (pierden buffs y claves; quedan en el mismo lugar y del mismo dueño) |
 | `invocar_por_muertos` | invoca `carta` una vez por cada esbirro de la `tribu` que murió en la partida; los que no caben en la mesa le suman sus stats a uno de tus esbirros de esa tribu al azar |
 | `mejora_tribu` | por el resto de la partida, tus esbirros de esa `tribu` tienen +`ataque`/+`vida`: los que están en mesa, los de la mano y los que vengan (se ve en la placa del jugador) |
 | `devorar` | destruye a tus otros esbirros (con `filtro` de tribu) y la carta gana +`ataque`/+`vida` por cada uno |
@@ -142,6 +143,7 @@ Diseño de Mario. Arquetipo: paladín molesto — llenar la mesa de Tun, buffear
 | Tunita (hechizo) | 2 | — | 1 de daño a un esbirro, +1 por cada Tun que jugaste esta partida | hecho |
 | **Funeral de Tun** (hechizo legendario) | 8 | — | Un Tun Zombie por cada Tun muerto en la partida; los que no caben suman sus stats a un Tun al azar | hecho |
 | Tun Zombie (ficha) | — | 1/1 | Lo invoca Funeral de Tun | hecho — **stats provisionales** |
+| **Porque Me Monean** (legendaria) | 7 | 3/5 | Grito: convierte a todos los esbirros del rival en Tun 1/1 | hecho |
 | Choza de Monos | 4 | 0/8 | Al final de tu turno, invoca dos Tun | hecho |
 | Tun Satánico | **5** | **3/3** | Grito: destruye a tus otros Tun y gana +2/+2 por cada uno | hecho — **coste y stats provisionales**, falta que Mario los defina |
 
