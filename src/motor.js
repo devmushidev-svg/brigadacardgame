@@ -339,6 +339,7 @@ function objetivos(estado, s, efecto, elegido, fuente) {
     case "esbirro_enemigo_azar": return ene.length ? [elegir(estado, ene)] : [];
     case "esbirros_enemigos": return ene;
     case "todos_esbirros": return [...yo, ...ene];
+    case "otros_esbirros": return [...yo, ...ene].filter((u) => u !== fuente);
     case "aliado_azar": return yo.length ? [elegir(estado, yo)] : [];
     case "aliados": return yo;
     case "todos_enemigos": return ["h" + otro(s), ...ene];
@@ -381,6 +382,29 @@ function aplicarEfectos(estado, s, efectos, elegido, ev, db, fuente, ctx = {}) {
       if (!ops.length) continue;
       if (estado.pendiente) darCarta(estado, s, elegir(estado, ops), ev); // ya hay otra elección abierta
       else { estado.pendiente = { seat: s, tipo: "descubrir", opciones: ops }; ev.push({ e: "elegir", seat: s, tipo: "descubrir" }); }
+      continue;
+    }
+    if (ef.tipo === "pelea") {
+      // como Pelea de Hearthstone: todos los esbirros hacen parkour y solo uno al azar sobrevive
+      const todos = [0, 1].flatMap((k) => estado.j[k].tablero).filter((m) => m.vida > 0);
+      if (todos.length > 1) {
+        const sobrevive = elegir(estado, todos);
+        ev.push({ e: "pelea", sobrevive: sobrevive.uid });
+        for (const m of todos) if (m !== sobrevive) { m.vida = 0; ev.push({ e: "destruido", a: m.uid }); }
+      }
+      continue;
+    }
+    if (ef.tipo === "activar") {
+      // Leche: si el esbirro es de la tribu del filtro (Cruit), repite su grito y su último aliento
+      for (const ref of objetivos(estado, s, ef, elegido, fuente)) {
+        const t = buscar(estado, ref);
+        if (!t || t.tipo !== "esbirro" || (ef.filtro?.tribu && t.obj.tribu !== ef.filtro.tribu)) continue;
+        const c = db[t.obj.id];
+        if (!c?.grito && !c?.aliento) continue;
+        ev.push({ e: "dispara", uid: ref, por: "leche" });
+        if (c.grito) aplicarEfectos(estado, t.seat, c.grito, null, ev, db, ref);
+        if (c.aliento) aplicarEfectos(estado, t.seat, c.aliento, null, ev, db, ref);
+      }
       continue;
     }
     if (ef.tipo === "transformar") {
@@ -472,10 +496,13 @@ function aplicarEfectos(estado, s, efectos, elegido, ev, db, fuente, ctx = {}) {
       }
       continue;
     }
-    for (const ref of objetivos(estado, s, ef, elegido, fuente)) {
+    const refs = objetivos(estado, s, ef, elegido, fuente);
+    const fxGrupo = ef.fx === "vomito"; // el vómito es uno solo que salpica a todos
+    if (fxGrupo && refs.length) ev.push({ e: "fx", fx: ef.fx, de: fuente, seat: s, a: refs });
+    for (const ref of refs) {
       const t = buscar(estado, ref);
       if (!t) continue;
-      if (ef.tipo === "dano") danar(estado, ref, n, ev, { fx: ef.fx, de: fuente });
+      if (ef.tipo === "dano") danar(estado, ref, n, ev, { fx: fxGrupo ? null : ef.fx, de: fuente });
       else if (ef.tipo === "curar") curar(estado, ref, n, ev);
       else if (ef.tipo === "destruir" && t.tipo === "esbirro") { t.obj.vida = 0; ev.push({ e: "destruido", a: ref }); }
       else if (ef.tipo === "buff" && t.tipo === "esbirro") {

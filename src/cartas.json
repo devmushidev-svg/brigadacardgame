@@ -517,6 +517,89 @@
     }
    ],
    "genero": "no_binario"
+  },
+  {
+   "id": "cruit_intolerante",
+   "nombre": "Cruit Intolerante a la Lactosa",
+   "genero": "no_binario",
+   "tipo": "esbirro",
+   "coste": 2,
+   "ataque": 1,
+   "vida": 3,
+   "tribu": "cruit",
+   "clase": "cruit",
+   "arte": "/arte/cruit_intolerante.webp",
+   "texto": "Grito de batalla: inflige 1 de daño a todos los demás esbirros.",
+   "grito": [
+    {
+     "tipo": "dano",
+     "objetivo": "otros_esbirros",
+     "cantidad": 1,
+     "fx": "vomito"
+    }
+   ]
+  },
+  {
+   "id": "lechero",
+   "nombre": "Lechero",
+   "genero": "hombre",
+   "tipo": "esbirro",
+   "coste": 1,
+   "ataque": 1,
+   "vida": 3,
+   "clase": "cruit",
+   "arte": "/arte/lechero.webp",
+   "texto": "Grito de batalla y último aliento: obtenés una Leche.",
+   "grito": [
+    {
+     "tipo": "dar_carta",
+     "carta": "leche"
+    }
+   ],
+   "aliento": [
+    {
+     "tipo": "dar_carta",
+     "carta": "leche"
+    }
+   ]
+  },
+  {
+   "id": "leche",
+   "nombre": "Leche",
+   "tipo": "hechizo",
+   "coste": 1,
+   "clase": "cruit",
+   "arte": "/arte/leche.webp",
+   "texto": "Dale +1/+1 a un esbirro. Si es un Cruit, activa su grito de batalla y su último aliento.",
+   "efectos": [
+    {
+     "tipo": "buff",
+     "objetivo": "elegido_esbirro",
+     "ataque": 1,
+     "vida": 1
+    },
+    {
+     "tipo": "activar",
+     "objetivo": "elegido_esbirro",
+     "filtro": {
+      "tribu": "cruit"
+     }
+    }
+   ]
+  },
+  {
+   "id": "nullscape",
+   "nombre": "Nullscape",
+   "tipo": "hechizo",
+   "coste": 4,
+   "clase": "cruit",
+   "arte": "/arte/nullscape.webp",
+   "texto": "Todos los esbirros hacen parkour. Solo uno al azar sobrevive.",
+   "efectos": [
+    {
+     "tipo": "pelea"
+    }
+   ]
   }
  ],
  "heroes": [

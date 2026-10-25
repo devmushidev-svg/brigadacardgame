@@ -82,6 +82,17 @@ const Sonido = (() => {
     },
     robo() { ruido(0.3, 0.15, 3000); tono(300, 0.25, "triangle", 0.08, 2.2); tono(900, 0.2, "sine", 0.05, 0.5, 0.25); },
     descubrir() { [523, 659, 784, 988, 1175, 1568].forEach((f, i) => tono(f, 0.5, "triangle", 0.05, 1, i * 0.06)); ruido(0.6, 0.04, 7000); },
+    vomito() { // "bleaarghh": arcada grave que baja + borboteo
+      if (mudo) return;
+      const c = a(), t = c.currentTime, o = c.createOscillator(), f = c.createBiquadFilter(), g = c.createGain(), l = c.createOscillator(), lg = c.createGain();
+      o.type = "sawtooth"; o.frequency.setValueAtTime(220, t); o.frequency.exponentialRampToValueAtTime(70, t + 0.7);
+      l.frequency.value = 23; lg.gain.value = 40; l.connect(lg).connect(o.frequency);
+      f.type = "lowpass"; f.frequency.setValueAtTime(1400, t); f.frequency.exponentialRampToValueAtTime(300, t + 0.7);
+      g.gain.setValueAtTime(0.0001, t); g.gain.exponentialRampToValueAtTime(0.3, t + 0.05); g.gain.exponentialRampToValueAtTime(0.0001, t + 0.8);
+      o.connect(f).connect(g).connect(c.destination); o.start(t); l.start(t); o.stop(t + 0.85); l.stop(t + 0.85);
+      for (let i = 0; i < 6; i++) setTimeout(() => ruido(0.12, 0.12, 500 + Math.random() * 700), 120 + i * 80);
+    },
+    parkour() { [0, 380, 760].forEach((d, i) => setTimeout(() => { ruido(0.25, 0.14, 2500); tono(300 + i * 90, 0.12, "triangle", 0.08, 1.8); }, d)); },
     slam() { tono(55, 0.6, "sine", 0.6, 0.5); tono(110, 0.25, "square", 0.08, 0.4); ruido(0.5, 0.35, 900); },
     activa() { [880, 1320, 1760].forEach((f, i) => tono(f, 0.22, "sine", 0.07, 1.01, i * 0.05)); ruido(0.15, 0.04, 5000); },
     progreso(fr) { const f = 520 + fr * 700; tono(f, 0.14, "triangle", 0.09); tono(f * 1.5, 0.12, "sine", 0.04, 1, 0.03); },
@@ -253,6 +264,47 @@ async function activarCarta(el) {
       { transform: "translateY(-50%) scale(1)", opacity: 1, offset: 0.85 }, { transform: "translateY(-50%) scale(.6)", opacity: 0 }], { duration: 1100, easing: "ease-out" }).finished;
     m.remove();
   } else await esperar(700);
+}
+
+// vómito: chorro verde-amarillo que sale del esbirro y salpica a todos
+async function vomitar(origenEl, blancos) {
+  if (!origenEl) return;
+  Sonido.vomito();
+  const o = centro(origenEl), colores = ["#b5c93a", "#8fa320", "#d6d36a", "#6e7d18", "#c9b84a"];
+  const gota = (x, y) => {
+    const g = document.createElement("div"), t = 6 + Math.random() * 12;
+    g.style.cssText = `position:fixed;left:${x}px;top:${y}px;width:${t}px;height:${t * (0.7 + Math.random() * 0.6)}px;margin:${-t / 2}px 0 0 ${-t / 2}px;z-index:67;pointer-events:none;
+      border-radius:${40 + Math.random() * 30}% ${50 + Math.random() * 30}% ${45 + Math.random() * 30}% ${55 + Math.random() * 30}%;background:${colores[Math.floor(Math.random() * colores.length)]};
+      box-shadow:inset -2px -2px 3px #0004, 0 0 2px #0006`;
+    $("#fx").append(g);
+    return g;
+  };
+  // arcada inicial: chorro en abanico
+  for (let i = 0; i < 26; i++) {
+    const g = gota(o.x, o.y), ang = -Math.PI / 2 + (Math.random() - 0.5) * 2.4, dist = 50 + Math.random() * 110;
+    g.animate([{ transform: "translate(0,0) scale(.4)" }, { transform: `translate(${Math.cos(ang) * dist}px, ${Math.sin(ang) * dist * 0.7}px) scale(1)`, offset: 0.6 },
+      { transform: `translate(${Math.cos(ang) * dist * 1.2}px, ${Math.sin(ang) * dist * 0.2 + 40}px) scale(.8)`, opacity: 0 }], { duration: 700, delay: i * 12, easing: "ease-out" }).onfinish = () => g.remove();
+  }
+  // a cada esbirro le llega su parte, en arco, y deja un charco
+  await Promise.all(blancos.map((b, k) => new Promise((fin) => {
+    const d = centro(b), n = 7;
+    for (let i = 0; i < n; i++) {
+      const g = gota(o.x, o.y), alto = 60 + Math.random() * 60, dur = 420 + Math.random() * 160, kf = [];
+      for (let p = 0; p <= 10; p++) { const t = p / 10; kf.push({ transform: `translate(${(d.x - o.x) * t + (Math.random() - 0.5) * 10}px, ${(d.y - o.y) * t - Math.sin(Math.PI * t) * alto}px)`, offset: t }); }
+      g.animate(kf, { duration: dur, delay: k * 50 + i * 25, easing: "linear" }).onfinish = () => {
+        g.remove();
+        if (i === n - 1) {
+          const ch = document.createElement("div");
+          ch.style.cssText = `position:fixed;left:${d.x}px;top:${d.y + 10}px;width:70px;height:26px;margin:-13px 0 0 -35px;border-radius:50%;z-index:66;pointer-events:none;
+            background:radial-gradient(ellipse, #c9cf4acc 30%, #8fa320aa 60%, #0000 72%)`;
+          $("#fx").append(ch);
+          ch.animate([{ transform: "scale(.2)", opacity: 1 }, { transform: "scale(1)", opacity: 1, offset: 0.25 }, { transform: "scale(1.1)", opacity: 0 }], { duration: 1100 }).onfinish = () => ch.remove();
+          particulas(d.x, d.y, "#b5c93a", 8, 35);
+          fin();
+        }
+      };
+    }
+  })));
 }
 
 // golpe con peso: destello blanco, sacudida según el daño y temblor de pantalla si es grande
@@ -668,7 +720,24 @@ async function animarUno(e, ev, v, nuevos, yo) {
         await esperar(e.n >= 5 ? 220 : 110); // pausa de impacto: los golpes fuertes "pesan"
         break;
       }
+      case "pelea": { // todos hacen parkour; después los que no sobreviven se destruyen
+        Sonido.parkour();
+        const els = $$(".tablero .esbirro");
+        banner("¡PARKOUR!", 900);
+        await Promise.all(els.map((el, i) => {
+          const r = () => (Math.random() * 2 - 1) * 70;
+          const d1 = r(), d2 = r(), d3 = r();
+          el.style.zIndex = 20;
+          return el.animate([{ transform: "none" }, { transform: `translate(${d1}px, -80px) rotate(180deg)`, offset: 0.18 }, { transform: `translate(${d1 * 1.5}px, 0) rotate(360deg)`, offset: 0.34 },
+            { transform: `translate(${d2}px, -100px) rotate(540deg) scale(1.1)`, offset: 0.54 }, { transform: `translate(${d2}px, 0) rotate(720deg)`, offset: 0.7 },
+            { transform: `translate(${d3}px, -50px) scaleX(-1)`, offset: 0.86 }, { transform: "none" }], { duration: 1500, delay: i * 70, easing: "ease-in-out" }).finished;
+        }));
+        const sob = refEl(e.sobrevive);
+        if (sob) { const c = centro(sob); particulas(c.x, c.y, "#ffd34f", 24, 90); sob.animate([{ filter: "brightness(2) drop-shadow(0 0 20px #ffd34f)" }, { filter: "none" }], 900); }
+        break;
+      }
       case "fx": {
+        if (e.fx === "vomito") await vomitar(refEl(e.de) || $(`.tablero[data-seat="${e.seat}"]`), (e.a || []).map(refEl).filter(Boolean));
         if (e.fx === "piedra") await tirarPiedra(refEl(e.de) || $(`.tablero[data-seat="${V.j[0].tablero.some((m) => m.uid === e.de) ? 0 : 1}"]`), refEl(e.a));
         break;
       }

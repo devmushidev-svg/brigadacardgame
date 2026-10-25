@@ -327,6 +327,25 @@ for (let k = 0; k < 20; k++) {
   assert.ok(!e.j[s].tablero.some((m) => m.id === "coco"), "muere al final del turno");
 }
 
+// --- Cruit: Intolerante, Lechero, Leche, Nullscape ---
+{
+  const e = nueva(42, ["cruit", "cruit"]); const s = e.turno, r = 1 - s;
+  e.j[s].tablero = []; e.j[r].tablero = [{ uid: "rv", id: "x", tribu: null, ataque: 1, vida: 3, vidaMax: 3, ataques: 0 }];
+  preparar(e, s, ["lechero", "cruit_intolerante", "leche", "nullscape"]);
+  M.aplicar(e, s, { t: "jugar", uid: "t0" }, db, 0);
+  assert.ok(e.j[s].mano.some((c) => c.id === "leche" && c.uid !== "t2"), "Lechero da una Leche");
+  const res = M.aplicar(e, s, { t: "jugar", uid: "t1" }, db, 0);
+  assert.ok(res.ev.some((x) => x.e === "fx" && x.fx === "vomito"));
+  assert.equal(e.j[r].tablero[0].vida, 2); assert.equal(e.j[s].tablero.find((m) => m.id === "lechero").vida, 2);
+  assert.equal(e.j[s].tablero.find((m) => m.id === "cruit_intolerante").vida, 3, "no se pega a si mismo");
+  const cru = e.j[s].tablero.find((m) => m.id === "cruit_intolerante").uid;
+  M.aplicar(e, s, { t: "jugar", uid: "t2", objetivo: cru }, db, 0);
+  assert.equal(e.j[r].tablero[0].vida, 1, "la Leche en un Cruit repite el grito");
+  assert.equal(e.j[s].tablero.find((m) => m.id === "cruit_intolerante").ataque, 2);
+  M.aplicar(e, s, { t: "jugar", uid: "t3" }, db, 0);
+  assert.equal(e.j[0].tablero.length + e.j[1].tablero.length, 1, "Nullscape: solo uno sobrevive");
+}
+
 // --- estrés: miles de partidas con jugadas al azar ---
 let r = 12345;
 const rand = () => ((r = (r * 1103515245 + 12345) >>> 0) / 4294967296);
