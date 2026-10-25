@@ -450,7 +450,7 @@ for (let k = 0; k < 20; k++) {
   const bano = e.j[s].tablero.find((m) => m.id === "cruit_bano"); bano.dormido = false;
   const v = e.j[r].vida;
   M.aplicar(e, s, { t: "atacar", de: bano.uid, a: "rv" }, db, 0);
-  assert.equal(e.j[r].vida, v - 2); assert.equal(e.j[r].tablero[0].vida, 9 - 4 - 2);
+  assert.equal(e.j[r].vida, v - 2); assert.equal(e.j[r].tablero[0].vida, 9 - 3 - 2);
 }
 // --- dos Cruit Vaca no se activan sin fin ---
 {
@@ -464,7 +464,7 @@ for (let k = 0; k < 20; k++) {
   assert.ok(!res.error && res.ev.length < 200, "termina");
 }
 
-// --- Cruit Verity: al morir sale Verity 6/6 ---
+// --- Cruit Verity: al morir sale Verity 5/5 ---
 {
   const e = nueva(49, ["cruit", "cruit"]); const s = e.turno, r = 1 - s;
   e.j[s].tablero = []; e.j[r].tablero = [{ uid: "rv", id: "x", tribu: null, ataque: 1, vida: 9, vidaMax: 9, ataques: 0 }];
@@ -472,7 +472,7 @@ for (let k = 0; k < 20; k++) {
   M.aplicar(e, s, { t: "jugar", uid: "t0" }, db, 0);
   const cv = e.j[s].tablero[0]; cv.dormido = false;
   M.aplicar(e, s, { t: "atacar", de: cv.uid, a: "rv" }, db, 0);
-  assert.deepEqual(e.j[s].tablero.map((m) => [m.id, m.ataque, m.vida]), [["verity", 6, 6]]);
+  assert.deepEqual(e.j[s].tablero.map((m) => [m.id, m.ataque, m.vida]), [["verity", 5, 5]]);
 }
 
 // --- Unislop: 3 tareas distintas; cuentan para Cruit Excel ---

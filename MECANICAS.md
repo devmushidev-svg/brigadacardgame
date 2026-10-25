@@ -207,10 +207,10 @@ Diseño de Mario. Marco azul (provisional). Cruit es no binario: toda carta con 
 | Cruit Vampiro ⚧ | 5 | 3/3 | Tus Cruit roban +1 de vida. Grito: invoca 2 Cruit Sangre | hecho |
 | Caca (ficha) | 0 | — | Se lanza al robarla: 2 de daño a quien la roba y roba otra | hecho |
 | Cruit Tostadora ⚧ | 1 | 1/2 | Grito: robás una carta | hecho |
-| Cruit Baño ⚧ | 4 | 3/2 | Último aliento: 2 de daño a todos los enemigos | hecho |
+| Cruit Baño ⚧ | 2 | 2/1 | Último aliento: 2 de daño a todos los enemigos | hecho |
 | **Cruit Vaca** ⚧ (legendaria, tribu Vaca: no cuenta como Cruit) | 4 | 3/4 | Grito: una Leche a cada uno de tus otros esbirros (+1/+1 y activa a los Cruit) | hecho |
-| **Cruit Verity** ⚧ (legendaria) | 5 | 3/1 | Último aliento: invoca a Verity 6/6 | hecho |
-| Verity ⚧ (ficha, forma monstruosa) | 6 | 6/6 | — | hecho |
+| **Cruit Verity** ⚧ (legendaria) | 3 | 3/1 | Último aliento: invoca a Verity 5/5 | hecho |
+| Verity ⚧ (ficha, forma monstruosa) | 5 | 5/5 | — | hecho |
 | **Unislop** (legendaria) | 4 | 3/3 | Grito: obtenés 3 tareas universitarias distintas al azar | hecho — imagen agregada; falta género |
 | Elliot Cruit ⚧ (tribu Cruit, Forsaken) | 2 | 2/2 | Al final de tu turno, una pizza cura 3 a un aliado herido al azar | hecho |
 | Chance Cruit ⚧ (tribu Cruit, Forsaken) | 3 | 3/3 | Grito: moneda. Cara: 6 de daño a un enemigo al azar. Cruz: 3 de daño a tu héroe | hecho |
@@ -223,7 +223,7 @@ Sin mazo armado, el héroe sale al azar.
 
 **Cruit (30):** 2 Cruit Tostadora, 2 Estreñido Cruit, 2 Lechero, 2 Leche, 2 Tarea de la U, 2 Cruit Intolerante, 2 Elliot Cruit, 2 Cruit Sangre, 2 Tun Brawl Stars, 2 Chance Cruit, 2 Cruit Baño, 2 Cruit Excel, 2 Cruit Vampiro, Cruit Verity, Cruit Vaca, Unislop, Coco Supremo.
 
-Con los mazos de 20, bot contra bot, Cruit le ganaba a Tun ~68% (era ~95% antes de los nerfs a Estreñido, Cruit Baño y Cruit Sangre y el buff a Novia de Tun). Falta medir con los mazos de 30.
+Con los mazos de 20, bot contra bot, Cruit le ganaba a Tun ~68% (era ~95% antes de los nerfs a Estreñido, Cruit Baño y Cruit Sangre y el buff a Novia de Tun). Con los mazos de 30 y mulligan (Lechero 1/1, Cruit Vaca fuera de la tribu, Cruit Verity 3 de maná con Verity 5/5, Cruit Baño 2/1 de 2 de maná), Cruit gana ~40%.
 
 ### Tareas universitarias (fichas de Unislop, etiqueta Tarea: cuentan para Cruit Excel)
 
