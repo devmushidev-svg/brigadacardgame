@@ -534,8 +534,16 @@
    "tribu": "cruit",
    "clase": "cruit",
    "arte": "/arte/cruit_intolerante.webp",
-   "texto": "Grito de batalla: inflige 1 de daño a todos los demás esbirros.",
+   "texto": "Grito de batalla y último aliento: inflige 1 de daño a todos los demás esbirros.",
    "grito": [
+    {
+     "tipo": "dano",
+     "objetivo": "otros_esbirros",
+     "cantidad": 1,
+     "fx": "vomito"
+    }
+   ],
+   "aliento": [
     {
      "tipo": "dano",
      "objetivo": "otros_esbirros",
@@ -752,8 +760,16 @@
    "tribu": "cruit",
    "clase": "cruit",
    "arte": "/arte/cruit_estrenido.webp",
-   "texto": "Grito de batalla: mete 2 Cacas en el mazo del rival. Al robarlas, recibe 2 de daño.",
+   "texto": "Grito de batalla y último aliento: mete 2 Cacas en el mazo del rival. Al robarlas, recibe 2 de daño.",
    "grito": [
+    {
+     "tipo": "barajar",
+     "carta": "caca",
+     "cantidad": 2,
+     "lado": "enemigo"
+    }
+   ],
+   "aliento": [
     {
      "tipo": "barajar",
      "carta": "caca",

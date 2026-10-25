@@ -195,14 +195,14 @@ Diseño de Mario. Marco azul (provisional). Cruit es no binario: toda carta con 
 |---|---|---|---|---|
 | Héroe Cruit | — | 30 | Poder (1): invoca un Coco 1/1 con carga que muere al final del turno | hecho (retrato con fondo de leche) |
 | Coco ⚧ (ficha, el hámster) | — | 1/1 | Carga. Muere al final de tu turno | hecho |
-| Cruit Intolerante a la Lactosa ⚧ (tribu Cruit) | 2 | 1/3 | Grito: 1 de daño a todos los demás esbirros (vómito) | hecho |
+| Cruit Intolerante a la Lactosa ⚧ (tribu Cruit) | 2 | 1/3 | Grito y último aliento: 1 de daño a todos los demás esbirros (vómito) | hecho |
 | Lechero ♂ | 1 | 1/1 | Grito: obtenés una Leche | hecho |
 | Leche (hechizo) | 1 | — | +1/+1 a un esbirro; si es un Cruit, activa su grito y su último aliento | hecho |
 | Nullscape (hechizo) | 4 | — | Todos los esbirros hacen parkour; solo uno al azar sobrevive | hecho |
 | Cruit Excel ⚧ (tribu Cruit) | 5 | 2/2 | Grito: +3/+3 por cada Tarea que lanzaste esta partida | hecho |
 | Tarea de la U (hechizo, etiqueta Tarea) | 1 | — | 2 de daño a tu héroe, roba una carta | hecho |
 | **Coco Supremo** ⚧ (legendaria) | 9 | 7/5 | Grito: repite los gritos y últimos alientos de todos los Cruit que jugaste esta partida | hecho |
-| Estreñido Cruit ⚧ | 1 | 1/2 | Grito: mete 2 Cacas en el mazo del rival (al robarlas: 2 de daño y roba otra) | hecho |
+| Estreñido Cruit ⚧ | 1 | 1/2 | Grito y último aliento: mete 2 Cacas en el mazo del rival (al robarlas: 2 de daño y roba otra) | hecho |
 | Cruit Sangre ⚧ | 2 | 2/2 | Al final de tu turno, roba 1 de vida al enemigo con menos vida | hecho |
 | Cruit Vampiro ⚧ | 5 | 3/3 | Tus Cruit roban +1 de vida. Grito: invoca 2 Cruit Sangre | hecho |
 | Caca (ficha) | 0 | — | Se lanza al robarla: 2 de daño a quien la roba y roba otra | hecho |

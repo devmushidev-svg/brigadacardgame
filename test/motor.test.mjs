@@ -336,19 +336,19 @@ for (let k = 0; k < 20; k++) {
 // --- Cruit: Intolerante, Lechero, Leche, Nullscape ---
 {
   const e = nueva(42, ["cruit", "cruit"]); const s = e.turno, r = 1 - s;
-  e.j[s].tablero = []; e.j[r].tablero = [{ uid: "rv", id: "x", tribu: null, ataque: 1, vida: 3, vidaMax: 3, ataques: 0 }];
+  e.j[s].tablero = []; e.j[r].tablero = [{ uid: "rv", id: "x", tribu: null, ataque: 1, vida: 5, vidaMax: 5, ataques: 0 }];
   preparar(e, s, ["lechero", "cruit_intolerante", "leche", "nullscape"]);
   M.aplicar(e, s, { t: "jugar", uid: "t0" }, db, 0);
   assert.ok(e.j[s].mano.some((c) => c.id === "leche" && c.uid !== "t2"), "Lechero da una Leche");
   const res = M.aplicar(e, s, { t: "jugar", uid: "t1" }, db, 0);
   assert.ok(res.ev.some((x) => x.e === "fx" && x.fx === "vomito"));
-  assert.equal(e.j[r].tablero[0].vida, 2);
+  assert.equal(e.j[r].tablero[0].vida, 4);
   assert.ok(!e.j[s].tablero.some((m) => m.id === "lechero"), "Lechero 1/1 muere con el vómito");
   assert.equal(e.j[s].mano.filter((c) => c.id === "leche").length, 2, "y ya no da Leche al morir");
   assert.equal(e.j[s].tablero.find((m) => m.id === "cruit_intolerante").vida, 3, "no se pega a si mismo");
   const cru = e.j[s].tablero.find((m) => m.id === "cruit_intolerante").uid;
   M.aplicar(e, s, { t: "jugar", uid: "t2", objetivo: cru }, db, 0);
-  assert.equal(e.j[r].tablero[0].vida, 1, "la Leche en un Cruit repite el grito");
+  assert.equal(e.j[r].tablero[0].vida, 2, "la Leche en el Intolerante repite el grito y el último aliento");
   assert.equal(e.j[s].tablero.find((m) => m.id === "cruit_intolerante").ataque, 2);
   M.aplicar(e, s, { t: "jugar", uid: "t3" }, db, 0);
   assert.equal(e.j[0].tablero.length + e.j[1].tablero.length, 1, "Nullscape: solo uno sobrevive");
@@ -398,7 +398,7 @@ for (let k = 0; k < 20; k++) {
   const res = M.aplicar(e, s, { t: "jugar", uid: "t2" }, db, 0);
   assert.ok(!res.error, res.error);
   assert.equal(res.ev.filter((x) => x.e === "repite").length, 2);
-  assert.equal(e.j[r].tablero[0].vida, 5, "2 vómitos más");
+  assert.equal(e.j[r].tablero[0].vida, 1, "grito y último aliento repetidos de los dos (4 vómitos) y, al morir los Intolerantes, 2 más");
 }
 {
   const e = nueva(46, ["cruit", "cruit"]); const s = e.turno;
@@ -420,6 +420,7 @@ for (let k = 0; k < 20; k++) {
   const mazo = e.j[r].mazo.length;
   M.aplicar(e, s, { t: "jugar", uid: "t0" }, db, 0);
   assert.equal(e.j[r].mazo.length, mazo + 2);
+  assert.deepEqual(db.cruit_estrenido.aliento, db.cruit_estrenido.grito, "al morir mete otras 2 Cacas");
   e.j[r].mazo = ["caca", "mauro_sosa", "mauro_sosa"]; // mazo fijo para que la cuenta no dependa del azar
   M.aplicar(e, s, { t: "jugar", uid: "t1" }, db, 0);
   assert.equal(e.j[s].tablero.filter((m) => m.id === "cruit_sangre").length, 2);
@@ -569,3 +570,16 @@ console.log("ok: mulligan");
   for (const t of [M.TUTORIAL.jugador, M.TUTORIAL.rival]) for (const id of t.mazo) assert.ok(db[id], id);
 }
 console.log("ok: tutorial");
+
+// --- Cruit Intolerante: también vomita al morir ---
+{
+  const e = nueva(61, ["cruit", "cruit"]); const s = e.turno, r = 1 - s;
+  e.j[s].tablero = []; e.j[r].tablero = [{ uid: "rv", id: "x", tribu: null, ataque: 9, vida: 9, vidaMax: 9, ataques: 0 }, { uid: "rw", id: "x", tribu: null, ataque: 0, vida: 5, vidaMax: 5, ataques: 0 }];
+  preparar(e, s, ["cruit_intolerante"]);
+  M.aplicar(e, s, { t: "jugar", uid: "t0" }, db, 0);
+  const ci = e.j[s].tablero[0]; ci.dormido = false;
+  M.aplicar(e, s, { t: "atacar", de: ci.uid, a: "rv" }, db, 0);
+  assert.ok(!e.j[s].tablero.length, "murió");
+  assert.equal(e.j[r].tablero.find((m) => m.uid === "rw").vida, 3, "1 del grito + 1 del último aliento");
+}
+console.log("ok: intolerante");
