@@ -92,6 +92,15 @@ const Sonido = (() => {
       o.connect(f).connect(g).connect(c.destination); o.start(t); l.start(t); o.stop(t + 0.85); l.stop(t + 0.85);
       for (let i = 0; i < 6; i++) setTimeout(() => ruido(0.12, 0.12, 500 + Math.random() * 700), 120 + i * 80);
     },
+    pedo() { // pfffrrt: ruido grave filtrado con temblor
+      if (mudo) return;
+      const c = a(), t = c.currentTime, o = c.createOscillator(), l = c.createOscillator(), lg = c.createGain(), f = c.createBiquadFilter(), g = c.createGain();
+      o.type = "sawtooth"; o.frequency.setValueAtTime(95, t); o.frequency.linearRampToValueAtTime(60, t + 0.5);
+      l.frequency.value = 31; lg.gain.value = 30; l.connect(lg).connect(o.frequency);
+      f.type = "lowpass"; f.frequency.value = 600;
+      g.gain.setValueAtTime(0.0001, t); g.gain.exponentialRampToValueAtTime(0.35, t + 0.03); g.gain.exponentialRampToValueAtTime(0.0001, t + 0.55);
+      o.connect(f).connect(g).connect(c.destination); o.start(t); l.start(t); o.stop(t + 0.6); l.stop(t + 0.6);
+    },
     moneda() { for (let i = 0; i < 7; i++) tono(2200 + (i % 2) * 400, 0.05, "square", 0.025, 1, i * 0.12); setTimeout(() => tono(1800, 0.3, "triangle", 0.08, 0.98), 1050); },
     disparo() { ruido(0.35, 0.5, 3500); tono(90, 0.3, "sine", 0.5, 0.4); },
     parkour() { [0, 380, 760].forEach((d, i) => setTimeout(() => { ruido(0.25, 0.14, 2500); tono(300 + i * 90, 0.12, "triangle", 0.08, 1.8); }, d)); },
@@ -137,6 +146,7 @@ function colorDe(t) {
   for (const ch of String(t || "x")) h = (h * 31 + ch.charCodeAt(0)) % 360;
   return `linear-gradient(135deg, hsl(${h} 45% 45%), hsl(${(h + 40) % 360} 50% 28%))`;
 }
+const artTexto = (arte) => (/^(https?:)?\//.test(arte || "") ? "💩" : arte || "❔");
 const artHTML = (arte) => (/^(https?:)?\//.test(arte || "") ? `<img src="${esc(arte)}" alt="">` : esc(arte || "❔"));
 
 function cartaHTML(c, { uid = "", clase = "" } = {}) {
@@ -779,6 +789,26 @@ async function animarUno(e, ev, v, nuevos, yo) {
         if (sob) { const c = centro(sob); particulas(c.x, c.y, "#ffd34f", 24, 90); sob.animate([{ filter: "brightness(2) drop-shadow(0 0 20px #ffd34f)" }, { filter: "none" }], 900); }
         break;
       }
+      case "baraja": { // las cacas vuelan al mazo del rival
+        const destino = $(`.zona.${e.seat === yo ? "yo" : "rival"} .mazo`) || refEl("h" + e.seat);
+        toast(`${e.n} ${DB[e.carta]?.nombre || "cartas"} al mazo de ${e.seat === yo ? "vos" : V.j[e.seat].nombre}`, 1600);
+        await Promise.all(Array.from({ length: e.n }, (_, i) => esperar(i * 140).then(() => lanzarCosa($(".campo"), destino, artTexto(DB[e.carta]?.arte), 38, 600, true))));
+        Sonido.pedo();
+        break;
+      }
+      case "se_lanza": { // robó una caca: le explota en la cara
+        const h = refEl("h" + e.seat);
+        if (h) {
+          const c = centro(h), x = document.createElement("div");
+          x.textContent = artTexto(DB[e.carta]?.arte); x.style.cssText = `position:fixed;left:${c.x}px;top:${c.y}px;font-size:70px;z-index:68;pointer-events:none;transform:translate(-50%,-50%)`;
+          $("#fx").append(x);
+          Sonido.pedo();
+          await x.animate([{ transform: "translate(-50%,-50%) scale(.2)", opacity: 0 }, { transform: "translate(-50%,-50%) scale(1.4)", opacity: 1, offset: 0.4 },
+            { transform: "translate(-50%,-50%) scale(1.1)", opacity: 1, offset: 0.7 }, { transform: "translate(-50%,-50%) scale(2)", opacity: 0 }], { duration: 750 }).finished;
+          x.remove(); particulas(c.x, c.y, "#6b4423", 22, 80);
+        }
+        break;
+      }
       case "repite": { // Coco Supremo: cada carta repetida aparece un momento
         Sonido.hechizo();
         await mostrarCarta(e.carta, 650);
@@ -800,6 +830,7 @@ async function animarUno(e, ev, v, nuevos, yo) {
         break;
       }
       case "fx": {
+        if (e.fx === "sangre") await lanzarCosa(refEl(e.de), refEl(e.a), "🩸", 30, 520, false);
         if (e.fx === "pizza") await lanzarCosa(refEl(e.de), refEl(e.a), "🍕", 34, 650, true);
         if (e.fx === "bala") await disparar(refEl(e.de) || $(`.tablero[data-seat="${V.j[0].tablero.some((m) => m.uid === e.de) ? 0 : 1}"]`) || $(".campo"), refEl(e.a));
         if (e.fx === "vomito") await vomitar(refEl(e.de) || $(`.tablero[data-seat="${e.seat}"]`), (e.a || []).map(refEl).filter(Boolean));

@@ -179,7 +179,15 @@ function robar(estado, s, ev, db) {
     danarHeroe(estado, s, p.fatiga, ev);
     return;
   }
-  darCarta(estado, s, p.mazo.shift(), ev);
+  const id = p.mazo.shift();
+  // cartas que se lanzan solas al robarlas (ej. la Caca de Estreñido Cruit): no van a la mano y se roba otra
+  if (db[id]?.al_robarse) {
+    ev.push({ e: "se_lanza", seat: s, carta: id });
+    aplicarEfectos(estado, s, db[id].al_robarse, null, ev, db, null);
+    if (estado.j[s].vida > 0) robar(estado, s, ev, db);
+    return;
+  }
+  darCarta(estado, s, id, ev);
   // efectos globales que se disparan al robar (ej. Panamá)
   for (const g of estado.globales) {
     if (g.disparador === "al_robar") aplicarEfectos(estado, s, g.efectos, null, ev, db, null, { quien: s });
@@ -344,6 +352,11 @@ function objetivos(estado, s, efecto, elegido, fuente) {
     case "aliados": return yo;
     case "todos_enemigos": return ["h" + otro(s), ...ene];
     case "enemigo_azar": return [elegir(estado, ["h" + otro(s), ...ene])];
+    case "enemigo_menos_vida": { // el personaje enemigo (héroe o esbirro) con menos vida; si empatan, al azar
+      const cand = [{ r: "h" + otro(s), v: estado.j[otro(s)].vida }, ...estado.j[otro(s)].tablero.filter((m) => m.vida > 0 && tribuOk(m)).map((m) => ({ r: m.uid, v: m.vida }))];
+      const min = Math.min(...cand.map((x) => x.v));
+      return [elegir(estado, cand.filter((x) => x.v === min)).r];
+    }
     case "aliado_herido_azar": { // tu héroe o uno de tus esbirros (incluido él mismo) que esté herido
       const p = estado.j[s];
       const heridos = [...(p.vida < p.vidaMax ? ["h" + s] : []), ...p.tablero.filter((m) => m.vida > 0 && m.vida < m.vidaMax && tribuOk(m)).map((m) => m.uid)];
@@ -409,6 +422,27 @@ function aplicarEfectos(estado, s, efectos, elegido, ev, db, fuente, ctx = {}) {
         if (c.grito) aplicarEfectos(estado, s, c.grito, null, ev, db, f, ctx);
         if (c.aliento) aplicarEfectos(estado, s, c.aliento, null, ev, db, f, ctx);
         resolverMuertes(estado, ev, db);
+      }
+      continue;
+    }
+    if (ef.tipo === "barajar") {
+      // mete copias de una carta en el mazo (del rival con lado "enemigo"), en lugares al azar
+      const lado = ef.lado === "enemigo" ? otro(s) : s, mazo = estado.j[lado].mazo;
+      for (let k = 0; k < n; k++) mazo.splice(Math.floor(azar(estado) * (mazo.length + 1)), 0, ef.carta);
+      ev.push({ e: "baraja", seat: lado, carta: ef.carta, n });
+      continue;
+    }
+    if (ef.tipo === "robar_vida") {
+      // daño que cura a tu héroe; cada Cruit Vampiro en tu mesa suma +1 (aumenta_robo_vida)
+      const extra = estado.j[s].tablero.filter((m) => m.vida > 0).reduce((t, m) => t + (db[m.id]?.aumenta_robo_vida || 0), 0);
+      for (const ref of objetivos(estado, s, ef, elegido, fuente)) {
+        const t = buscar(estado, ref);
+        if (!t) continue;
+        const antes = t.tipo === "heroe" ? t.obj.vida : t.obj.vida, escudo = t.tipo === "esbirro" && t.obj.escudo;
+        ev.push({ e: "fx", fx: "sangre", de: ref, a: "h" + s });
+        danar(estado, ref, n + extra, ev);
+        const quitado = escudo ? 0 : Math.max(0, antes - t.obj.vida);
+        if (quitado) curar(estado, "h" + s, quitado, ev);
       }
       continue;
     }

@@ -404,6 +404,27 @@ for (let k = 0; k < 20; k++) {
   assert.deepEqual([cs.ataque, cs.vida], [10, 8], "el grito de Excel repetido buffea a Coco Supremo (+3/+3 por 1 tarea)");
 }
 
+// --- Estreñido Cruit, Cruit Sangre, Cruit Vampiro ---
+{
+  const e = nueva(47, ["cruit", "cruit"]); const s = e.turno, r = 1 - s;
+  e.j[s].tablero = []; e.j[r].tablero = [];
+  preparar(e, s, ["cruit_estrenido", "cruit_vampiro"]);
+  const mazo = e.j[r].mazo.length;
+  M.aplicar(e, s, { t: "jugar", uid: "t0" }, db, 0);
+  assert.equal(e.j[r].mazo.length, mazo + 3);
+  e.j[r].mazo.unshift("caca");
+  M.aplicar(e, s, { t: "jugar", uid: "t1" }, db, 0);
+  assert.equal(e.j[s].tablero.filter((m) => m.id === "cruit_sangre").length, 2);
+  e.j[s].vida = 20;
+  const vr = e.j[r].vida, mr = e.j[r].mano.length;
+  const res = M.aplicar(e, s, { t: "fin" }, db, 0);
+  // 2 Cruit Sangre con un Vampiro: roban 4 cada uno al enemigo con menos vida (el héroe rival, sin esbirros)
+  assert.equal(e.j[s].vida, 28, "+8 de vida");
+  assert.ok(res.ev.some((x) => x.e === "se_lanza"), "el rival robó una caca al empezar su turno");
+  assert.equal(e.j[r].vida, vr - 8 - 3, "8 robados + 3 de la caca");
+  assert.equal(e.j[r].mano.length, mr + 1, "la caca no va a la mano, roba otra");
+}
+
 // --- estrés: miles de partidas con jugadas al azar ---
 let r = 12345;
 const rand = () => ((r = (r * 1103515245 + 12345) >>> 0) / 4294967296);

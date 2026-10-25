@@ -724,6 +724,85 @@
     }
    ],
    "genero": "no_binario"
+  },
+  {
+   "id": "caca",
+   "nombre": "Caca",
+   "tipo": "hechizo",
+   "coste": 0,
+   "token": true,
+   "arte": "💩",
+   "texto": "Se lanza al robarla: te hace 3 de daño y robas otra carta.",
+   "al_robarse": [
+    {
+     "tipo": "dano",
+     "objetivo": "heroe_propio",
+     "cantidad": 3,
+     "fx": "caca"
+    }
+   ]
+  },
+  {
+   "id": "cruit_estrenido",
+   "nombre": "Estreñido Cruit",
+   "genero": "no_binario",
+   "tipo": "esbirro",
+   "coste": 1,
+   "ataque": 2,
+   "vida": 3,
+   "tribu": "cruit",
+   "clase": "cruit",
+   "arte": "/arte/cruit_estrenido.webp",
+   "texto": "Grito de batalla: mete 3 Cacas en el mazo del rival. Al robarlas, recibe 3 de daño.",
+   "grito": [
+    {
+     "tipo": "barajar",
+     "carta": "caca",
+     "cantidad": 3,
+     "lado": "enemigo"
+    }
+   ]
+  },
+  {
+   "id": "cruit_sangre",
+   "nombre": "Cruit Sangre",
+   "genero": "no_binario",
+   "tipo": "esbirro",
+   "coste": 2,
+   "ataque": 2,
+   "vida": 3,
+   "tribu": "cruit",
+   "clase": "cruit",
+   "arte": "/arte/cruit_sangre.webp",
+   "texto": "Al final de tu turno, le roba 3 de vida al enemigo con menos vida y se la da a tu héroe.",
+   "fin_turno": [
+    {
+     "tipo": "robar_vida",
+     "objetivo": "enemigo_menos_vida",
+     "cantidad": 3
+    }
+   ]
+  },
+  {
+   "id": "cruit_vampiro",
+   "nombre": "Cruit Vampiro",
+   "genero": "no_binario",
+   "tipo": "esbirro",
+   "coste": 5,
+   "ataque": 4,
+   "vida": 4,
+   "tribu": "cruit",
+   "clase": "cruit",
+   "arte": "/arte/cruit_vampiro.webp",
+   "texto": "Tus Cruit roban +1 de vida. Grito de batalla: invoca 2 Cruit Sangre.",
+   "aumenta_robo_vida": 1,
+   "grito": [
+    {
+     "tipo": "invocar",
+     "carta": "cruit_sangre",
+     "cantidad": 2
+    }
+   ]
   }
  ],
  "heroes": [
