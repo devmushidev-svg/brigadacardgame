@@ -192,7 +192,7 @@ Diseño de Mario. Marco azul (provisional). Cruit es no binario: toda carta con 
 | Tarea de la U (hechizo, etiqueta Tarea) | 1 | — | 2 de daño a tu héroe, roba una carta | hecho |
 | **Coco Supremo** ⚧ (legendaria) | 9 | 7/5 | Grito: repite los gritos y últimos alientos de todos los Cruit que jugaste esta partida | hecho |
 | Estreñido Cruit ⚧ | 1 | 1/2 | Grito: mete 2 Cacas en el mazo del rival (al robarlas: 2 de daño y roba otra) | hecho |
-| Cruit Sangre ⚧ | 2 | 2/3 | Al final de tu turno, roba 3 de vida al enemigo con menos vida | hecho |
+| Cruit Sangre ⚧ | 2 | 2/2 | Al final de tu turno, roba 1 de vida al enemigo con menos vida | hecho |
 | Cruit Vampiro ⚧ | 5 | 3/3 | Tus Cruit roban +1 de vida. Grito: invoca 2 Cruit Sangre | hecho |
 | Caca (ficha) | 0 | — | Se lanza al robarla: 2 de daño a quien la roba y roba otra | hecho |
 | Cruit Tostadora ⚧ | 1 | 1/2 | Grito: robás una carta | hecho |
@@ -212,7 +212,7 @@ Sin mazo armado, el héroe sale al azar.
 
 **Cruit:** 2 Cruit Tostadora, 2 Estreñido Cruit, 2 Lechero, 2 Leche, 2 Tarea de la U, 2 Cruit Sangre, Chance Cruit, 2 Cruit Baño, Cruit Verity, Cruit Vaca, Unislop, Cruit Excel, Coco Supremo.
 
-Bot contra bot, Cruit le gana a Tun ~81% de las veces (era ~95% antes del nerf a Estreñido y Cruit Baño y el buff a Novia de Tun).
+Bot contra bot, Cruit le gana a Tun ~68% de las veces (era ~95% antes de los nerfs a Estreñido, Cruit Baño y Cruit Sangre y el buff a Novia de Tun).
 
 ### Tareas universitarias (fichas de Unislop, etiqueta Tarea: cuentan para Cruit Excel)
 

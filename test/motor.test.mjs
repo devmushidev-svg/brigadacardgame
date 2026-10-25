@@ -420,10 +420,10 @@ for (let k = 0; k < 20; k++) {
   e.j[s].vida = 20;
   const vr = e.j[r].vida, mr = e.j[r].mano.length;
   const res = M.aplicar(e, s, { t: "fin" }, db, 0);
-  // 2 Cruit Sangre con un Vampiro: roban 4 cada uno al enemigo con menos vida (el héroe rival, sin esbirros)
-  assert.equal(e.j[s].vida, 28, "+8 de vida");
+  // 2 Cruit Sangre con un Vampiro: roban 2 cada uno al enemigo con menos vida (el héroe rival, sin esbirros)
+  assert.equal(e.j[s].vida, 24, "+4 de vida");
   assert.ok(res.ev.some((x) => x.e === "se_lanza"), "el rival robó una caca al empezar su turno");
-  assert.equal(e.j[r].vida, vr - 8 - 2, "8 robados + 2 de la caca");
+  assert.equal(e.j[r].vida, vr - 4 - 2, "4 robados + 2 de la caca");
   assert.equal(e.j[r].mano.length, mr + 1, "la caca no va a la mano, roba otra");
   e.j[s].vida = 29; e.turno = s; M.aplicar(e, s, { t: "fin" }, db, 0);
   assert.ok(e.j[s].vida > 30 && e.j[s].vidaMax === e.j[s].vida, "robar vida suma, pasa de 30");
