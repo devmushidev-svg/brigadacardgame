@@ -126,7 +126,7 @@ export function empezar(estado, db, ahora, heroes = {}) {
   estado.fase = "jugando";
   const lista = Object.values(heroes);
   for (const p of estado.j) {
-    const h = heroes[p.heroe] || lista[0] || null;
+    const h = heroes[p.heroe] || (lista.length ? elegir(estado, lista) : null); // sin mazo elegido: héroe al azar
     p.heroe = h ? h.id : null;
     p.poder = h?.poder ? copia(h.poder) : null;
     p.mazo = armarMazo(estado, db, p.heroe, p.mazoElegido?.heroe === p.heroe ? p.mazoElegido.cartas : null);

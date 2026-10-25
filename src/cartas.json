@@ -495,6 +495,27 @@
     "ataque": 1,
     "vida": 1
    }
+  },
+  {
+   "id": "coco",
+   "nombre": "Coco",
+   "tipo": "esbirro",
+   "coste": 1,
+   "ataque": 1,
+   "vida": 1,
+   "clase": "cruit",
+   "token": true,
+   "claves": [
+    "carga"
+   ],
+   "arte": "/arte/coco.webp",
+   "texto": "Carga. Muere al final de tu turno.",
+   "fin_turno": [
+    {
+     "tipo": "destruir",
+     "objetivo": "yo"
+    }
+   ]
   }
  ],
  "heroes": [
@@ -513,6 +534,26 @@
      {
       "tipo": "invocar",
       "carta": "tun",
+      "cantidad": 1
+     }
+    ]
+   }
+  },
+  {
+   "id": "cruit",
+   "nombre": "Cruit",
+   "arte": "🧑",
+   "clase": "cruit",
+   "marco": "linear-gradient(160deg, #7fb2ff, #2f62c4 40%, #16306e 80%, #2f62c4)",
+   "poder": {
+    "nombre": "Coco",
+    "coste": 1,
+    "texto": "Invoca un Coco 1/1 con carga que muere al final del turno.",
+    "arte": "/arte/poder_cruit.webp",
+    "efectos": [
+     {
+      "tipo": "invocar",
+      "carta": "coco",
       "cantidad": 1
      }
     ]

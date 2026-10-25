@@ -8,9 +8,10 @@ const JS = JSON.parse(readFileSync(new URL("../src/cartas.json", import.meta.url
 const db = Object.fromEntries(JS.cartas.map((c) => [c.id, c]));
 const heroes = Object.fromEntries(JS.heroes.map((h) => [h.id, h]));
 
-function nueva(semilla = 1) {
+function nueva(semilla = 1, hs = ["tun", "tun"]) {
   const e = M.crearPartida(db, semilla);
   e.j[0].nombre = "A"; e.j[1].nombre = "B";
+  e.j[0].heroe = hs[0]; e.j[1].heroe = hs[1];
   M.empezar(e, db, 0, heroes);
   return e;
 }
@@ -309,13 +310,30 @@ for (let k = 0; k < 20; k++) {
   assert.deepEqual(todas.sort(), cartas.slice().sort(), "usa el mazo elegido");
 }
 
+// --- Cruit: el poder invoca un Coco con carga que muere al final del turno ---
+{
+  const e = M.crearPartida(db, 41); e.j[0].nombre = "A"; e.j[1].nombre = "B";
+  e.j[0].heroe = "cruit"; e.j[1].heroe = "cruit";
+  M.empezar(e, db, 0, heroes);
+  const s = e.turno, r = 1 - s;
+  assert.equal(e.j[s].heroe, "cruit");
+  e.j[s].mana = 1; e.j[r].tablero = [];
+  M.aplicar(e, s, { t: "poder" }, db, 0);
+  const coco = e.j[s].tablero.find((m) => m.id === "coco");
+  assert.ok(coco && M.puedeAtacar(coco), "carga");
+  M.aplicar(e, s, { t: "atacar", de: coco.uid, a: "h" + r }, db, 0);
+  assert.equal(e.j[r].vida, 29);
+  M.aplicar(e, s, { t: "fin" }, db, 0);
+  assert.ok(!e.j[s].tablero.some((m) => m.id === "coco"), "muere al final del turno");
+}
+
 // --- estrés: miles de partidas con jugadas al azar ---
 let r = 12345;
 const rand = () => ((r = (r * 1103515245 + 12345) >>> 0) / 4294967296);
 let terminadas = 0, turnosTot = 0, maxTurnos = 0, misiones = 0;
 const ganados = [0, 0, 0];
 for (let g = 0; g < 2000; g++) {
-  const e = nueva(g * 7919 + 1);
+  const e = nueva(g * 7919 + 1, [null, null]); // héroes al azar
   let pasos = 0;
   while (e.fase === "jugando" && pasos++ < 6000) {
     const s = e.turno;

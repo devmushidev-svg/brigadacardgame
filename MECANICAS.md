@@ -165,6 +165,17 @@ Diseño de Mario. Arquetipo: paladín molesto — llenar la mesa de Tun, buffear
 - Misión: medallón arriba del retrato del héroe con anillo de progreso; cada avance suena y brilla; al completarse hay fanfarria, el medallón se agranda y se muestra la recompensa.
 - Robar de la mano: la carta cruza la pantalla de una mano a la otra.
 
+## Clase Cruit
+
+Diseño de Mario. Marco azul (provisional).
+
+| Carta | Coste | Stats | Efecto | Estado |
+|---|---|---|---|---|
+| Héroe Cruit | — | 30 | Poder (1): invoca un Coco 1/1 con carga que muere al final del turno | hecho — **falta la imagen del héroe** |
+| Coco (ficha) | — | 1/1 | Carga. Muere al final de tu turno | hecho |
+
+Sin mazo armado, el héroe sale al azar.
+
 ## Pendiente de agregar al motor (ideas en discusión)
 
 - auras ("mientras esté vivo, tus Tun tienen +2/+2")
