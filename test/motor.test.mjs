@@ -443,6 +443,17 @@ for (let k = 0; k < 20; k++) {
   assert.equal(e.j[r].vida, v - 2); assert.equal(e.j[r].tablero[0].vida, 9 - 3 - 2);
 }
 
+// --- Cruit Verity: al morir sale Verity 6/6 ---
+{
+  const e = nueva(49, ["cruit", "cruit"]); const s = e.turno, r = 1 - s;
+  e.j[s].tablero = []; e.j[r].tablero = [{ uid: "rv", id: "x", tribu: null, ataque: 1, vida: 9, vidaMax: 9, ataques: 0 }];
+  preparar(e, s, ["cruit_verity"]);
+  M.aplicar(e, s, { t: "jugar", uid: "t0" }, db, 0);
+  const cv = e.j[s].tablero[0]; cv.dormido = false;
+  M.aplicar(e, s, { t: "atacar", de: cv.uid, a: "rv" }, db, 0);
+  assert.deepEqual(e.j[s].tablero.map((m) => [m.id, m.ataque, m.vida]), [["verity", 6, 6]]);
+}
+
 // --- estrés: miles de partidas con jugadas al azar ---
 let r = 12345;
 const rand = () => ((r = (r * 1103515245 + 12345) >>> 0) / 4294967296);

@@ -862,6 +862,39 @@
      "cantidad": 2
     }
    ]
+  },
+  {
+   "id": "cruit_verity",
+   "nombre": "Cruit Verity",
+   "genero": "no_binario",
+   "tipo": "esbirro",
+   "coste": 3,
+   "ataque": 3,
+   "vida": 1,
+   "tribu": "cruit",
+   "clase": "cruit",
+   "arte": "/arte/cruit_verity.webp",
+   "texto": "Último aliento: invoca a Verity 6/6.",
+   "aliento": [
+    {
+     "tipo": "invocar",
+     "carta": "verity",
+     "cantidad": 1
+    }
+   ]
+  },
+  {
+   "id": "verity",
+   "nombre": "Verity",
+   "genero": "no_binario",
+   "tipo": "esbirro",
+   "coste": 6,
+   "ataque": 6,
+   "vida": 6,
+   "clase": "cruit",
+   "token": true,
+   "arte": "/arte/verity.webp",
+   "texto": "Tu amigo ayudante. Ya no tan amigo."
   }
  ],
  "heroes": [
