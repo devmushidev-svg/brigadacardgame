@@ -134,7 +134,10 @@ button { font-family: var(--f-tit); cursor: pointer; }
   box-shadow: 0 0 0 2px #2a1d10, 0 8px 12px #000a; }
 .esbirro .arte { display: grid; place-items: center; width: 100%; height: 100%; border-radius: 50%; overflow: hidden;
   font-size: calc(var(--esb) * .56); line-height: 1; background: var(--ruido), var(--fondo, #555); box-shadow: inset 0 0 16px #000d; pointer-events: none; }
-.esbirro .arte img, .carta .arte img { width: 100%; height: 100%; object-fit: cover; }
+.esbirro .arte img, .carta .arte img { width: 100%; height: 100%; object-fit: cover; object-position: 50% 30%; }
+.carta .texto.t2 { font-size: calc(var(--carta-w) * .072); line-height: 1.1; }
+.carta .texto.t3 { font-size: calc(var(--carta-w) * .063); line-height: 1.08; }
+.carta .texto.t4 { font-size: calc(var(--carta-w) * .056); line-height: 1.05; }
 .esbirro.provocar::before { content: ""; position: absolute; inset: -9px -12px -6px; z-index: -1; pointer-events: none;
   clip-path: polygon(50% 0, 100% 12%, 96% 62%, 50% 100%, 4% 62%, 0 12%);
   background: var(--ruido), linear-gradient(#b9b2a6, #6d665c 60%, #4a443c); filter: drop-shadow(0 4px 4px #000); }
@@ -173,15 +176,15 @@ button { font-family: var(--f-tit); cursor: pointer; }
 .carta.legendaria { box-shadow: 0 0 0 1.5px #1e160d, 0 0 0 3.5px var(--oro), 0 0 18px #ffb30088, 0 8px 16px #000c; }
 .carta.legendaria::before { content: "★"; position: absolute; top: -12px; left: 50%; transform: translateX(-50%); z-index: 3; font-size: calc(var(--carta-w) * .16);
   color: var(--oro); text-shadow: 0 0 6px #ffb300, 0 2px 2px #000; }
-.carta .arte { position: relative; height: 47%; margin: 2px 8% 0; border-radius: 50%; display: grid; place-items: center; overflow: hidden;
+.carta .arte { position: relative; height: 53%; margin: 0 3% 0; flex: none; border-radius: 50%; display: grid; place-items: center; overflow: hidden;
   font-size: calc(var(--carta-w) * .36); background: var(--ruido), var(--fondo, #777); box-shadow: 0 0 0 3px #3a2c1a, 0 0 0 5px #a8946b, inset 0 0 14px #000c; }
 .carta.hechizo .arte, .carta.mision .arte { border-radius: 14px; margin: 2px 6% 0; }
-.carta .titulo { position: relative; z-index: 2; margin: -9% -3% 0; padding: 4% 6%; text-align: center; font-family: var(--f-tit); font-weight: 700;
+.carta .titulo { position: relative; z-index: 2; margin: -7% -3% 0; padding: 4% 6%; text-align: center; font-family: var(--f-tit); font-weight: 700;
   font-size: calc(var(--carta-w) * .095); color: #fff; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
   text-shadow: -1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000;
   background: linear-gradient(#d9bd85, #a8854a 50%, #7c5f30); clip-path: polygon(0 18%, 50% 0, 100% 18%, 97% 100%, 50% 84%, 3% 100%);
   filter: drop-shadow(0 2px 2px #000); }
-.carta .texto { flex: 1; margin: 2% 4% 8%; padding: 6% 6% 10%; border-radius: 8px; background: var(--ruido), linear-gradient(#f7ecd2, #dcc89f);
+.carta .texto { flex: 1; min-height: 0; overflow: hidden; margin: 1% 4% 9%; padding: 2% 4% 4%; border-radius: 8px; background: var(--ruido), linear-gradient(#f7ecd2, #dcc89f);
   font-weight: 700; font-size: calc(var(--carta-w) * .082); line-height: 1.15; text-align: center; display: grid; place-items: center;
   box-shadow: inset 0 0 8px #8a6a3a88; }
 .carta .arq { position: absolute; bottom: 5px; left: 0; right: 0; text-align: center; font: 800 calc(var(--carta-w) * .065) var(--f-tit); color: #f2e6c8; opacity: .8;

@@ -134,7 +134,7 @@ function cartaHTML(c, { uid = "", clase = "" } = {}) {
   return `<div class="carta ${esH ? "hechizo" : ""} ${c.tipo === "mision" ? "mision" : ""} ${c.rareza === "legendaria" ? "legendaria" : ""} ${clase}" ${uid ? `data-uid="${uid}"` : ""} data-carta="${esc(c.id)}"${marco ? ` style="--marco:${esc(marco)}"` : ""}>
     <div class="arte" style="--fondo:${colorDe(c.arquetipo || c.id)}">${artHTML(c.arte)}</div>
     <div class="titulo">${esc(c.nombre)}</div>
-    <div class="texto">${esc(c.texto || "")}</div>
+    <div class="texto ${((l) => (l > 115 ? "t4" : l > 85 ? "t3" : l > 50 ? "t2" : ""))((c.texto || "").length)}">${esc(c.texto || "")}</div>
     ${etiqueta ? `<div class="arq">${esc(etiqueta)}</div>` : ""}
     <div class="stat mana ${DB[c.id] && c.coste < DB[c.id].coste ? "rebajado" : ""}">${c.coste}</div>
     ${esH ? "" : `<div class="stat atk">${c.ataque}</div><div class="stat hp">${c.vida}</div>`}
