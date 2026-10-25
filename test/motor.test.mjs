@@ -69,18 +69,6 @@ for (let k = 0; k < 50; k++) {
   e.j[s].tablero = Array.from({ length: 7 }, (_, k) => ({ uid: "z" + k, id: "mae", tribu: null, ataque: 1, vida: 2, vidaMax: 2, ataques: 0 }));
   assert.equal(M.puedeUsarPoder(e, s), false, "sin espacio no se puede usar el poder");
 }
-// --- Tun Maestro: invoca 5 y los dispara ---
-{
-  const e = nueva(7); const s = e.turno, r = 1 - s;
-  e.j[r].tablero = []; e.j[s].tablero = [];
-  preparar(e, s, ["tun_maestro"]);
-  const vidaAntes = e.j[r].vida;
-  const res = M.aplicar(e, s, { t: "jugar", uid: "t0" }, db, 0);
-  assert.ok(!res.error);
-  assert.equal(res.ev.filter((x) => x.e === "invoca" && x.carta === "tun").length, 5);
-  assert.equal(res.ev.filter((x) => x.e === "ataque").length, 5, "cada Tun se dispara");
-  assert.equal(e.j[r].vida, vidaAntes - 5, "sin esbirros enemigos, los 5 le pegan a la cara");
-}
 // --- Panamá: cada robo invoca un Tun para quien roba, aunque Panamá muera ---
 {
   const e = nueva(8); const s = e.turno, r = 1 - s;
@@ -150,6 +138,62 @@ for (let k = 0; k < 20; k++) {
   M.aplicar(e, s, { t: "jugar", uid: "t0" }, db, 0);
   M.aplicar(e, s, { t: "fin" }, db, 0);
   assert.equal(tuns(e, s), 2);
+}
+
+// --- Tun IA: descubrir (3 opciones distintas, solo el que elige las ve) ---
+{
+  const e = nueva(21); const s = e.turno, r = 1 - s;
+  e.j[s].tablero = [];
+  preparar(e, s, ["tun_ia"]);
+  assert.ok(!M.aplicar(e, s, { t: "jugar", uid: "t0" }, db, 0).error);
+  const ops = e.pendiente.opciones;
+  assert.equal(new Set(ops).size, ops.length); assert.ok(ops.length === 3 && ops.every((id) => db[id].tribu === "tun" && !db[id].token));
+  assert.ok(M.vista(e, s, db).pendiente.opciones && !M.vista(e, r, db).pendiente.opciones, "el rival no ve las opciones");
+  assert.ok(M.aplicar(e, s, { t: "atacar", de: "x", a: "h0" }, db, 0).error, "no se puede hacer otra cosa antes de elegir");
+  const antes = e.j[s].mano.length;
+  assert.ok(!M.aplicar(e, s, { t: "elegir", i: 1 }, db, 0).error);
+  assert.equal(e.j[s].mano.length, antes + 1); assert.equal(e.j[s].mano.at(-1).id, ops[1]); assert.equal(e.pendiente, null);
+  // si se pasa el turno sin elegir, se elige al azar
+  e.turno = s; preparar(e, s, ["tun_ia"]); e.j[s].tablero = [];
+  M.aplicar(e, s, { t: "jugar", uid: "t0" }, db, 0);
+  assert.ok(!M.aplicar(e, s, { t: "fin" }, db, 0).error); assert.equal(e.pendiente, null);
+}
+// --- Tun Cool: 1 menos por cada Tun en la mesa (de los dos lados) ---
+{
+  const e = nueva(22); const s = e.turno, r = 1 - s;
+  preparar(e, s, ["tun_cool"], 4);
+  e.j[s].tablero = []; e.j[r].tablero = [];
+  assert.equal(M.costeDe(e, s, db.tun_cool), 10);
+  for (let k = 0; k < 4; k++) { e.j[s].poderUsado = false; e.j[s].mana = 4; M.aplicar(e, s, { t: "poder" }, db, 0); }
+  e.j[r].tablero.push({ uid: "z9", id: "tun", tribu: "tun", ataque: 1, vida: 1, vidaMax: 1, ataques: 0 });
+  assert.equal(M.costeDe(e, s, db.tun_cool), 5);
+  e.j[s].mana = 5;
+  assert.ok(!M.aplicar(e, s, { t: "jugar", uid: "t0" }, db, 0).error); assert.equal(e.j[s].mana, 0);
+}
+// --- Tun Mujer: tus Tun la atacan y cada golpe hace 1 a un enemigo ---
+{
+  const e = nueva(23); const s = e.turno, r = 1 - s;
+  preparar(e, s, ["tun_mujer"]);
+  e.j[r].tablero = [];
+  e.j[s].tablero = [0, 1, 2].map((k) => ({ uid: "q" + k, id: "tun", tribu: "tun", ataque: 1, vida: 1, vidaMax: 1, ataques: 0 }));
+  const vidaRival = e.j[r].vida;
+  const res = M.aplicar(e, s, { t: "jugar", uid: "t0" }, db, 0);
+  assert.ok(!res.error, res.error);
+  const mujer = e.j[s].tablero.find((m) => m.id === "tun_mujer");
+  assert.equal(mujer.vida, 5, "3 Tun le pegaron 1 cada uno");
+  assert.equal(tuns(e, s), 1, "los Tun murieron contra ella (2 de ataque)");
+  assert.equal(e.j[r].vida, vidaRival - 3, "3 golpes = 3 de daño al rival");
+}
+// --- Tun Maestro: 5 Tun al azar, el jugador elige a quién lanza cada uno ---
+{
+  const e = nueva(24); const s = e.turno, r = 1 - s;
+  preparar(e, s, ["tun_maestro"]);
+  e.j[s].tablero = []; e.j[r].tablero = [];
+  M.aplicar(e, s, { t: "jugar", uid: "t0" }, db, 0);
+  assert.equal(e.j[s].tablero.length, 6); assert.equal(e.pendiente.tipo, "disparar");
+  let n = 0;
+  while (e.pendiente && n++ < 10) assert.ok(!M.aplicar(e, s, { t: "elegir", a: "h" + r }, db, 0).error);
+  assert.ok(e.j[r].vida < 30 - 4 || e.fase === "fin", "los 5 le pegaron a la cara");
 }
 
 // --- estrés: miles de partidas con jugadas al azar ---

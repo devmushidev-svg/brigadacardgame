@@ -27,7 +27,7 @@
    "tribu": "tun",
    "token": true,
    "clase": "tun",
-   "arte": "🧍",
+   "arte": "/arte/tun.webp",
    "texto": "Es Tun."
   },
   {
@@ -65,13 +65,15 @@
    "rareza": "legendaria",
    "token": true,
    "arte": "/arte/tun_maestro.webp",
-   "texto": "Grito de batalla: invoca 5 Tun y dispáralos a los enemigos.",
+   "texto": "Grito de batalla: invoca 5 Tun al azar y lanzalos contra los enemigos que elijas.",
    "grito": [
     {
      "tipo": "invocar",
-     "carta": "tun",
+     "azar": {
+      "tribu": "tun"
+     },
      "cantidad": 5,
-     "disparar": true
+     "disparar": "elegir"
     }
    ]
   },
@@ -161,13 +163,22 @@
   {
    "id": "mauro_sosa",
    "nombre": "Mauro Sosa",
+   "genero": "hombre",
    "tipo": "esbirro",
    "coste": 2,
    "ataque": 2,
    "vida": 3,
    "texto": "Grito de batalla: si el rival tiene una mujer en la mano, te la robás.",
    "arte": "/arte/mauro_sosa.webp",
-   "grito": [{ "tipo": "robar_mano", "filtro": { "genero": "mujer" }, "cantidad": 1 }]
+   "grito": [
+    {
+     "tipo": "robar_mano",
+     "filtro": {
+      "genero": "mujer"
+     },
+     "cantidad": 1
+    }
+   ]
   },
   {
    "id": "tun_satanico",
@@ -194,19 +205,105 @@
      "fx": "devorar"
     }
    ]
+  },
+  {
+   "id": "tun_ia",
+   "nombre": "Tun IA",
+   "genero": "hombre",
+   "tipo": "esbirro",
+   "coste": 1,
+   "ataque": 1,
+   "vida": 2,
+   "tribu": "tun",
+   "clase": "tun",
+   "arte": "/arte/tun_ia.webp",
+   "texto": "Grito de batalla: descubre un Tun.",
+   "grito": [
+    {
+     "tipo": "descubrir",
+     "filtro": {
+      "tribu": "tun"
+     }
+    }
+   ]
+  },
+  {
+   "id": "tun_cool",
+   "nombre": "Tun Cool",
+   "genero": "hombre",
+   "tipo": "esbirro",
+   "coste": 10,
+   "ataque": 6,
+   "vida": 7,
+   "tribu": "tun",
+   "clase": "tun",
+   "arte": "/arte/tun_cool.webp",
+   "texto": "Cuesta 1 menos por cada otro Tun en el campo de batalla.",
+   "descuento": {
+    "por": "tribu_en_mesa",
+    "tribu": "tun"
+   }
+  },
+  {
+   "id": "tun_mujer",
+   "nombre": "Tun Mujer",
+   "genero": "mujer",
+   "tipo": "esbirro",
+   "coste": 5,
+   "ataque": 2,
+   "vida": 8,
+   "tribu": "tun",
+   "clase": "tun",
+   "arte": "/arte/tun_mujer.webp",
+   "texto": "Grito de batalla: tus Tun atacan a este esbirro. Cada vez que recibe daño, inflige 1 de daño a un enemigo al azar.",
+   "grito": [
+    {
+     "tipo": "atraer_ataques",
+     "filtro": {
+      "tribu": "tun"
+     }
+    }
+   ],
+   "al_recibir_dano": [
+    {
+     "tipo": "dano",
+     "objetivo": "enemigo_azar",
+     "cantidad": 1
+    }
+   ]
+  },
+  {
+   "id": "tun_tung_sahur",
+   "nombre": "Tun Tung Sahur",
+   "genero": "hombre",
+   "tipo": "esbirro",
+   "coste": 1,
+   "ataque": 1,
+   "vida": 1,
+   "tribu": "tun",
+   "clase": "tun",
+   "arte": "/arte/tun_tung_sahur.webp",
+   "texto": "Grito de batalla: invoca un Tun 1/1.",
+   "grito": [
+    {
+     "tipo": "invocar",
+     "carta": "tun",
+     "cantidad": 1
+    }
+   ]
   }
  ],
  "heroes": [
   {
    "id": "tun",
    "nombre": "Tun",
-   "arte": "🧍",
+   "arte": "/arte/heroe_tun.webp",
    "marco": "linear-gradient(160deg, #8db356, #557a2b 40%, #2f4a16 80%, #557a2b)",
    "clase": "tun",
    "poder": {
     "nombre": "Llamar a otro Tun",
     "coste": 1,
-    "arte": "📞",
+    "arte": "/arte/poder_tun.webp",
     "texto": "Invoca un Tun 1/1.",
     "efectos": [
      {

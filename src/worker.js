@@ -79,7 +79,7 @@ export class Partida extends DurableObject {
     const conectados = this.conectados();
     for (const ws of this.ctx.getWebSockets()) {
       const s = ws.deserializeAttachment()?.seat ?? -1;
-      const v = M.vista(this.estado, s);
+      const v = M.vista(this.estado, s, DB);
       v.conectados = conectados;
       v.revancha = this.revancha;
       v.ahora = Date.now();

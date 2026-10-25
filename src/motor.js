@@ -36,6 +36,19 @@ const nuevoUid = (estado) => "m" + estado.sigId++;
 const copia = (x) => JSON.parse(JSON.stringify(x));
 const efectosQuePiden = (c) => [...(c.grito || []), ...(c.efectos || [])];
 export const necesitaObjetivo = (carta) => efectosQuePiden(carta).some((e) => (e.objetivo || "").startsWith("elegido"));
+// coste real de una carta en la mano (ej. Tun Cool: 1 menos por cada Tun en la mesa, de los dos lados)
+export function costeDe(estado, s, c) {
+  if (!c) return 99;
+  let coste = c.coste;
+  const d = c.descuento;
+  if (d?.por === "tribu_en_mesa") {
+    const lados = d.lados === "propio" ? [s] : [0, 1];
+    for (const k of lados) coste -= estado.j[k].tablero.filter((m) => m.tribu === d.tribu && m.vida > 0).length;
+  }
+  return Math.max(0, coste);
+}
+// cartas que pueden salir al azar o en un descubrir
+const pozo = (db, filtro) => Object.values(db).filter((c) => !c.token && c.tipo === "esbirro" && cumpleFiltro(c, filtro));
 const maxCopias = (c) => (c.rareza === "legendaria" ? 1 : CONFIG.COPIAS_MAX);
 
 function armarMazo(estado, db, clase) {
@@ -216,6 +229,7 @@ function danar(estado, ref, n, ev, extra = {}) {
   }
   t.obj.vida -= n;
   ev.push({ e: "dano", a: ref, n });
+  if (t.obj.alRecibirDano) (estado.golpes ||= []).push({ uid: ref, id: t.obj.id, seat: t.seat });
 }
 
 function curar(estado, ref, n, ev) {
@@ -255,6 +269,7 @@ function invocar(estado, s, id, ev, db, pos) {
     doble: claves.has("doble"),
     dormido: !claves.has("carga"),
     ataques: 0,
+    alRecibirDano: !!c.al_recibir_dano,
   };
   const i = pos == null ? p.tablero.length : Math.max(0, Math.min(pos, p.tablero.length));
   p.tablero.splice(i, 0, m);
@@ -324,6 +339,26 @@ function aplicarEfectos(estado, s, efectos, elegido, ev, db, fuente, ctx = {}) {
       }
       continue;
     }
+    if (ef.tipo === "descubrir") {
+      // como Hearthstone: 3 opciones distintas, el jugador se queda con una
+      const lista = pozo(db, ef.filtro).map((c) => c.id);
+      const ops = [];
+      while (ops.length < 3 && lista.length) ops.push(lista.splice(Math.floor(azar(estado) * lista.length), 1)[0]);
+      if (!ops.length) continue;
+      if (estado.pendiente) darCarta(estado, s, elegir(estado, ops), ev); // ya hay otra elección abierta
+      else { estado.pendiente = { seat: s, tipo: "descubrir", opciones: ops }; ev.push({ e: "elegir", seat: s, tipo: "descubrir" }); }
+      continue;
+    }
+    if (ef.tipo === "atraer_ataques") {
+      // tus otros esbirros (del filtro) atacan a esta carta, uno por uno
+      for (const m of [...estado.j[s].tablero]) {
+        const f = fuente && buscar(estado, fuente);
+        if (!f || f.obj.vida <= 0) break;
+        if (m.uid === fuente || m.vida <= 0 || m.ataque <= 0 || (ef.filtro?.tribu && m.tribu !== ef.filtro.tribu)) continue;
+        chocar(estado, m.uid, fuente, ev);
+      }
+      continue;
+    }
     if (ef.tipo === "dar_carta") { for (let k = 0; k < n; k++) darCarta(estado, s, ef.carta, ev); continue; }
     if (ef.tipo === "devorar") {
       // destruye a tus otros esbirros (de la tribu del filtro) y gana stats por cada uno
@@ -345,12 +380,17 @@ function aplicarEfectos(estado, s, efectos, elegido, ev, db, fuente, ctx = {}) {
     if (ef.tipo === "invocar") {
       const lado = ef.lado === "enemigo" ? otro(s) : ef.lado === "quien_roba" && ctx.quien != null ? ctx.quien : s;
       const nuevos = [];
+      const opciones = ef.azar ? pozo(db, ef.azar) : null;
       for (let k = 0; k < n; k++) {
-        const m = invocar(estado, lado, ef.carta, ev, db);
+        const id = opciones ? opciones.length && elegir(estado, opciones).id : ef.carta;
+        const m = id && invocar(estado, lado, id, ev, db);
         if (m) nuevos.push(m.uid);
       }
-      // "disparar": cada invocado se lanza contra un enemigo al azar
-      if (ef.disparar) {
+      // "disparar": "elegir" = el jugador elige a quién se lanza cada uno; true = enemigo al azar
+      if (ef.disparar === "elegir" && nuevos.length) {
+        if (estado.pendiente?.tipo === "disparar" && estado.pendiente.seat === lado) estado.pendiente.cola.push(...nuevos);
+        else if (!estado.pendiente) { estado.pendiente = { seat: lado, tipo: "disparar", cola: nuevos }; ev.push({ e: "elegir", seat: lado, tipo: "disparar" }); }
+      } else if (ef.disparar) {
         for (const uid of nuevos) {
           if (estado.fase !== "jugando" || !buscar(estado, uid)) continue;
           const ene = ["h" + otro(lado), ...estado.j[otro(lado)].tablero.map((m) => m.uid)];
@@ -380,14 +420,23 @@ function aplicarEfectos(estado, s, efectos, elegido, ev, db, fuente, ctx = {}) {
 }
 
 function resolverMuertes(estado, ev, db) {
-  for (let vuelta = 0; vuelta < 30; vuelta++) {
+  for (let vuelta = 0; vuelta < 40; vuelta++) {
+    // "cada vez que este esbirro recibe daño" (se activa aunque muera por ese golpe)
+    const golpes = estado.golpes || [];
+    estado.golpes = [];
+    for (const g of golpes) {
+      const c = db[g.id];
+      if (!c?.al_recibir_dano || estado.fase !== "jugando") continue;
+      ev.push({ e: "dispara", uid: g.uid, por: "dano" });
+      aplicarEfectos(estado, g.seat, c.al_recibir_dano, null, ev, db, g.uid);
+    }
     const muertos = [];
     for (const s of [0, 1]) {
       const p = estado.j[s];
       for (const m of p.tablero) if (m.vida <= 0) muertos.push({ s, m });
       p.tablero = p.tablero.filter((m) => m.vida > 0);
     }
-    if (!muertos.length) break;
+    if (!muertos.length) { if (!estado.golpes.length) break; continue; }
     for (const { s, m } of muertos) {
       ev.push({ e: "muere", uid: m.uid, seat: s });
       const c = db[m.id];
@@ -407,6 +456,7 @@ function resolverMuertes(estado, ev, db) {
       }
     }
   }
+  estado.golpes = [];
   const muerto0 = estado.j[0].vida <= 0, muerto1 = estado.j[1].vida <= 0;
   if ((muerto0 || muerto1) && estado.fase === "jugando") {
     estado.fase = "fin";
@@ -455,6 +505,32 @@ export function puedeUsarPoder(estado, s) {
   return true;
 }
 
+// ---------- elecciones pendientes (descubrir, disparar eligiendo) ----------
+export function opcionesPendiente(estado) {
+  const pe = estado.pendiente;
+  if (!pe) return [];
+  if (pe.tipo === "descubrir") return pe.opciones.map((_, i) => i);
+  return ["h" + otro(pe.seat), ...estado.j[otro(pe.seat)].tablero.map((m) => m.uid)];
+}
+function resolverPendiente(estado, eleccion, ev, db) {
+  const pe = estado.pendiente;
+  if (pe.tipo === "descubrir") {
+    estado.pendiente = null;
+    const id = pe.opciones[eleccion];
+    if (darCarta(estado, pe.seat, id, ev)) ev.push({ e: "descubierta", seat: pe.seat });
+    return;
+  }
+  const uid = pe.cola.shift();
+  if (buscar(estado, uid)) { chocar(estado, uid, eleccion, ev); resolverMuertes(estado, ev, db); }
+  // los que murieron en el camino ya no disparan
+  pe.cola = pe.cola.filter((u) => buscar(estado, u));
+  if (!pe.cola.length || estado.fase !== "jugando") estado.pendiente = null;
+}
+function resolverAlAzar(estado, ev, db) {
+  for (let k = 0; k < 20 && estado.pendiente && estado.fase === "jugando"; k++) resolverPendiente(estado, elegir(estado, opcionesPendiente(estado)), ev, db);
+  estado.pendiente = null;
+}
+
 // ---------- acciones ----------
 export function aplicar(estado, s, accion, db, ahora) {
   const ev = [];
@@ -467,6 +543,22 @@ export function aplicar(estado, s, accion, db, ahora) {
   }
   if (estado.turno !== s) return { error: "no es tu turno" };
   const p = estado.j[s];
+
+  if (accion.t === "elegir") {
+    const pe = estado.pendiente;
+    if (!pe || pe.seat !== s) return { error: "no hay nada que elegir" };
+    const ok = opcionesPendiente(estado);
+    const valor = pe.tipo === "descubrir" ? +accion.i : accion.a;
+    if (!ok.includes(valor)) return { error: "eleccion invalida" };
+    resolverPendiente(estado, valor, ev, db);
+    resolverMuertes(estado, ev, db);
+    return { ev };
+  }
+  if (estado.pendiente) {
+    if (accion.t !== "fin") return { error: estado.pendiente.tipo === "descubrir" ? "primero elegi una carta" : "primero elegi a quien disparar" };
+    resolverAlAzar(estado, ev, db);
+    if (estado.fase !== "jugando") return { ev };
+  }
 
   if (accion.t === "fin") {
     registrar(estado, `${p.nombre} termino su turno`);
@@ -495,7 +587,8 @@ export function aplicar(estado, s, accion, db, ahora) {
     if (i < 0) return { error: "esa carta no esta en tu mano" };
     const carta = db[p.mano[i].id];
     if (!carta) return { error: "carta desconocida" };
-    if (carta.coste > p.mana) return { error: "no te alcanza el mana" };
+    const coste = costeDe(estado, s, carta);
+    if (coste > p.mana) return { error: "no te alcanza el mana" };
     if (carta.tipo === "esbirro" && p.tablero.length >= CONFIG.MAX_TABLERO) return { error: "tablero lleno" };
     if (carta.tipo === "mision" && p.mision) return { error: "ya tenes una mision activa" };
     const pide = necesitaObjetivo(carta);
@@ -504,7 +597,7 @@ export function aplicar(estado, s, accion, db, ahora) {
     } else if (carta.tipo === "hechizo" && pide) {
       return { error: "no hay objetivos para este hechizo" };
     }
-    p.mana -= carta.coste;
+    p.mana -= coste;
     p.mano.splice(i, 1);
     registrar(estado, `${p.nombre} jugo ${carta.nombre}`);
     if (carta.tipo === "mision") {
@@ -544,13 +637,14 @@ export function tiempoAgotado(estado, db, ahora) {
   const s = estado.turno;
   registrar(estado, `a ${estado.j[s].nombre} se le acabo el tiempo`);
   const ev = [];
-  finTurno(estado, s, ev, db);
+  if (estado.pendiente) resolverAlAzar(estado, ev, db);
+  if (estado.fase === "jugando") finTurno(estado, s, ev, db);
   if (estado.fase === "jugando") inicioTurno(estado, otro(s), ev, db, ahora);
   return ev;
 }
 
 // ---------- lo que ve cada jugador ----------
-export function vista(estado, yo) {
+export function vista(estado, yo, db0 = {}) {
   return {
     fase: estado.fase,
     turno: estado.turno,
@@ -560,6 +654,12 @@ export function vista(estado, yo) {
     yo,
     log: estado.log.slice(-12),
     globales: estado.globales.map((g) => g.origen).filter(Boolean),
+    pendiente: estado.pendiente
+      ? { seat: estado.pendiente.seat, tipo: estado.pendiente.tipo,
+          opciones: estado.pendiente.seat === yo && estado.pendiente.tipo === "descubrir" ? estado.pendiente.opciones : undefined,
+          tirador: estado.pendiente.tipo === "disparar" ? estado.pendiente.cola[0] : undefined,
+          quedan: estado.pendiente.tipo === "disparar" ? estado.pendiente.cola.length : undefined }
+      : null,
     j: estado.j.map((p, s) => ({
       nombre: p.nombre,
       heroe: p.heroe,
@@ -572,7 +672,7 @@ export function vista(estado, yo) {
       manaMax: p.manaMax,
       mazo: p.mazo.length,
       manoN: p.mano.length,
-      mano: s === yo ? p.mano : undefined,
+      mano: s === yo ? p.mano.map((c) => ({ ...c, coste: db0[c.id] ? costeDe(estado, s, db0[c.id]) : undefined })) : undefined,
       tablero: p.tablero,
     })),
   };

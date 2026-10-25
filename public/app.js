@@ -81,6 +81,7 @@ const Sonido = (() => {
       ruido(0.7, 0.05, oscuro ? 500 : 4000);
     },
     robo() { ruido(0.3, 0.15, 3000); tono(300, 0.25, "triangle", 0.08, 2.2); tono(900, 0.2, "sine", 0.05, 0.5, 0.25); },
+    descubrir() { [523, 659, 784, 988, 1175, 1568].forEach((f, i) => tono(f, 0.5, "triangle", 0.05, 1, i * 0.06)); ruido(0.6, 0.04, 7000); },
     slam() { tono(55, 0.6, "sine", 0.6, 0.5); tono(110, 0.25, "square", 0.08, 0.4); ruido(0.5, 0.35, 900); },
     activa() { [880, 1320, 1760].forEach((f, i) => tono(f, 0.22, "sine", 0.07, 1.01, i * 0.05)); ruido(0.15, 0.04, 5000); },
     progreso(fr) { const f = 520 + fr * 700; tono(f, 0.14, "triangle", 0.09); tono(f * 1.5, 0.12, "sine", 0.04, 1, 0.03); },
@@ -135,7 +136,7 @@ function cartaHTML(c, { uid = "", clase = "" } = {}) {
     <div class="titulo">${esc(c.nombre)}</div>
     <div class="texto">${esc(c.texto || "")}</div>
     ${etiqueta ? `<div class="arq">${esc(etiqueta)}</div>` : ""}
-    <div class="stat mana">${c.coste}</div>
+    <div class="stat mana ${DB[c.id] && c.coste < DB[c.id].coste ? "rebajado" : ""}">${c.coste}</div>
     ${esH ? "" : `<div class="stat atk">${c.ataque}</div><div class="stat hp">${c.vida}</div>`}
   </div>`;
 }
@@ -501,9 +502,10 @@ async function animarUno(e, ev, v, nuevos, yo) {
             { duration: 330, easing: "cubic-bezier(.5,0,.9,.6)" }).finished;
           bala.remove(); Sonido.golpe(1); particulas(hasta.x, hasta.y, "#ffd27a", 10, 50);
         }
-        if (de && a) {
+        if (de && (a || ev.some((x) => x.e === "invoca" && x.uid === e.a))) {
+          // si el objetivo recién entró (Tun Mujer), van hacia donde va a aparecer
           Sonido.ataque();
-          const p1 = centro(de), p2 = centro(a);
+          const p1 = centro(de), p2 = a ? centro(a) : centro(de.closest(".tablero") || de);
           const dx = (p2.x - p1.x) * 0.82, dy = (p2.y - p1.y) * 0.82;
           de.style.zIndex = 30;
           await de.animate([{ transform: "translate(0,0) scale(1)" }, { transform: `translate(${-dx * 0.08}px, ${-dy * 0.08}px) scale(1.12)`, offset: 0.35 },
@@ -608,7 +610,7 @@ async function animarUno(e, ev, v, nuevos, yo) {
         const el = refEl(e.uid);
         ev.__origen = e.uid;
         if (!el) break;
-        if (e.por === "muere") { // reacción rápida (Tun Puto)
+        if (e.por !== "fin_turno") { // reacción rápida (Tun Puto, Tun Mujer)
           el.animate([{ filter: "none", transform: "scale(1)" }, { filter: "drop-shadow(0 0 12px #ffd34f) brightness(1.4)", transform: "scale(1.15)" }, { filter: "none", transform: "scale(1)" }], 280);
           await esperar(160);
         } else await activarCarta(el);
@@ -689,6 +691,8 @@ function objetivosAtaque(v, s) {
   return new Set(prov.length ? prov.map((m) => m.uid) : ["h" + (1 - s), ...ene.map((m) => m.uid)]);
 }
 const puedeAtacar = (m) => !m.noAtaca && m.ataque > 0 && !m.dormido && m.ataques < (m.doble ? 2 : 1);
+// la carta de la mano con su coste real (ej. Tun Cool baja según la mesa)
+const cartaMano = (c) => (DB[c.id] ? { ...DB[c.id], coste: c.coste ?? DB[c.id].coste } : null);
 function jugable(v, c) {
   const p = v.j[v.yo];
   if (!c || c.coste > p.mana) return false;
@@ -738,7 +742,7 @@ function render(v) {
   const mano = (P.mano || []);
   const n = mano.length;
   const poderListo = miTurno && P.poder && !P.poderUsado && P.poder.coste <= P.mana && !(P.tablero.length >= 7 && (P.poder.efectos || []).every((e) => e.tipo === "invocar"));
-  const hayJugadas = miTurno && (mano.some((c) => jugable(v, DB[c.id])) || P.tablero.some(puedeAtacar) || poderListo);
+  const hayJugadas = miTurno && !v.pendiente && (mano.some((c) => jugable(v, cartaMano(c))) || P.tablero.some(puedeAtacar) || poderListo);
   const cristales = (q) => `<div class="cristales"><b>${q.mana}/${q.manaMax}</b>${Array.from({ length: 10 }, (_, i) =>
     `<i class="cristal ${i < q.mana ? "lleno" : i < q.manaMax ? "vacio" : "bloqueado"}"></i>`).join("")}</div>`;
   app.innerHTML = `<div class="mesa">
@@ -761,7 +765,7 @@ function render(v) {
     </div>
     <div class="mano" style="--n:${Math.max(1, n)};--n1:${Math.max(1, n - 1)}">${mano.map((c, i) => {
       const off = i - (n - 1) / 2;
-      const card = DB[c.id] || { nombre: "?", coste: 0 };
+      const card = cartaMano(c) || { nombre: "?", coste: 0 };
       return cartaHTML(card, { uid: c.uid, clase: miTurno && jugable(v, card) ? "jugable" : "" })
         .replace('class="carta', `style="--rot:${off * Math.min(4, 20 / n)}deg;--baja:${Math.abs(off) * Math.abs(off) * (n > 6 ? 1.2 : 2.2)}px" class="carta`);
     }).join("")}</div>
@@ -781,7 +785,69 @@ function render(v) {
   $("#log").onclick = mostrarLog;
   $("#rendir") && ($("#rendir").onclick = () => confirmar("¿Rendirse?", () => enviar({ t: "rendirse" })));
   actualizarReloj();
+  pendiente(v);
   if (v.fase === "fin") renderFinal(v);
+}
+
+// ---------- elecciones: descubrir (como Hearthstone) y a quién lanzar cada Tun ----------
+let descubrirKey = null;
+function pendiente(v) {
+  const pe = v.fase === "jugando" ? v.pendiente : null;
+  const mio = pe && pe.seat === v.yo;
+  if (!(mio && pe.tipo === "descubrir")) { $("#descubrir")?.remove(); descubrirKey = null; }
+  $("#instruccion")?.remove();
+  if (!pe) return;
+  if (!mio) { // el rival está eligiendo
+    const d = document.createElement("div");
+    d.id = "instruccion"; d.className = "instruccion rival";
+    d.textContent = pe.tipo === "descubrir" ? `${v.j[pe.seat].nombre} está descubriendo una carta...` : `${v.j[pe.seat].nombre} está apuntando...`;
+    app.append(d);
+    return;
+  }
+  if (pe.tipo === "descubrir") return mostrarDescubrir(pe.opciones || []);
+  // disparar: el Tun brilla y los enemigos se marcan; un toque elige
+  const tir = refEl(pe.tirador);
+  const validos = new Set(["h" + (1 - v.yo), ...v.j[1 - v.yo].tablero.map((m) => m.uid)]);
+  if (tir) tir.classList.add("tirador");
+  apuntando = { tipo: "disparo", origen: tir ? centro(tir) : centro(refEl("h" + v.yo)), validos, toque: true };
+  marcar(validos);
+  const d = document.createElement("div");
+  d.id = "instruccion"; d.className = "instruccion";
+  d.innerHTML = `🎯 Elegí a quién lanzar a <b>${esc(DB[V.j[v.yo].tablero.find((m) => m.uid === pe.tirador)?.id]?.nombre || "este Tun")}</b>${pe.quedan > 1 ? ` <span>(quedan ${pe.quedan})</span>` : ""}`;
+  app.append(d);
+}
+function mostrarDescubrir(ops) {
+  const key = ops.join(",");
+  if (descubrirKey === key && $("#descubrir")) return;
+  $("#descubrir")?.remove();
+  descubrirKey = key;
+  const o = document.createElement("div");
+  o.id = "descubrir"; o.className = "descubrir";
+  o.innerHTML = `<div class="desc-titulo">DESCUBRE UNA CARTA</div>
+    <div class="desc-cartas">${ops.map((id, i) => `<div class="desc-op" data-i="${i}"><div class="desc-brillo"></div>${cartaHTML(DB[id] || {})}</div>`).join("")}</div>
+    <button class="mini-btn desc-ver" title="ver la mesa">👁 ver mesa</button>`;
+  document.body.append(o);
+  Sonido.descubrir();
+  o.animate([{ opacity: 0 }, { opacity: 1 }], 300);
+  $$(".desc-op", o).forEach((el, i) => {
+    el.animate([{ transform: "translateY(60px) scale(.2) rotateY(180deg)", opacity: 0 }, { transform: "translateY(-10px) scale(1.08) rotateY(0)", opacity: 1, offset: 0.7 }, { transform: "none", opacity: 1 }],
+      { duration: 650, delay: 120 + i * 140, easing: "cubic-bezier(.2,.8,.3,1)", fill: "backwards" });
+    setTimeout(() => { const c = centro(el); particulas(c.x, c.y, "#ffd34f", 16, 80); }, 450 + i * 140);
+    el.onclick = () => {
+      if (o.dataset.listo) return;
+      o.dataset.listo = 1;
+      Sonido.carta();
+      const c = centro(el), mano = centro($(".mano") || document.body);
+      particulas(c.x, c.y, "#ffd34f", 30, 120);
+      $$(".desc-op", o).forEach((x) => x !== el && x.animate([{ opacity: 1 }, { opacity: 0, transform: "scale(.7)" }], { duration: 300, fill: "forwards" }));
+      el.animate([{ transform: "none" }, { transform: "scale(1.15)", offset: 0.3 }, { transform: `translate(${mano.x - c.x}px, ${mano.y - c.y}px) scale(.3)`, opacity: 0.2 }],
+        { duration: 650, easing: "cubic-bezier(.5,0,.8,.6)", fill: "forwards" }).onfinish = () => o.remove();
+      enviar({ t: "elegir", i });
+    };
+  });
+  const ver = $(".desc-ver", o);
+  ver.onpointerdown = () => o.classList.add("oculto");
+  ver.onpointerup = ver.onpointerleave = () => o.classList.remove("oculto");
 }
 
 function renderEspera(v) {
@@ -865,7 +931,8 @@ function marcar(validos) { validos.forEach((r) => refEl(r)?.classList.add("objet
 const bajo = (x, y) => document.elementFromPoint(x, y)?.closest("[data-ref]")?.dataset.ref;
 
 function zoom(idCarta, uid) {
-  const c = DB[idCarta];
+  const enMano = uid && V?.j[V.yo]?.mano?.find((x) => x.uid === uid);
+  const c = enMano ? cartaMano(enMano) : DB[idCarta];
   if (!c) return;
   const puede = uid && V && V.yo >= 0 && V.turno === V.yo && V.fase === "jugando" && jugable(V, c);
   const m = document.createElement("div");
@@ -1067,6 +1134,7 @@ function resolverApuntado(ref) {
   $$(".objetivo").forEach((x) => { x.classList.remove("objetivo"); x.style.transform = ""; });
   if (a.fantasma) a.fantasma.remove();
   if (a.tipo === "ataque") enviar({ t: "atacar", de: a.de, a: ref });
+  else if (a.tipo === "disparo") { Sonido.ataque(); $("#instruccion")?.remove(); enviar({ t: "elegir", a: ref }); }
   else if (a.tipo === "poder") { Sonido.hechizo(); enviar({ t: "poder", objetivo: ref }); }
   else { Sonido.carta(); $(`.mano [data-uid="${a.uid}"]`)?.style.setProperty("opacity", ".25"); enviar({ t: "jugar", uid: a.uid, pos: a.pos, objetivo: ref }); }
 }

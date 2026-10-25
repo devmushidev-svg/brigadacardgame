@@ -38,10 +38,15 @@ export function evaluar(e, s) {
 
 export function jugadas(e, s, db) {
   const p = e.j[s], out = [];
+  // si hay que elegir (descubrir o a quién disparar), solo valen esas opciones
+  if (e.pendiente) {
+    if (e.pendiente.seat !== s) return [];
+    return M.opcionesPendiente(e).map((o) => (e.pendiente.tipo === "descubrir" ? { t: "elegir", i: o } : { t: "elegir", a: o }));
+  }
   const refs = ["h0", "h1", ...e.j[0].tablero.map((m) => m.uid), ...e.j[1].tablero.map((m) => m.uid)];
   for (const c of p.mano) {
     const carta = db[c.id];
-    if (!carta || carta.coste > p.mana) continue;
+    if (!carta || M.costeDe(e, s, carta) > p.mana) continue;
     if (carta.tipo === "esbirro" && p.tablero.length >= M.CONFIG.MAX_TABLERO) continue;
     if (carta.tipo === "mision" && p.mision) continue;
     if (M.necesitaObjetivo(carta) && M.hayObjetivos(e, s, carta)) {
@@ -73,7 +78,7 @@ export function decidir(e, s, db) {
     if (!c) continue;
     let p = evaluar(c, s);
     // jugadas que no cambian la mesa pero dan maná (La Moneda): valen lo que permitan jugar después
-    if (a.t === "jugar" && c.j[s].mana > e.j[s].mana - (db[e.j[s].mano.find((x) => x.uid === a.uid)?.id]?.coste || 0)) {
+    if (a.t === "jugar" && c.j[s].mana > e.j[s].mana - M.costeDe(e, s, db[e.j[s].mano.find((x) => x.uid === a.uid)?.id])) {
       let sig = p;
       for (const b of jugadas(c, s, db)) {
         const d = probar(c, s, b, db);
@@ -83,5 +88,6 @@ export function decidir(e, s, db) {
     }
     if (p > mejorP) { mejorP = p; mejor = a; }
   }
+  if (!mejor && e.pendiente) return jugadas(e, s, db)[0] || { t: "fin" };
   return mejor || { t: "fin" };
 }

@@ -105,6 +105,9 @@ button { font-family: var(--f-tit); cursor: pointer; }
   background: linear-gradient(145deg, #fff0b0, var(--oro) 35%, var(--oro3)); box-shadow: 0 0 0 2px #2a1806, 0 5px 10px #000b;
   font-size: calc(var(--esb) * .34); transition: transform .2s, filter .2s; }
 .poder > span { display: grid; place-items: center; width: 100%; height: 100%; border-radius: 50%; background: radial-gradient(circle at 40% 35%, #5d7aa8, #1d2b45); box-shadow: inset 0 0 8px #000; }
+.poder > span { overflow: hidden; }
+.poder > span img { width: 100%; height: 100%; object-fit: cover; }
+.global img { width: 100%; height: 100%; object-fit: cover; border-radius: 50%; }
 .poder .stat.mana { left: 50%; top: -12px; transform: translateX(-50%); width: 24px; height: 26px; font-size: 14px; }
 .poder.listo { box-shadow: 0 0 0 2px #2a1806, 0 0 0 4px var(--verde), 0 0 18px 4px #5cff86aa; }
 .poder.listo:hover { transform: scale(1.08); }
@@ -284,3 +287,27 @@ button { font-family: var(--f-tit); cursor: pointer; }
 .runa { position: fixed; width: 110px; height: 110px; border-radius: 50%; pointer-events: none; border: 3px dashed #ffd34f; box-shadow: 0 0 16px #ffd34f, inset 0 0 16px #ffd34f88; }
 .popup-carta { position: fixed; z-index: 64; pointer-events: none; filter: drop-shadow(0 10px 20px #000c); }
 .popup-carta .carta { --carta-w: min(34vw, 170px); }
+
+/* ---------- descubrir (como Hearthstone) ---------- */
+.descubrir { position: fixed; inset: 0; z-index: 58; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 22px;
+  background: radial-gradient(ellipse at center, #2a1a0699 0%, #000d 70%); transition: opacity .15s; }
+.descubrir.oculto { opacity: .08; }
+.desc-titulo { font: 900 clamp(20px, 5vw, 34px) var(--f-tit); color: var(--oro); letter-spacing: 2px; text-shadow: 0 0 18px #ffb300, 0 3px 0 #2a1806; }
+.desc-cartas { display: flex; gap: clamp(8px, 3vw, 34px); perspective: 900px; }
+.desc-op { position: relative; cursor: pointer; transition: transform .15s; }
+.desc-op .carta { --carta-w: min(29vw, 180px); box-shadow: 0 0 0 1.5px #1e160d, 0 0 0 3.5px #ffd34f, 0 0 26px 6px #ffb300aa, 0 10px 20px #000c; }
+.desc-op:hover { transform: translateY(-10px) scale(1.06); }
+.desc-brillo { position: absolute; inset: -30%; border-radius: 50%; pointer-events: none;
+  background: repeating-conic-gradient(#ffd34f55 0 8deg, #0000 8deg 24deg); -webkit-mask: radial-gradient(circle, #000 20%, #0000 65%); mask: radial-gradient(circle, #000 20%, #0000 65%);
+  animation: girar 9s linear infinite; }
+@keyframes girar { to { transform: rotate(360deg); } }
+.desc-ver { position: static; padding: 6px 14px; font: 700 14px var(--f-txt); }
+
+/* ---------- apuntar un Tun lanzado ---------- */
+.instruccion { position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); z-index: 20; pointer-events: none; white-space: nowrap;
+  padding: 8px 16px; border-radius: 20px; font: 700 15px var(--f-txt); color: #fff3d0; background: #2a1806ee; border: 2px solid var(--oro); box-shadow: 0 0 18px #ffb30088; }
+.instruccion span { color: var(--oro); }
+.instruccion.rival { border-color: #8a7a60; box-shadow: none; color: #dcc9a6; font-weight: 600; }
+.esbirro.tirador { z-index: 6; animation: tirador 0.9s ease-in-out infinite alternate; }
+@keyframes tirador { from { filter: drop-shadow(0 0 4px #ffd34f); transform: translateY(0); } to { filter: drop-shadow(0 0 16px #ffd34f) brightness(1.25); transform: translateY(-6px) scale(1.08); } }
+.stat.mana.rebajado { color: #9dff8a; text-shadow: 0 0 6px #2bff5a, 0 1px 0 #000; }

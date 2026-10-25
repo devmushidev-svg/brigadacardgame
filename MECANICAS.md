@@ -51,7 +51,7 @@ Recomendado: PNG o WEBP cuadrado de 512×512, con el personaje centrado, porque 
 | `hechizo` | aplica `efectos` y se va |
 | `mision` | queda activa con un contador; al cumplirse aplica su `recompensa` |
 
-Campos: `id`, `nombre`, `coste`, `ataque`, `vida`, `texto`, `arte` (emoji o `/arte/x.png` en `public/arte/`), `clase`, `tribu`, `rareza` (`legendaria`), `token: true` (no entra al mazo; solo se invoca o se da), `arquetipo`, `genero` (`hombre`, `mujer` o `no_binario`; **toda carta de personaje lleva uno**, se pregunta al crearla; sale como ♂ ♀ ⚧ abajo de la carta), `etiquetas` (lista libre, ej. `["mujer"]`, para efectos que buscan cartas por etiqueta), `entrada` (animación al entrar: `legendaria` —automática en legendarias— o `demonio`).
+Campos: `id`, `nombre`, `coste`, `ataque`, `vida`, `texto`, `arte` (emoji o `/arte/x.png` en `public/arte/`), `clase`, `tribu`, `rareza` (`legendaria`), `token: true` (no entra al mazo; solo se invoca o se da), `arquetipo`, `genero` (`hombre`, `mujer` o `no_binario`; **toda carta de personaje lleva uno**, se pregunta al crearla; sale como ♂ ♀ ⚧ abajo de la carta), `etiquetas` (lista libre, ej. `["mujer"]`, para efectos que buscan cartas por etiqueta), `descuento` (`{ "por": "tribu_en_mesa", "tribu": "tun" }`: cuesta 1 menos por cada esbirro de esa tribu en la mesa, de los dos lados; `"lados": "propio"` solo cuenta los tuyos), `entrada` (animación al entrar: `legendaria` —automática en legendarias— o `demonio`).
 
 ## Palabras clave (`claves`)
 
@@ -70,6 +70,7 @@ Campos: `id`, `nombre`, `coste`, `ataque`, `vida`, `texto`, `arte` (emoji o `/ar
 | `grito` | grito de batalla: al jugarlo desde la mano |
 | `aliento` | último aliento: al morir |
 | `fin_turno` | al final de cada turno de su dueño |
+| `al_recibir_dano` | cada vez que este esbirro recibe daño (aunque muera por ese golpe) |
 | `cuando_muere` | `{ "tribu": "tun", "efectos": [...] }`: cada vez que muere un esbirro de esa tribu (de cualquier lado) |
 | efecto `global` | por el resto de la partida, aunque la carta muera (ej. `al_robar`) |
 
@@ -83,12 +84,14 @@ Campos: `id`, `nombre`, `coste`, `ataque`, `vida`, `texto`, `arte` (emoji o `/ar
 | `curar` | cura sin pasar la vida máxima |
 | `robar` | roba N cartas |
 | `buff` | +`ataque`/+`vida`; opcional `provocar`, `escudo`, `carga` |
-| `invocar` | invoca N copias de `carta`; `lado`: propio, `enemigo` o `quien_roba`; `disparar: true` = cada uno se lanza contra un enemigo al azar |
+| `invocar` | invoca N copias de `carta`; `lado`: propio, `enemigo` o `quien_roba`; `disparar: true` = cada uno se lanza contra un enemigo al azar; `disparar: "elegir"` = el jugador elige a quién lanza cada uno (ignora provocar); `azar: { "tribu": "tun" }` en vez de `carta` = invoca esbirros al azar de esa tribu |
 | `destruir` | destruye un esbirro |
 | `mana` | maná extra este turno |
 | `dar_carta` | pone `carta` en tu mano |
 | `global` | crea un efecto permanente con `disparador` y `efectos` |
 | `robar_mano` | te robás N cartas de la mano rival que cumplan el `filtro` (`{ "genero": "mujer" }`, `{ "etiqueta": ... }` o `{ "tribu": ... }`); si no hay, no pasa nada |
+| `descubrir` | como Hearthstone: muestra 3 cartas distintas del `filtro` (ej. tribu Tun) y te quedás con una; si se acaba el turno sin elegir, se elige al azar |
+| `atraer_ataques` | tus otros esbirros (del `filtro`) atacan a esta carta, uno por uno, con choque normal |
 | `devorar` | destruye a tus otros esbirros (con `filtro` de tribu) y la carta gana +`ataque`/+`vida` por cada uno |
 
 **Efecto visual (`fx`):** cualquier efecto puede llevar `"fx"` para que el cliente lo dibuje distinto:
@@ -120,9 +123,13 @@ Diseño de Mario. Arquetipo: paladín molesto — llenar la mesa de Tun, buffear
 | Héroe Tun | — | 30 | Poder (1): invoca un Tun 1/1 | hecho |
 | Tun (ficha) | 1 | 1/1 | tribu Tun | hecho |
 | **Tun the Awarded** (misión, legendaria) | 1 | — | Invoca 15 Tun (cuenta todo, incluido el poder) → Tun Maestro del Universo | hecho |
-| **Tun Maestro del Universo** (legendaria, recompensa) | 5 | 8/8 | Grito: invoca 5 Tun y cada uno se lanza contra un enemigo al azar | hecho |
+| **Tun Maestro del Universo** (legendaria, recompensa) | 5 | 8/8 | Grito: invoca 5 Tun al azar (cualquier Tun del juego) y elegís contra quién se lanza cada uno | hecho |
 | **Panamá** (legendaria) | 1 | 1/1 | Grito: por el resto de la partida, cada vez que un jugador robe, invoca un Tun para él | hecho |
 | Tun Puto | 3 | 1/5 | Cada vez que muere un Tun (de cualquier lado), 1 de daño a un enemigo al azar | hecho |
+| Tun IA | 1 | 1/2 | Grito: descubre un Tun | hecho |
+| Tun Tung Sahur | 1 | 1/1 | Grito: invoca un Tun 1/1 | hecho |
+| Tun Mujer ♀ | 5 | 2/8 | Grito: tus Tun la atacan. Cada vez que recibe daño, 1 de daño a un enemigo al azar | hecho |
+| Tun Cool | 10 | 6/7 | Cuesta 1 menos por cada otro Tun en el campo (los dos lados) | hecho |
 | Choza de Monos | 4 | 0/8 | Al final de tu turno, invoca dos Tun | hecho |
 | Tun Satánico | **5** | **3/3** | Grito: destruye a tus otros Tun y gana +2/+2 por cada uno | hecho — **coste y stats provisionales**, falta que Mario los defina |
 
