@@ -194,6 +194,9 @@ Diseño de Mario. Marco azul (provisional). Cruit es no binario: toda carta con 
 | Cruit Sangre ⚧ | 2 | 2/3 | Al final de tu turno, roba 3 de vida al enemigo con menos vida | hecho |
 | Cruit Vampiro ⚧ | 5 | 3/3 | Tus Cruit roban +1 de vida. Grito: invoca 2 Cruit Sangre | hecho |
 | Caca (ficha) | 0 | — | Se lanza al robarla: 3 de daño a quien la roba y roba otra | hecho |
+| Cruit Tostadora ⚧ | 1 | 1/2 | Grito: robás una carta | hecho |
+| Cruit Baño ⚧ | 3 | 3/2 | Último aliento: 2 de daño a todos los enemigos | hecho |
+| Cruit Vaca ⚧ | 4 | 3/4 | Grito: obtenés 2 Leches | hecho |
 | Elliot Cruit ⚧ (tribu Cruit, Forsaken) | 2 | 2/2 | Al final de tu turno, una pizza cura 3 a un aliado herido al azar | hecho |
 | Chance Cruit ⚧ (tribu Cruit, Forsaken) | 3 | 3/3 | Grito: moneda. Cara: 6 de daño a un enemigo al azar. Cruz: 3 de daño a tu héroe | hecho |
 

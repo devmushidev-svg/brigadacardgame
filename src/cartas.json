@@ -803,6 +803,65 @@
      "cantidad": 2
     }
    ]
+  },
+  {
+   "genero": "no_binario",
+   "tipo": "esbirro",
+   "tribu": "cruit",
+   "clase": "cruit",
+   "id": "cruit_tostadora",
+   "nombre": "Cruit Tostadora",
+   "coste": 1,
+   "ataque": 1,
+   "vida": 2,
+   "arte": "/arte/cruit_tostadora.webp",
+   "texto": "Grito de batalla: robás una carta.",
+   "grito": [
+    {
+     "tipo": "robar",
+     "cantidad": 1
+    }
+   ]
+  },
+  {
+   "genero": "no_binario",
+   "tipo": "esbirro",
+   "tribu": "cruit",
+   "clase": "cruit",
+   "id": "cruit_bano",
+   "nombre": "Cruit Baño",
+   "coste": 3,
+   "ataque": 3,
+   "vida": 2,
+   "arte": "/arte/cruit_bano.webp",
+   "texto": "Último aliento: inflige 2 de daño a todos los enemigos.",
+   "aliento": [
+    {
+     "tipo": "dano",
+     "objetivo": "todos_enemigos",
+     "cantidad": 2
+    }
+   ]
+  },
+  {
+   "genero": "no_binario",
+   "tipo": "esbirro",
+   "tribu": "cruit",
+   "clase": "cruit",
+   "id": "cruit_vaca",
+   "nombre": "Cruit Vaca",
+   "coste": 4,
+   "ataque": 3,
+   "vida": 4,
+   "arte": "/arte/cruit_vaca.webp",
+   "texto": "Grito de batalla: obtenés 2 Leches.",
+   "grito": [
+    {
+     "tipo": "dar_carta",
+     "carta": "leche",
+     "cantidad": 2
+    }
+   ]
   }
  ],
  "heroes": [
