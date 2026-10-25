@@ -3,14 +3,16 @@ import { readFileSync } from "node:fs";
 import * as M from "../src/motor.js";
 import { decidir, jugadas } from "../src/ia.js";
 
-const db = Object.fromEntries(JSON.parse(readFileSync(new URL("../src/cartas.json", import.meta.url))).cartas.map((c) => [c.id, c]));
+const JS = JSON.parse(readFileSync(new URL("../src/cartas.json", import.meta.url)));
+const db = Object.fromEntries(JS.cartas.map((c) => [c.id, c]));
+const heroes = Object.fromEntries(JS.heroes.map((h) => [h.id, h]));
 let r = 777;
 const rand = () => ((r = (r * 1103515245 + 12345) >>> 0) / 4294967296);
 
 function partida(semilla, tipos) {
   const e = M.crearPartida(db, semilla);
   e.j[0].nombre = "A"; e.j[1].nombre = "B";
-  M.empezar(e, db, 0);
+  M.empezar(e, db, 0, heroes);
   let pasos = 0;
   while (e.fase === "jugando" && pasos++ < 4000) {
     const s = e.turno;

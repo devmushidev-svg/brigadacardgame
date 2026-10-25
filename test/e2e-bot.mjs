@@ -15,7 +15,7 @@ await p.click("#bot");
 await p.waitForSelector(".mesa", { timeout: 10000 });
 const rival = await p.$eval(".barra .nombre", (e) => e.textContent);
 
-let misTurnos = 0, turnosBot = 0, capturaBot = false;
+let usosPoder = 0, misTurnos = 0, turnosBot = 0, capturaBot = false;
 const t0 = Date.now();
 while (Date.now() - t0 < 600000) {
   if (await p.$(".final")) break;
@@ -44,6 +44,8 @@ while (Date.now() - t0 < 600000) {
     await p.mouse.move(o.x + o.width / 2, o.y + o.height / 2, { steps: 8 }); await p.mouse.up();
     await espera(1500);
   }
+  if (await p.$("#poder.listo")) { await p.click("#poder", { force: true }); await espera(1200); usosPoder++; }
+  if (misTurnos === 4) await p.screenshot({ path: `${OUT}/bot_06_poder.png` });
   await p.click(".fin-turno", { force: true });
   turnosBot++;
   if (misTurnos === 6) await p.screenshot({ path: `${OUT}/bot_03_mitad.png` });
@@ -55,5 +57,6 @@ const fin = await p.$eval(".final h1", (e) => e.textContent).catch(() => "sin fi
 await p.click("#rev", { force: true });
 await espera(2500);
 const revancha = !(await p.$(".final")) && !!(await p.$(".mesa"));
-console.log(JSON.stringify({ rival, misTurnos, fin, revancha, errores }));
+const mision = await p.$eval(".mision-chip", (e) => e.textContent).catch(() => "sin chip");
+console.log(JSON.stringify({ rival, misTurnos, usosPoder, mision, fin, revancha, errores }));
 await browser.close();

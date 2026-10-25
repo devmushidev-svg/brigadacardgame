@@ -71,6 +71,7 @@ async function jugarTurno(page, etiqueta, turno) {
     await page.mouse.up();
     await espera(1500);
   }
+  if (await page.$("#poder.listo")) { await page.click("#poder", { force: true }); await espera(1200); }
   await page.click(".fin-turno", { force: true });
   await espera(400);
 }

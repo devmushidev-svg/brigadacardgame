@@ -5,6 +5,7 @@ const app = $("#app");
 const esperar = (ms) => new Promise((r) => setTimeout(r, ms));
 const esc = (t) => String(t ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
 let DB = {};
+let HEROES = {};
 
 // ================= sonido (sintetizado, sin archivos) =================
 const Sonido = (() => {
@@ -58,12 +59,13 @@ function colorDe(t) {
 const artHTML = (arte) => (/^(https?:)?\//.test(arte || "") ? `<img src="${esc(arte)}" alt="">` : esc(arte || "❔"));
 
 function cartaHTML(c, { uid = "", clase = "" } = {}) {
-  const esH = c.tipo === "hechizo";
-  return `<div class="carta ${esH ? "hechizo" : ""} ${clase}" ${uid ? `data-uid="${uid}"` : ""} data-carta="${esc(c.id)}">
+  const esH = c.tipo === "hechizo" || c.tipo === "mision";
+  const etiqueta = [c.clase ? HEROES[c.clase]?.nombre || c.clase : "", c.arquetipo || "", c.tribu && c.tribu !== c.clase ? c.tribu : ""].filter(Boolean).join(" · ");
+  return `<div class="carta ${esH ? "hechizo" : ""} ${c.tipo === "mision" ? "mision" : ""} ${c.rareza === "legendaria" ? "legendaria" : ""} ${clase}" ${uid ? `data-uid="${uid}"` : ""} data-carta="${esc(c.id)}">
     <div class="arte" style="--fondo:${colorDe(c.arquetipo || c.id)}">${artHTML(c.arte)}</div>
     <div class="titulo">${esc(c.nombre)}</div>
     <div class="texto">${esc(c.texto || "")}</div>
-    ${c.arquetipo ? `<div class="arq">${esc(c.arquetipo)}</div>` : ""}
+    ${etiqueta ? `<div class="arq">${esc(etiqueta)}</div>` : ""}
     <div class="stat mana">${c.coste}</div>
     ${esH ? "" : `<div class="stat atk">${c.ataque}</div><div class="stat hp">${c.vida}</div>`}
   </div>`;
@@ -142,8 +144,9 @@ cargarCartas().then(() => {
 
 async function cargarCartas() {
   try {
-    const lista = await (await fetch("/api/cartas")).json();
-    DB = Object.fromEntries(lista.map((c) => [c.id, c]));
+    const d = await (await fetch("/api/cartas")).json();
+    DB = Object.fromEntries(d.cartas.map((c) => [c.id, c]));
+    HEROES = Object.fromEntries((d.heroes || []).map((h) => [h.id, h]));
   } catch { toast("no cargaron las cartas"); }
 }
 
@@ -258,6 +261,18 @@ async function animar(ev, v, nuevos) {
         break;
       case "ataque": {
         const de = refEl(e.de), a = refEl(e.a);
+        if (!de && a) {
+          // esbirro recien invocado que se dispara (no esta dibujado todavia): proyectil
+          const desde = centro($(`.tablero[data-seat="${e.a[0] === "h" ? 1 - +e.a[1] : (V.j[0].tablero.some((m) => m.uid === e.a) ? 1 : 0)}"]`) || document.body);
+          const hasta = centro(a), bala = document.createElement("div");
+          bala.className = "proyectil"; bala.innerHTML = artHTML(DB[ev.find((x) => x.uid === e.de)?.carta]?.arte || "🧍");
+          bala.style.left = desde.x + "px"; bala.style.top = desde.y + "px";
+          $("#fx").append(bala);
+          Sonido.ataque();
+          await bala.animate([{ transform: "translate(-50%,-50%) scale(.6) rotate(0)" }, { transform: `translate(calc(-50% + ${hasta.x - desde.x}px), calc(-50% + ${hasta.y - desde.y}px)) scale(1.3) rotate(540deg)` }],
+            { duration: 330, easing: "cubic-bezier(.5,0,.9,.6)" }).finished;
+          bala.remove(); Sonido.golpe(1); particulas(hasta.x, hasta.y, "#ffd27a", 10, 50);
+        }
         if (de && a) {
           Sonido.ataque();
           const p1 = centro(de), p2 = centro(a);
@@ -307,6 +322,24 @@ async function animar(ev, v, nuevos) {
       case "quemada": if (e.seat === yo) toast(`mano llena: se quemó ${DB[e.carta]?.nombre || "una carta"}`); break;
       case "mana": numero(refEl("h" + e.seat), "+" + e.n + " maná", "buff"); break;
       case "roba": Sonido.roba(); break;
+      case "poder": {
+        const b = $(`[data-poder="${e.seat}"]`);
+        Sonido.hechizo();
+        if (b) { const c = centro(b); particulas(c.x, c.y, "#9ad0ff", 14, 50); b.animate([{ transform: "scale(1)" }, { transform: "scale(1.3)" }, { transform: "scale(1)" }], 350); }
+        await esperar(250);
+        break;
+      }
+      case "mision": if (e.seat !== yo) await mostrarCarta(e.carta, 1000); else Sonido.hechizo(); break;
+      case "mision_progreso": numero(refEl("h" + e.seat), `${e.progreso}/${e.meta}`, "buff"); break;
+      case "mision_completa": {
+        const el = refEl("h" + e.seat);
+        if (el) { const c = centro(el); for (let k = 0; k < 3; k++) particulas(c.x, c.y, "#ffd34f", 20, 110); }
+        Sonido.victoria();
+        await banner(e.seat === yo ? "¡MISIÓN COMPLETA!" : `${V.j[e.seat].nombre} completó su misión`, 1400);
+        break;
+      }
+      case "dispara": { const el = refEl(e.uid); if (el) el.animate([{ transform: "scale(1)" }, { transform: "scale(1.15)" }, { transform: "scale(1)" }], 300); await esperar(200); break; }
+      case "global": { const g = ev.find((x) => x.e === "grito" || x.e === "hechizo"); toast("efecto activo por el resto de la partida", 1800); break; }
     }
   }
 }
@@ -364,7 +397,8 @@ const puedeAtacar = (m) => !m.noAtaca && m.ataque > 0 && !m.dormido && m.ataques
 function jugable(v, c) {
   const p = v.j[v.yo];
   if (!c || c.coste > p.mana) return false;
-  if (c.tipo !== "hechizo" && p.tablero.length >= 7) return false;
+  if (c.tipo === "esbirro" && p.tablero.length >= 7) return false;
+  if (c.tipo === "mision" && p.mision) return false;
   if (c.tipo === "hechizo" && pideObjetivo(c) && !objetivosCarta(v, v.yo, c).size) return false;
   return true;
 }
@@ -372,10 +406,21 @@ function jugable(v, c) {
 // ================= dibujar mesa =================
 function heroeHTML(v, s) {
   const p = v.j[s];
+  const h = HEROES[p.heroe];
   const desc = v.conectados && !v.conectados[s] && v.fase === "jugando";
-  return `<div class="heroe ${desc ? "desconectado" : ""}" data-ref="h${s}" data-seat="${s}" style="background:${colorDe(p.nombre)}">
-    ${esc((p.nombre || "?")[0].toUpperCase())}
+  const mi = p.mision;
+  return `<div class="heroe ${desc ? "desconectado" : ""}" data-ref="h${s}" data-seat="${s}" style="background:${colorDe(h?.id || p.nombre)}">
+    <span class="heroe-arte">${h ? artHTML(h.arte) : esc((p.nombre || "?")[0].toUpperCase())}</span>
+    ${mi ? `<div class="mision-chip ${mi.completa ? "completa" : ""}" title="${esc(mi.nombre)}">🏆 ${mi.completa ? "✔" : `${mi.progreso}/${mi.meta}`}</div>` : ""}
     <div class="stat hp ${p.vida < p.vidaMax ? "herido" : ""}">${p.vida}</div></div>`;
+}
+function poderHTML(v, s) {
+  const p = v.j[s];
+  if (!p.poder) return "";
+  const mio = s === v.yo && v.turno === s && v.fase === "jugando";
+  const listo = mio && !p.poderUsado && p.poder.coste <= p.mana && !(p.tablero.length >= 7 && (p.poder.efectos || []).every((e) => e.tipo === "invocar"));
+  return `<button class="poder ${listo ? "listo" : ""} ${p.poderUsado ? "usado" : ""}" data-poder="${s}" ${s === v.yo ? 'id="poder"' : ""} title="${esc(p.poder.nombre)}: ${esc(p.poder.texto || "")}">
+    <span>${artHTML(p.poder.arte || "⚡")}</span><div class="stat mana">${p.poder.coste}</div></button>`;
 }
 function esbirroHTML(m, s, v) {
   const c = DB[m.id] || {};
@@ -395,17 +440,18 @@ function render(v) {
   const miTurno = v.fase === "jugando" && v.turno === v.yo;
   const mano = (P.mano || []);
   const n = mano.length;
-  const hayJugadas = miTurno && (mano.some((c) => jugable(v, DB[c.id])) || P.tablero.some(puedeAtacar));
+  const poderListo = miTurno && P.poder && !P.poderUsado && P.poder.coste <= P.mana && !(P.tablero.length >= 7 && (P.poder.efectos || []).every((e) => e.tipo === "invocar"));
+  const hayJugadas = miTurno && (mano.some((c) => jugable(v, DB[c.id])) || P.tablero.some(puedeAtacar) || poderListo);
   app.innerHTML = `<div class="mesa">
-    <div class="barra">${heroeHTML(v, riv)}
+    <div class="barra">${heroeHTML(v, riv)}${poderHTML(v, riv)}
       <div class="info"><div class="nombre">${esc(R.nombre)}</div>
         <div class="chips"><span class="chip">💧 ${R.mana}/${R.manaMax}</span><span class="chip">🂠 ${R.mazo}</span>
         ${v.conectados && !v.conectados[riv] ? '<span class="chip">desconectado</span>' : ""}</div></div>
       <div class="dorsos">${"<div class='dorso'></div>".repeat(R.manoN)}</div></div>
     <div class="tablero" data-seat="${riv}">${R.tablero.map((m) => esbirroHTML(m, riv, v)).join("")}</div>
-    <div class="medio"><div class="reloj"></div><div class="linea"><div class="cuerda"></div></div><div class="reloj turno-txt">${miTurno ? "tu turno" : v.yo < 0 ? "mirando" : ""}</div></div>
+    <div class="medio">${(v.globales || []).map((g) => `<span class="global" title="${esc(DB[g]?.texto || "")}">${artHTML(DB[g]?.arte || "🌐")}</span>`).join("")}<div class="reloj"></div><div class="linea"><div class="cuerda"></div></div><div class="reloj turno-txt">${miTurno ? "tu turno" : v.yo < 0 ? "mirando" : ""}</div></div>
     <div class="tablero" data-seat="${yo}" id="mi-tablero">${P.tablero.map((m) => esbirroHTML(m, yo, v)).join("")}</div>
-    <div class="barra yo">${heroeHTML(v, yo)}
+    <div class="barra yo">${heroeHTML(v, yo)}${poderHTML(v, yo)}
       <div class="info"><div class="nombre">${esc(P.nombre)}</div>
         <div class="cristales">${Array.from({ length: P.manaMax }, (_, i) => `<div class="cristal ${i < P.mana ? "lleno" : ""}"></div>`).join("")}</div>
         <div class="chips"><span class="chip">💧 ${P.mana}/${P.manaMax}</span><span class="chip">🂠 ${P.mazo}</span></div></div>
@@ -420,6 +466,13 @@ function render(v) {
       ${v.yo >= 0 && v.fase === "jugando" ? '<button class="mini-btn" id="rendir">🏳️</button>' : ""}</div>
   </div>`;
   $("#fin") && ($("#fin").onclick = () => { if (miTurno) { enviar({ t: "fin" }); $("#fin").disabled = true; } });
+  const bp = $("#poder");
+  if (bp) bp.onclick = () => {
+    if (!bp.classList.contains("listo")) { if (P.poder) toast(`${P.poder.nombre}: ${P.poder.texto || ""}`, 1800); return; }
+    const validos = pideObjetivo(P.poder) ? objetivosCarta(v, v.yo, P.poder) : new Set();
+    if (validos.size) { apuntando = { tipo: "poder", origen: centro(bp), validos, toque: true }; marcar(validos); toast("elegí un objetivo", 900); return; }
+    bp.classList.remove("listo"); Sonido.hechizo(); enviar({ t: "poder" });
+  };
   $("#mudo").onclick = () => { Sonido.toggle(); $("#mudo").textContent = Sonido.mudo ? "🔇" : "🔊"; };
   $("#log").onclick = mostrarLog;
   $("#rendir") && ($("#rendir").onclick = () => confirmar("¿Rendirse?", () => enviar({ t: "rendirse" })));
@@ -584,7 +637,7 @@ addEventListener("pointermove", (e) => {
     const el = gesto.cartaEl;
     if (el && el.classList.contains("jugable") && !apuntando) {
       const c = DB[el.dataset.carta];
-      if (c.tipo === "hechizo" && pideObjetivo(c)) {
+      if (c.tipo !== "esbirro" && pideObjetivo(c)) {
         apuntando = { tipo: "carta", uid: el.dataset.uid, origen: centro(el), validos: objetivosCarta(V, V.yo, c) };
         el.style.transform = "translateY(-30px) scale(1.1)";
         marcar(apuntando.validos);
@@ -624,8 +677,8 @@ addEventListener("pointerup", (e) => {
     const { f, el, c } = g.arrastre;
     const manoTop = $(".mano").getBoundingClientRect().top;
     if (e.clientY < manoTop - 10) {
-      const pos = c.tipo === "hechizo" ? null : posicionEn(e.clientX);
-      if (c.tipo !== "hechizo" && pideObjetivo(c) && objetivosCarta(V, V.yo, c).size) {
+      const pos = c.tipo !== "esbirro" ? null : posicionEn(e.clientX);
+      if (c.tipo === "esbirro" && pideObjetivo(c) && objetivosCarta(V, V.yo, c).size) {
         f.style.transition = "transform .15s"; f.style.transform = "scale(.7)";
         return intentarJugar(el.dataset.uid, pos, { x: e.clientX, y: e.clientY }, f);
       }
@@ -663,6 +716,7 @@ function resolverApuntado(ref) {
   $$(".objetivo").forEach((x) => { x.classList.remove("objetivo"); x.style.transform = ""; });
   if (a.fantasma) a.fantasma.remove();
   if (a.tipo === "ataque") enviar({ t: "atacar", de: a.de, a: ref });
+  else if (a.tipo === "poder") { Sonido.hechizo(); enviar({ t: "poder", objetivo: ref }); }
   else { Sonido.carta(); $(`.mano [data-uid="${a.uid}"]`)?.style.setProperty("opacity", ".25"); enviar({ t: "jugar", uid: a.uid, pos: a.pos, objetivo: ref }); }
 }
 addEventListener("pointercancel", () => { gesto = null; cancelarApuntado(); });

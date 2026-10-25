@@ -6,6 +6,7 @@ import * as M from "./motor.js";
 import { decidir } from "./ia.js";
 
 const DB = Object.fromEntries(cartasJson.cartas.map((c) => [c.id, c]));
+const HEROES = Object.fromEntries((cartasJson.heroes || []).map((h) => [h.id, h]));
 const ID_OK = /^[a-z0-9]{6,12}$/;
 
 export default {
@@ -16,7 +17,7 @@ export default {
       return Response.json({ id });
     }
     if (url.pathname === "/api/cartas") {
-      return Response.json(cartasJson.cartas, { headers: { "cache-control": "no-cache" } });
+      return Response.json({ cartas: cartasJson.cartas, heroes: cartasJson.heroes || [] }, { headers: { "cache-control": "no-cache" } });
     }
     const ws = url.pathname.match(/^\/ws\/([a-z0-9]+)$/);
     if (ws) {
@@ -139,7 +140,7 @@ export class Partida extends DurableObject {
       ws.serializeAttachment({ seat });
       if (seat >= 0) ws.send(JSON.stringify({ t: "token", token: this.tokens[seat], seat }));
       let ev = [];
-      if (this.estado.fase === "esperando" && this.tokens[0] && this.tokens[1]) ev = M.empezar(this.estado, DB, Date.now());
+      if (this.estado.fase === "esperando" && this.tokens[0] && this.tokens[1]) ev = M.empezar(this.estado, DB, Date.now(), HEROES);
       await this.guardar();
       await this.programarAlarma();
       this.difundir(ev);
@@ -158,7 +159,7 @@ export class Partida extends DurableObject {
         this.estado = M.crearPartida(DB, crypto.getRandomValues(new Uint32Array(1))[0]);
         nombres.forEach((n, i) => (this.estado.j[i].nombre = n));
         this.revancha = [false, false];
-        ev = M.empezar(this.estado, DB, Date.now());
+        ev = M.empezar(this.estado, DB, Date.now(), HEROES);
       }
       await this.guardar();
       await this.programarAlarma();

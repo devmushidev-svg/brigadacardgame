@@ -1,49 +1,595 @@
 {
-  "_nota": "CARTAS DE PRUEBA. Mario las reemplaza por las suyas. Formato explicado en CARTAS.md",
-  "cartas": [
-    { "id": "moneda", "nombre": "La Moneda", "tipo": "hechizo", "coste": 0, "token": true, "arte": "🪙",
-      "texto": "Gana 1 de maná este turno.", "efectos": [{ "tipo": "mana", "cantidad": 1 }] },
-    { "id": "mensaje_borrado", "nombre": "Mensaje Borrado", "tipo": "esbirro", "coste": 1, "ataque": 1, "vida": 1, "token": true, "arte": "🗑️",
-      "texto": "" },
-
-    { "id": "mae", "nombre": "Mae del Barrio", "tipo": "esbirro", "coste": 1, "ataque": 1, "vida": 2, "arte": "🧢", "arquetipo": "Barrio",
-      "texto": "" },
-    { "id": "chismoso", "nombre": "Chismoso", "tipo": "esbirro", "coste": 1, "ataque": 1, "vida": 1, "arte": "👂", "arquetipo": "Barrio",
-      "texto": "Grito de batalla: roba una carta.", "grito": [{ "tipo": "robar", "cantidad": 1 }] },
-    { "id": "perro", "nombre": "Perro de la Colonia", "tipo": "esbirro", "coste": 2, "ataque": 3, "vida": 1, "claves": ["carga"], "arte": "🐕", "arquetipo": "Barrio",
-      "texto": "Carga." },
-    { "id": "portero", "nombre": "Portero", "tipo": "esbirro", "coste": 2, "ataque": 1, "vida": 4, "claves": ["provocar"], "arte": "🚪", "arquetipo": "Oficina",
-      "texto": "Provocar." },
-    { "id": "pupusero", "nombre": "Pupusero", "tipo": "esbirro", "coste": 2, "ataque": 2, "vida": 2, "arte": "🫓", "arquetipo": "Barrio",
-      "texto": "Grito de batalla: cura 3 a tu héroe.", "grito": [{ "tipo": "curar", "objetivo": "heroe_propio", "cantidad": 3 }] },
-    { "id": "lanzapiedras", "nombre": "Lanzapiedras", "tipo": "esbirro", "coste": 3, "ataque": 2, "vida": 2, "arte": "🪨", "arquetipo": "Barrio",
-      "texto": "Grito de batalla: inflige 2 de daño.", "grito": [{ "tipo": "dano", "objetivo": "elegido", "cantidad": 2 }] },
-    { "id": "jefe", "nombre": "El Jefe", "tipo": "esbirro", "coste": 3, "ataque": 2, "vida": 3, "arte": "👔", "arquetipo": "Oficina",
-      "texto": "Grito de batalla: da +1/+1 a otro esbirro tuyo.", "grito": [{ "tipo": "buff", "objetivo": "elegido_aliado", "ataque": 1, "vida": 1 }] },
-    { "id": "influencer", "nombre": "Influencer", "tipo": "esbirro", "coste": 3, "ataque": 3, "vida": 2, "claves": ["escudo"], "arte": "🤳", "arquetipo": "Internet",
-      "texto": "Escudo divino." },
-    { "id": "troll", "nombre": "Troll de Internet", "tipo": "esbirro", "coste": 4, "ataque": 4, "vida": 3, "arte": "🧌", "arquetipo": "Internet",
-      "texto": "Último aliento: invoca un Mensaje Borrado 1/1.", "aliento": [{ "tipo": "invocar", "carta": "mensaje_borrado", "cantidad": 1 }] },
-    { "id": "guardia", "nombre": "Guardia de Seguridad", "tipo": "esbirro", "coste": 4, "ataque": 3, "vida": 6, "claves": ["provocar"], "arte": "💂", "arquetipo": "Oficina",
-      "texto": "Provocar." },
-    { "id": "motorista", "nombre": "Motorista", "tipo": "esbirro", "coste": 5, "ataque": 4, "vida": 4, "claves": ["carga"], "arte": "🏍️", "arquetipo": "Barrio",
-      "texto": "Carga." },
-    { "id": "spammer", "nombre": "Spammer", "tipo": "esbirro", "coste": 5, "ataque": 3, "vida": 4, "claves": ["doble"], "arte": "📨", "arquetipo": "Internet",
-      "texto": "Viento furioso (ataca dos veces)." },
-    { "id": "apagon", "nombre": "Apagón", "tipo": "esbirro", "coste": 6, "ataque": 4, "vida": 5, "arte": "🔌", "arquetipo": "Barrio",
-      "texto": "Grito de batalla: inflige 1 a todos los esbirros enemigos.", "grito": [{ "tipo": "dano", "objetivo": "esbirros_enemigos", "cantidad": 1 }] },
-    { "id": "admin", "nombre": "Admin del Grupo", "tipo": "esbirro", "coste": 7, "ataque": 6, "vida": 7, "claves": ["provocar"], "arte": "🛡️", "arquetipo": "Internet",
-      "texto": "Provocar. Último aliento: inflige 3 al héroe enemigo.", "aliento": [{ "tipo": "dano", "objetivo": "heroe_enemigo", "cantidad": 3 }] },
-    { "id": "huracan", "nombre": "Huracán", "tipo": "esbirro", "coste": 8, "ataque": 8, "vida": 8, "arte": "🌀", "arquetipo": "Barrio",
-      "texto": "" },
-
-    { "id": "chancla", "nombre": "Chanclazo", "tipo": "hechizo", "coste": 1, "arte": "🩴", "arquetipo": "Barrio",
-      "texto": "Inflige 2 de daño.", "efectos": [{ "tipo": "dano", "objetivo": "elegido", "cantidad": 2 }] },
-    { "id": "cafe", "nombre": "Café Cargado", "tipo": "hechizo", "coste": 2, "arte": "☕", "arquetipo": "Oficina",
-      "texto": "Roba 2 cartas.", "efectos": [{ "tipo": "robar", "cantidad": 2 }] },
-    { "id": "ban", "nombre": "Ban", "tipo": "hechizo", "coste": 5, "arte": "🔨", "arquetipo": "Internet",
-      "texto": "Destruye un esbirro.", "efectos": [{ "tipo": "destruir", "objetivo": "elegido_esbirro" }] },
-    { "id": "lluvia", "nombre": "Aguacero", "tipo": "hechizo", "coste": 4, "arte": "🌧️", "arquetipo": "Barrio",
-      "texto": "Inflige 2 a todos los esbirros enemigos.", "efectos": [{ "tipo": "dano", "objetivo": "esbirros_enemigos", "cantidad": 2 }] }
-  ]
+ "_nota": "Cartas neutrales DE PRUEBA + clase Tun (diseño de Mario, ver MECANICAS.md). Formato en MECANICAS.md",
+ "cartas": [
+  {
+   "id": "moneda",
+   "nombre": "La Moneda",
+   "tipo": "hechizo",
+   "coste": 0,
+   "token": true,
+   "arte": "🪙",
+   "texto": "Gana 1 de maná este turno.",
+   "efectos": [
+    {
+     "tipo": "mana",
+     "cantidad": 1
+    }
+   ]
+  },
+  {
+   "id": "mensaje_borrado",
+   "nombre": "Mensaje Borrado",
+   "tipo": "esbirro",
+   "coste": 1,
+   "ataque": 1,
+   "vida": 1,
+   "token": true,
+   "arte": "🗑️",
+   "texto": ""
+  },
+  {
+   "id": "mae",
+   "nombre": "Mae del Barrio",
+   "tipo": "esbirro",
+   "coste": 1,
+   "ataque": 1,
+   "vida": 2,
+   "arte": "🧢",
+   "arquetipo": "Barrio",
+   "texto": ""
+  },
+  {
+   "id": "chismoso",
+   "nombre": "Chismoso",
+   "tipo": "esbirro",
+   "coste": 1,
+   "ataque": 1,
+   "vida": 1,
+   "arte": "👂",
+   "arquetipo": "Barrio",
+   "texto": "Grito de batalla: roba una carta.",
+   "grito": [
+    {
+     "tipo": "robar",
+     "cantidad": 1
+    }
+   ]
+  },
+  {
+   "id": "perro",
+   "nombre": "Perro de la Colonia",
+   "tipo": "esbirro",
+   "coste": 2,
+   "ataque": 3,
+   "vida": 1,
+   "claves": [
+    "carga"
+   ],
+   "arte": "🐕",
+   "arquetipo": "Barrio",
+   "texto": "Carga."
+  },
+  {
+   "id": "portero",
+   "nombre": "Portero",
+   "tipo": "esbirro",
+   "coste": 2,
+   "ataque": 1,
+   "vida": 4,
+   "claves": [
+    "provocar"
+   ],
+   "arte": "🚪",
+   "arquetipo": "Oficina",
+   "texto": "Provocar."
+  },
+  {
+   "id": "pupusero",
+   "nombre": "Pupusero",
+   "tipo": "esbirro",
+   "coste": 2,
+   "ataque": 2,
+   "vida": 2,
+   "arte": "🫓",
+   "arquetipo": "Barrio",
+   "texto": "Grito de batalla: cura 3 a tu héroe.",
+   "grito": [
+    {
+     "tipo": "curar",
+     "objetivo": "heroe_propio",
+     "cantidad": 3
+    }
+   ]
+  },
+  {
+   "id": "lanzapiedras",
+   "nombre": "Lanzapiedras",
+   "tipo": "esbirro",
+   "coste": 3,
+   "ataque": 2,
+   "vida": 2,
+   "arte": "🪨",
+   "arquetipo": "Barrio",
+   "texto": "Grito de batalla: inflige 2 de daño.",
+   "grito": [
+    {
+     "tipo": "dano",
+     "objetivo": "elegido",
+     "cantidad": 2
+    }
+   ]
+  },
+  {
+   "id": "jefe",
+   "nombre": "El Jefe",
+   "tipo": "esbirro",
+   "coste": 3,
+   "ataque": 2,
+   "vida": 3,
+   "arte": "👔",
+   "arquetipo": "Oficina",
+   "texto": "Grito de batalla: da +1/+1 a otro esbirro tuyo.",
+   "grito": [
+    {
+     "tipo": "buff",
+     "objetivo": "elegido_aliado",
+     "ataque": 1,
+     "vida": 1
+    }
+   ]
+  },
+  {
+   "id": "influencer",
+   "nombre": "Influencer",
+   "tipo": "esbirro",
+   "coste": 3,
+   "ataque": 3,
+   "vida": 2,
+   "claves": [
+    "escudo"
+   ],
+   "arte": "🤳",
+   "arquetipo": "Internet",
+   "texto": "Escudo divino."
+  },
+  {
+   "id": "troll",
+   "nombre": "Troll de Internet",
+   "tipo": "esbirro",
+   "coste": 4,
+   "ataque": 4,
+   "vida": 3,
+   "arte": "🧌",
+   "arquetipo": "Internet",
+   "texto": "Último aliento: invoca un Mensaje Borrado 1/1.",
+   "aliento": [
+    {
+     "tipo": "invocar",
+     "carta": "mensaje_borrado",
+     "cantidad": 1
+    }
+   ]
+  },
+  {
+   "id": "guardia",
+   "nombre": "Guardia de Seguridad",
+   "tipo": "esbirro",
+   "coste": 4,
+   "ataque": 3,
+   "vida": 6,
+   "claves": [
+    "provocar"
+   ],
+   "arte": "💂",
+   "arquetipo": "Oficina",
+   "texto": "Provocar."
+  },
+  {
+   "id": "motorista",
+   "nombre": "Motorista",
+   "tipo": "esbirro",
+   "coste": 5,
+   "ataque": 4,
+   "vida": 4,
+   "claves": [
+    "carga"
+   ],
+   "arte": "🏍️",
+   "arquetipo": "Barrio",
+   "texto": "Carga."
+  },
+  {
+   "id": "spammer",
+   "nombre": "Spammer",
+   "tipo": "esbirro",
+   "coste": 5,
+   "ataque": 3,
+   "vida": 4,
+   "claves": [
+    "doble"
+   ],
+   "arte": "📨",
+   "arquetipo": "Internet",
+   "texto": "Viento furioso (ataca dos veces)."
+  },
+  {
+   "id": "apagon",
+   "nombre": "Apagón",
+   "tipo": "esbirro",
+   "coste": 6,
+   "ataque": 4,
+   "vida": 5,
+   "arte": "🔌",
+   "arquetipo": "Barrio",
+   "texto": "Grito de batalla: inflige 1 a todos los esbirros enemigos.",
+   "grito": [
+    {
+     "tipo": "dano",
+     "objetivo": "esbirros_enemigos",
+     "cantidad": 1
+    }
+   ]
+  },
+  {
+   "id": "admin",
+   "nombre": "Admin del Grupo",
+   "tipo": "esbirro",
+   "coste": 7,
+   "ataque": 6,
+   "vida": 7,
+   "claves": [
+    "provocar"
+   ],
+   "arte": "🛡️",
+   "arquetipo": "Internet",
+   "texto": "Provocar. Último aliento: inflige 3 al héroe enemigo.",
+   "aliento": [
+    {
+     "tipo": "dano",
+     "objetivo": "heroe_enemigo",
+     "cantidad": 3
+    }
+   ]
+  },
+  {
+   "id": "huracan",
+   "nombre": "Huracán",
+   "tipo": "esbirro",
+   "coste": 8,
+   "ataque": 8,
+   "vida": 8,
+   "arte": "🌀",
+   "arquetipo": "Barrio",
+   "texto": ""
+  },
+  {
+   "id": "chancla",
+   "nombre": "Chanclazo",
+   "tipo": "hechizo",
+   "coste": 1,
+   "arte": "🩴",
+   "arquetipo": "Barrio",
+   "texto": "Inflige 2 de daño.",
+   "efectos": [
+    {
+     "tipo": "dano",
+     "objetivo": "elegido",
+     "cantidad": 2
+    }
+   ]
+  },
+  {
+   "id": "cafe",
+   "nombre": "Café Cargado",
+   "tipo": "hechizo",
+   "coste": 2,
+   "arte": "☕",
+   "arquetipo": "Oficina",
+   "texto": "Roba 2 cartas.",
+   "efectos": [
+    {
+     "tipo": "robar",
+     "cantidad": 2
+    }
+   ]
+  },
+  {
+   "id": "ban",
+   "nombre": "Ban",
+   "tipo": "hechizo",
+   "coste": 5,
+   "arte": "🔨",
+   "arquetipo": "Internet",
+   "texto": "Destruye un esbirro.",
+   "efectos": [
+    {
+     "tipo": "destruir",
+     "objetivo": "elegido_esbirro"
+    }
+   ]
+  },
+  {
+   "id": "lluvia",
+   "nombre": "Aguacero",
+   "tipo": "hechizo",
+   "coste": 4,
+   "arte": "🌧️",
+   "arquetipo": "Barrio",
+   "texto": "Inflige 2 a todos los esbirros enemigos.",
+   "efectos": [
+    {
+     "tipo": "dano",
+     "objetivo": "esbirros_enemigos",
+     "cantidad": 2
+    }
+   ]
+  },
+  {
+   "id": "tun",
+   "nombre": "Tun",
+   "tipo": "esbirro",
+   "coste": 1,
+   "ataque": 1,
+   "vida": 1,
+   "tribu": "tun",
+   "token": true,
+   "clase": "tun",
+   "arte": "🧍",
+   "texto": ""
+  },
+  {
+   "id": "tun_awarded",
+   "nombre": "Tun the Awarded",
+   "tipo": "mision",
+   "coste": 1,
+   "clase": "tun",
+   "rareza": "legendaria",
+   "arte": "🏆",
+   "texto": "Misión: invoca 15 Tun. Recompensa: Tun Maestro del Universo.",
+   "mision": {
+    "contar": "invocar_tribu",
+    "tribu": "tun",
+    "meta": 15,
+    "recompensa": [
+     {
+      "tipo": "dar_carta",
+      "carta": "tun_maestro"
+     }
+    ]
+   }
+  },
+  {
+   "id": "tun_maestro",
+   "nombre": "Tun Maestro del Universo",
+   "tipo": "esbirro",
+   "coste": 5,
+   "ataque": 8,
+   "vida": 8,
+   "tribu": "tun",
+   "clase": "tun",
+   "rareza": "legendaria",
+   "token": true,
+   "arte": "🌌",
+   "texto": "Grito de batalla: invoca 5 Tun y dispáralos a los enemigos.",
+   "grito": [
+    {
+     "tipo": "invocar",
+     "carta": "tun",
+     "cantidad": 5,
+     "disparar": true
+    }
+   ]
+  },
+  {
+   "id": "panama",
+   "nombre": "Panamá",
+   "tipo": "esbirro",
+   "coste": 1,
+   "ataque": 1,
+   "vida": 1,
+   "clase": "tun",
+   "rareza": "legendaria",
+   "arte": "🇵🇦",
+   "texto": "Grito de batalla: por el resto de la partida, cada vez que un jugador robe una carta, invoca un Tun 1/1 para él.",
+   "grito": [
+    {
+     "tipo": "global",
+     "disparador": "al_robar",
+     "origen": "panama",
+     "efectos": [
+      {
+       "tipo": "invocar",
+       "carta": "tun",
+       "cantidad": 1,
+       "lado": "quien_roba"
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "tun_bebe",
+   "nombre": "Tun Bebé",
+   "tipo": "esbirro",
+   "coste": 1,
+   "ataque": 1,
+   "vida": 2,
+   "tribu": "tun",
+   "clase": "tun",
+   "arte": "👶",
+   "provisional": true,
+   "texto": "Grito de batalla: invoca un Tun.",
+   "grito": [
+    {
+     "tipo": "invocar",
+     "carta": "tun",
+     "cantidad": 1
+    }
+   ]
+  },
+  {
+   "id": "tun_molesto",
+   "nombre": "Tun Molesto",
+   "tipo": "esbirro",
+   "coste": 2,
+   "ataque": 2,
+   "vida": 2,
+   "tribu": "tun",
+   "clase": "tun",
+   "claves": [
+    "provocar",
+    "escudo"
+   ],
+   "arte": "😤",
+   "provisional": true,
+   "texto": "Provocar. Escudo divino."
+  },
+  {
+   "id": "primo_tun",
+   "nombre": "Primo de Tun",
+   "tipo": "esbirro",
+   "coste": 2,
+   "ataque": 2,
+   "vida": 3,
+   "tribu": "tun",
+   "clase": "tun",
+   "arte": "🧑‍🤝‍🧑",
+   "provisional": true,
+   "texto": "Último aliento: invoca dos Tun.",
+   "aliento": [
+    {
+     "tipo": "invocar",
+     "carta": "tun",
+     "cantidad": 2
+    }
+   ]
+  },
+  {
+   "id": "junta_tuns",
+   "nombre": "Junta de Tuns",
+   "tipo": "hechizo",
+   "coste": 2,
+   "clase": "tun",
+   "arte": "🫂",
+   "provisional": true,
+   "texto": "Invoca tres Tun.",
+   "efectos": [
+    {
+     "tipo": "invocar",
+     "carta": "tun",
+     "cantidad": 3
+    }
+   ]
+  },
+  {
+   "id": "bendicion_tun",
+   "nombre": "Bendición de Tun",
+   "tipo": "hechizo",
+   "coste": 1,
+   "clase": "tun",
+   "arte": "✨",
+   "provisional": true,
+   "texto": "Da +3/+3 y Provocar a un esbirro.",
+   "efectos": [
+    {
+     "tipo": "buff",
+     "objetivo": "elegido_esbirro",
+     "ataque": 3,
+     "vida": 3,
+     "provocar": true
+    }
+   ]
+  },
+  {
+   "id": "tun_motivador",
+   "nombre": "Tun Motivador",
+   "tipo": "esbirro",
+   "coste": 3,
+   "ataque": 3,
+   "vida": 3,
+   "tribu": "tun",
+   "clase": "tun",
+   "arte": "📣",
+   "provisional": true,
+   "texto": "Grito de batalla: da +1/+1 a tus otros Tun.",
+   "grito": [
+    {
+     "tipo": "buff",
+     "objetivo": "aliados",
+     "filtro": {
+      "tribu": "tun"
+     },
+     "ataque": 1,
+     "vida": 1
+    }
+   ]
+  },
+  {
+   "id": "tun_pesado",
+   "nombre": "Tun Pesado",
+   "tipo": "esbirro",
+   "coste": 4,
+   "ataque": 4,
+   "vida": 6,
+   "tribu": "tun",
+   "clase": "tun",
+   "claves": [
+    "provocar"
+   ],
+   "arte": "🐘",
+   "provisional": true,
+   "texto": "Provocar. Grito de batalla: da Escudo divino a tus otros Tun.",
+   "grito": [
+    {
+     "tipo": "buff",
+     "objetivo": "aliados",
+     "filtro": {
+      "tribu": "tun"
+     },
+     "escudo": true
+    }
+   ]
+  },
+  {
+   "id": "tun_infinito",
+   "nombre": "Tun Infinito",
+   "tipo": "esbirro",
+   "coste": 6,
+   "ataque": 5,
+   "vida": 7,
+   "tribu": "tun",
+   "clase": "tun",
+   "arte": "♾️",
+   "provisional": true,
+   "texto": "Al final de tu turno, invoca dos Tun.",
+   "fin_turno": [
+    {
+     "tipo": "invocar",
+     "carta": "tun",
+     "cantidad": 2
+    }
+   ]
+  }
+ ],
+ "heroes": [
+  {
+   "id": "tun",
+   "nombre": "Tun",
+   "arte": "🧍",
+   "clase": "tun",
+   "poder": {
+    "nombre": "Llamar a otro Tun",
+    "coste": 1,
+    "arte": "📞",
+    "texto": "Invoca un Tun 1/1.",
+    "efectos": [
+     {
+      "tipo": "invocar",
+      "carta": "tun",
+      "cantidad": 1
+     }
+    ]
+   }
+  }
+ ]
 }
