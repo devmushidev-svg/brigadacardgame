@@ -6,7 +6,7 @@
   "scripts": {
     "dev": "wrangler dev",
     "deploy": "wrangler deploy",
-    "test": "node test/motor.test.mjs"
+    "test": "node test/motor.test.mjs && node test/ia.test.mjs"
   },
   "devDependencies": {
     "wrangler": "^4.152.0"

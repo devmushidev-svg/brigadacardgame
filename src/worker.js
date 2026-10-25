@@ -3,6 +3,7 @@
 import { DurableObject } from "cloudflare:workers";
 import cartasJson from "./cartas.json";
 import * as M from "./motor.js";
+import { decidir } from "./ia.js";
 
 const DB = Object.fromEntries(cartasJson.cartas.map((c) => [c.id, c]));
 const ID_OK = /^[a-z0-9]{6,12}$/;
@@ -28,6 +29,7 @@ export default {
   },
 };
 
+const dormir = (ms) => new Promise((r) => setTimeout(r, ms));
 const limpiarNombre = (n) => String(n || "").replace(/[\u0000-\u001f<>]/g, "").trim().slice(0, 20) || null;
 
 export class Partida extends DurableObject {
@@ -36,7 +38,10 @@ export class Partida extends DurableObject {
     this.estado = null;
     this.tokens = [null, null];
     this.revancha = [false, false];
+    this.bot = null; // asiento del bot, si la partida es contra la máquina
+    this.botCorriendo = false;
     ctx.blockConcurrencyWhile(async () => {
+      this.bot = (await ctx.storage.get("bot")) ?? null;
       this.estado = (await ctx.storage.get("estado")) || null;
       this.tokens = (await ctx.storage.get("tokens")) || [null, null];
       this.revancha = (await ctx.storage.get("revancha")) || [false, false];
@@ -51,7 +56,7 @@ export class Partida extends DurableObject {
   }
 
   async guardar() {
-    await this.ctx.storage.put({ estado: this.estado, tokens: this.tokens, revancha: this.revancha });
+    await this.ctx.storage.put({ estado: this.estado, tokens: this.tokens, revancha: this.revancha, bot: this.bot });
   }
 
   async programarAlarma() {
@@ -65,6 +70,7 @@ export class Partida extends DurableObject {
       const s = ws.deserializeAttachment()?.seat;
       if (s === 0 || s === 1) c[s] = true;
     }
+    if (this.bot !== null) c[this.bot] = true;
     return c;
   }
 
@@ -78,6 +84,31 @@ export class Partida extends DurableObject {
       v.ahora = Date.now();
       try { ws.send(JSON.stringify({ t: "estado", ev, v })); } catch {}
     }
+    if (this.bot !== null && this.estado.fase === "jugando" && this.estado.turno === this.bot) this.turnoBot();
+  }
+
+  // El bot juega su turno acción por acción, con pausas para que se vea.
+  async turnoBot() {
+    if (this.botCorriendo) return;
+    this.botCorriendo = true;
+    try {
+      await dormir(1300);
+      for (let k = 0; k < 30; k++) {
+        if (this.estado.fase !== "jugando" || this.estado.turno !== this.bot) return;
+        let a = k === 29 ? { t: "fin" } : decidir(this.estado, this.bot, DB);
+        let res = M.aplicar(this.estado, this.bot, a, DB, Date.now());
+        if (res.error) { a = { t: "fin" }; res = M.aplicar(this.estado, this.bot, a, DB, Date.now()); }
+        await this.guardar();
+        await this.programarAlarma();
+        this.botCorriendo = a.t !== "fin"; // al pasar el turno, difundir no debe re-entrar
+        this.difundir(res.ev || []);
+        if (a.t === "fin") return;
+        this.botCorriendo = true;
+        await dormir(a.t === "atacar" ? 1150 : 1450);
+      }
+    } finally {
+      this.botCorriendo = false;
+    }
   }
 
   async webSocketMessage(ws, raw) {
@@ -90,8 +121,14 @@ export class Partida extends DurableObject {
     const yo = ws.deserializeAttachment()?.seat ?? -1;
 
     if (msg.t === "hola") {
-      let seat = this.tokens.findIndex((t) => t && t === msg.token);
+      let seat = this.tokens.findIndex((t) => t && t !== "BOT" && t === msg.token);
       const nombre = limpiarNombre(msg.nombre);
+      // partida contra el bot: el primero en entrar lo pide, el bot ocupa el otro asiento
+      if (msg.bot && this.estado.fase === "esperando" && !this.tokens[0] && !this.tokens[1] && nombre) {
+        this.bot = 1;
+        this.tokens[1] = "BOT";
+        this.estado.j[1].nombre = "Bot";
+      }
       if (seat < 0 && nombre && this.estado.fase === "esperando") {
         seat = this.tokens.findIndex((t) => !t);
         if (seat >= 0) {
@@ -114,6 +151,7 @@ export class Partida extends DurableObject {
     if (msg.t === "revancha") {
       if (this.estado.fase !== "fin") return;
       this.revancha[yo] = true;
+      if (this.bot !== null) this.revancha[this.bot] = true;
       let ev = [];
       if (this.revancha[0] && this.revancha[1]) {
         const nombres = this.estado.j.map((p) => p.nombre);

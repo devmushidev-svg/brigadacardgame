@@ -152,16 +152,19 @@ function pantallaLobby() {
     <h1 class="logo">PUTO<small>CARTAS</small></h1>
     <input id="nombre" maxlength="20" placeholder="tu nombre" value="${esc(localStorage.getItem("nombre") || "")}">
     <button class="boton" id="crear">Crear partida</button>
+    <button class="boton" id="bot">Jugar contra el bot</button>
     <button class="boton sec" id="ver">Ver cartas</button>
-    <div class="ayuda">Creás la partida y le pasás el link a tu rival.</div>
+    <div class="ayuda">Creás la partida y le pasás el link a tu rival, o practicás contra el bot.</div>
   </div></div>`;
-  $("#crear").onclick = async () => {
+  const crear = async (bot) => {
     const n = $("#nombre").value.trim();
     if (!n) { $("#nombre").focus(); toast("poné tu nombre"); return; }
     localStorage.setItem("nombre", n);
     const { id } = await (await fetch("/api/crear", { method: "POST" })).json();
-    location.href = "/p/" + id;
+    location.href = "/p/" + id + (bot ? "?bot=1" : "");
   };
+  $("#crear").onclick = () => crear(false);
+  $("#bot").onclick = () => crear(true);
   $("#ver").onclick = () => (location.href = "/cartas");
 }
 
@@ -205,7 +208,8 @@ function conectar() {
   ws = new WebSocket(`${proto}://${location.host}/ws/${PID}`);
   ws.onopen = () => {
     intentos = 0;
-    ws.send(JSON.stringify({ t: "hola", token: localStorage.getItem("tok_" + PID), nombre: localStorage.getItem("nombre") }));
+    ws.send(JSON.stringify({ t: "hola", token: localStorage.getItem("tok_" + PID), nombre: localStorage.getItem("nombre"),
+      bot: new URLSearchParams(location.search).has("bot") }));
   };
   ws.onmessage = (m) => {
     const d = JSON.parse(m.data);
@@ -406,11 +410,11 @@ function render(v) {
         <div class="cristales">${Array.from({ length: P.manaMax }, (_, i) => `<div class="cristal ${i < P.mana ? "lleno" : ""}"></div>`).join("")}</div>
         <div class="chips"><span class="chip">💧 ${P.mana}/${P.manaMax}</span><span class="chip">🂠 ${P.mazo}</span></div></div>
       ${v.yo >= 0 ? `<button class="fin-turno ${miTurno && !hayJugadas ? "listo" : ""}" id="fin" ${miTurno ? "" : "disabled"}>${miTurno ? "Terminar turno" : "Turno rival"}</button>` : ""}</div>
-    <div class="mano">${mano.map((c, i) => {
+    <div class="mano" style="--n:${Math.max(1, n)};--n1:${Math.max(1, n - 1)}">${mano.map((c, i) => {
       const off = i - (n - 1) / 2;
       const card = DB[c.id] || { nombre: "?", coste: 0 };
       return cartaHTML(card, { uid: c.uid, clase: miTurno && jugable(v, card) ? "jugable" : "" })
-        .replace('class="carta', `style="transform: translateY(${Math.abs(off) * Math.abs(off) * 2.2}px) rotate(${off * 4}deg)" class="carta`);
+        .replace('class="carta', `style="transform: translateY(${Math.abs(off) * Math.abs(off) * (n > 6 ? 1.2 : 2.2)}px) rotate(${off * Math.min(4, 20 / n)}deg)" class="carta`);
     }).join("")}</div>
     <div class="esquina"><button class="mini-btn" id="log">📜</button><button class="mini-btn" id="mudo">${Sonido.mudo ? "🔇" : "🔊"}</button>
       ${v.yo >= 0 && v.fase === "jugando" ? '<button class="mini-btn" id="rendir">🏳️</button>' : ""}</div>

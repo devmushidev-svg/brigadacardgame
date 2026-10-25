@@ -271,7 +271,7 @@ function resolverMuertes(estado, ev, db) {
 }
 
 // ---------- validación de objetivos elegidos ----------
-function objetivoValido(estado, s, carta, ref) {
+export function objetivoValido(estado, s, carta, ref) {
   const ef = [...(carta.grito || []), ...(carta.efectos || [])].find((e) => (e.objetivo || "").startsWith("elegido"));
   if (!ef) return true;
   const t = buscar(estado, ref);
