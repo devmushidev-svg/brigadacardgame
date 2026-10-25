@@ -515,7 +515,8 @@
      "tipo": "destruir",
      "objetivo": "yo"
     }
-   ]
+   ],
+   "genero": "no_binario"
   },
   {
    "id": "cruit_intolerante",
@@ -720,7 +721,8 @@
       "tribu": "cruit"
      }
     }
-   ]
+   ],
+   "genero": "no_binario"
   }
  ],
  "heroes": [
