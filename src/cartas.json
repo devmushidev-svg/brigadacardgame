@@ -846,8 +846,8 @@
    "id": "cruit_bano",
    "nombre": "Cruit Baño",
    "coste": 2,
-   "ataque": 2,
-   "vida": 1,
+   "ataque": 4,
+   "vida": 2,
    "arte": "/arte/cruit_bano.webp",
    "texto": "Grito de batalla: inflige daño igual al ataque de este esbirro, repartido al azar entre todos los enemigos.",
    "grito": [
