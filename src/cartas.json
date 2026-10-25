@@ -332,19 +332,23 @@
    "nombre": "Novia de Tun",
    "genero": "mujer",
    "tipo": "esbirro",
-   "coste": 4,
-   "ataque": 4,
-   "vida": 4,
+   "coste": 3,
+   "ataque": 2,
+   "vida": 1,
    "tribu": "tun",
    "clase": "tun",
    "arte": "/arte/novia_tun.webp",
-   "texto": "Último aliento: por el resto de la partida, tus Tun tienen +1/+1.",
+   "texto": "Último aliento: invoca 2 Tun y, por el resto de la partida, tus Tun tienen +1 de ataque.",
    "aliento": [
     {
      "tipo": "mejora_tribu",
      "tribu": "tun",
-     "ataque": 1,
-     "vida": 1
+     "ataque": 1
+    },
+    {
+     "tipo": "invocar",
+     "carta": "tun",
+     "cantidad": 2
     }
    ]
   },

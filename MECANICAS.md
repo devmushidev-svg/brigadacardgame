@@ -158,7 +158,7 @@ Diseño de Mario. Arquetipo: paladín molesto — llenar la mesa de Tun, buffear
 | Tun Tung Sahur | 1 | 1/1 | Grito: invoca un Tun 1/1 | hecho |
 | Tun Mujer ♀ | 5 | 2/8 | Grito: tus Tun la atacan. Cada vez que recibe daño, 2 de daño a un enemigo al azar | hecho |
 | Tun Cool | 10 | 6/7 | Cuesta 1 menos por cada otro Tun en el campo (los dos lados) | hecho |
-| Novia de Tun ♀ | 4 | 4/4 | Último aliento: tus Tun tienen +1/+1 por el resto de la partida | hecho |
+| Novia de Tun ♀ | 3 | 2/1 | Último aliento: invoca 2 Tun y tus Tun tienen +1 de ataque por el resto de la partida | hecho |
 | Tun Mastermind | 25 | 6/3 | Acometida. 1 menos por cada Tun muerto en la partida. Grito: tus Tun tienen +1 de ataque por el resto de la partida | hecho |
 | Comida (hechizo) | 3 | — | Invoca 4 Tun 1/1 | hecho |
 | Plátano (hechizo) | 1 | — | +2/+2 y provocar a uno de tus Tun | hecho |
@@ -223,7 +223,7 @@ Sin mazo armado, el héroe sale al azar.
 
 **Cruit (30):** 2 Cruit Tostadora, 2 Estreñido Cruit, 2 Lechero, 2 Leche, 2 Tarea de la U, 2 Cruit Intolerante, 2 Elliot Cruit, 2 Cruit Sangre, 2 Tun Brawl Stars, 2 Chance Cruit, 2 Cruit Baño, 2 Cruit Excel, 2 Cruit Vampiro, Cruit Verity, Cruit Vaca, Unislop, Coco Supremo.
 
-Con los mazos de 20, bot contra bot, Cruit le ganaba a Tun ~68% (era ~95% antes de los nerfs a Estreñido, Cruit Baño y Cruit Sangre y el buff a Novia de Tun). Con los mazos de 30 y mulligan (Lechero 1/1, Cruit Vaca fuera de la tribu, Cruit Verity 3 de maná con Verity 5/5, Cruit Baño 2/1 de 2 de maná), Cruit gana ~40%.
+Con los mazos de 20, bot contra bot, Cruit le ganaba a Tun ~68% (era ~95% antes de los nerfs a Estreñido, Cruit Baño y Cruit Sangre y el buff a Novia de Tun). Con los mazos de 30 y mulligan (Lechero 1/1, Cruit Vaca fuera de la tribu, Cruit Verity 3 de maná con Verity 5/5, Cruit Baño 2/1 de 2 de maná, Novia de Tun 3 de maná 2/1 que al morir invoca 2 Tun), Cruit gana ~41%.
 
 ### Tareas universitarias (fichas de Unislop, etiqueta Tarea: cuentan para Cruit Excel)
 
