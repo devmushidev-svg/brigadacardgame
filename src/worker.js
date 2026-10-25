@@ -111,7 +111,7 @@ export class Partida extends DurableObject {
     if (this.botCorriendo) return;
     this.botCorriendo = true;
     try {
-      await dormir(1300);
+      await dormir(2000);
       for (let k = 0; k < 30; k++) {
         if (this.estado.fase !== "jugando" || this.estado.turno !== this.bot) return;
         let a = k === 29 ? { t: "fin" } : decidir(this.estado, this.bot, DB);
@@ -123,7 +123,7 @@ export class Partida extends DurableObject {
         this.difundir(res.ev || []);
         if (a.t === "fin") return;
         this.botCorriendo = true;
-        await dormir(a.t === "atacar" ? 1150 : 1450);
+        await dormir(a.t === "atacar" ? 1800 : 2300); // el cliente anima más lento: el bot espera a que se vea
       }
     } finally {
       this.botCorriendo = false;

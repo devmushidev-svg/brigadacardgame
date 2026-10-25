@@ -194,7 +194,7 @@ Diseño de Mario. Marco azul (provisional). Cruit es no binario: toda carta con 
 | Héroe Cruit | — | 30 | Poder (1): invoca un Coco 1/1 con carga que muere al final del turno | hecho (retrato con fondo de leche) |
 | Coco ⚧ (ficha, el hámster) | — | 1/1 | Carga. Muere al final de tu turno | hecho |
 | Cruit Intolerante a la Lactosa ⚧ (tribu Cruit) | 2 | 1/3 | Grito: 1 de daño a todos los demás esbirros (vómito) | hecho |
-| Lechero ♂ | 1 | 1/3 | Grito y último aliento: obtenés una Leche | hecho |
+| Lechero ♂ | 1 | 1/1 | Grito: obtenés una Leche | hecho |
 | Leche (hechizo) | 1 | — | +1/+1 a un esbirro; si es un Cruit, activa su grito y su último aliento | hecho |
 | Nullscape (hechizo) | 4 | — | Todos los esbirros hacen parkour; solo uno al azar sobrevive | hecho |
 | Cruit Excel ⚧ (tribu Cruit) | 5 | 2/2 | Grito: +3/+3 por cada Tarea que lanzaste esta partida | hecho |
@@ -206,8 +206,8 @@ Diseño de Mario. Marco azul (provisional). Cruit es no binario: toda carta con 
 | Caca (ficha) | 0 | — | Se lanza al robarla: 2 de daño a quien la roba y roba otra | hecho |
 | Cruit Tostadora ⚧ | 1 | 1/2 | Grito: robás una carta | hecho |
 | Cruit Baño ⚧ | 4 | 3/2 | Último aliento: 2 de daño a todos los enemigos | hecho |
-| **Cruit Vaca** ⚧ (legendaria) | 4 | 3/4 | Grito: una Leche a cada uno de tus otros esbirros (+1/+1 y activa a los Cruit) | hecho |
-| **Cruit Verity** ⚧ (legendaria) | 3 | 3/1 | Último aliento: invoca a Verity 6/6 | hecho |
+| **Cruit Vaca** ⚧ (legendaria, tribu Vaca: no cuenta como Cruit) | 4 | 3/4 | Grito: una Leche a cada uno de tus otros esbirros (+1/+1 y activa a los Cruit) | hecho |
+| **Cruit Verity** ⚧ (legendaria) | 5 | 3/1 | Último aliento: invoca a Verity 6/6 | hecho |
 | Verity ⚧ (ficha, forma monstruosa) | 6 | 6/6 | — | hecho |
 | **Unislop** (legendaria) | 4 | 3/3 | Grito: obtenés 3 tareas universitarias distintas al azar | hecho — imagen agregada; falta género |
 | Elliot Cruit ⚧ (tribu Cruit, Forsaken) | 2 | 2/2 | Al final de tu turno, una pizza cura 3 a un aliado herido al azar | hecho |

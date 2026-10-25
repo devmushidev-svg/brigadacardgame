@@ -2,7 +2,15 @@
 const $ = (s, el = document) => el.querySelector(s);
 const $$ = (s, el = document) => [...el.querySelectorAll(s)];
 const app = $("#app");
-const esperar = (ms) => new Promise((r) => setTimeout(r, ms));
+// mientras se animan las jugadas, todo va más lento para que se entienda qué pasa
+const LENTO = 1.6;
+let animando = false;
+const esperar = (ms) => new Promise((r) => setTimeout(r, animando ? ms * LENTO : ms));
+const animarOriginal = Element.prototype.animate;
+Element.prototype.animate = function (frames, o) {
+  if (animando) o = typeof o === "number" ? o * LENTO : { ...o, duration: (o?.duration || 0) * LENTO, delay: (o?.delay || 0) * LENTO };
+  return animarOriginal.call(this, frames, o);
+};
 const esc = (t) => String(t ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
 let DB = {};
 let HEROES = {};
@@ -768,10 +776,13 @@ async function procesar() {
       const { ev, v } = cola.shift();
       desfase = v.ahora - Date.now();
       const nuevos = new Set();
-      if (V && V.fase === "jugando" && ev.length) await animar(ev, v, nuevos);
-      const antes = V;
-      render(v);
-      await despues(ev, v, antes, nuevos);
+      animando = true;
+      try {
+        if (V && V.fase === "jugando" && ev.length) await animar(ev, v, nuevos);
+        const antes = V;
+        render(v);
+        await despues(ev, v, antes, nuevos);
+      } finally { animando = false; }
     }
   } finally { procesando = false; }
 }
@@ -803,6 +814,8 @@ async function animarUno(e, ev, v, nuevos, yo) {
           (nuevos.especial ||= new Set()).add(e.uid);
           await entradaEspecial(c, e.seat, tipo);
         } else if (ev.__origen) (nuevos.origen ||= new Map()).set(e.uid, ev.__origen);
+        // si tiene grito de batalla, ya se pone en la mesa: así se ve mientras hace su efecto
+        if (ev.some((x) => x.e === "grito" && x.uid === e.uid)) ponerEnMesa(e, v, nuevos, !tipo);
         break;
       }
       case "grito": ev.__origen = e.uid; break;
@@ -1036,6 +1049,25 @@ async function animarUno(e, ev, v, nuevos, yo) {
       case "global": { const g = ev.find((x) => x.e === "grito" || x.e === "hechizo"); toast("efecto activo por el resto de la partida", 1800); break; }
     }
   }
+}
+
+// dibuja un esbirro recién jugado en la mesa vieja (con sus stats de base) antes de que termine la animación
+function ponerEnMesa(e, v, nuevos, caer) {
+  const tab = $(`.tablero[data-seat="${e.seat}"]`);
+  if (!tab || refEl(e.uid)) return;
+  const c = DB[e.carta] || {};
+  const d = document.createElement("div");
+  d.innerHTML = esbirroHTML({ uid: e.uid, id: e.carta, ataque: c.ataque, vida: c.vida, vidaMax: c.vida }, e.seat, { ...v, fase: "animando" });
+  const el = d.firstElementChild;
+  const orden = v.j[e.seat].tablero.map((m) => m.uid), i = orden.indexOf(e.uid);
+  const sig = i < 0 ? null : [...tab.children].find((ch) => orden.indexOf(ch.dataset.ref) > i);
+  tab.insertBefore(el, sig || null);
+  tab.style.setProperty("--n", tab.children.length);
+  (nuevos.especial ||= new Set()).add(e.uid);
+  if (!caer) return;
+  Sonido.jugar();
+  el.animate([{ transform: "translateY(-50px) scale(1.45)", opacity: 0 }, { transform: "translateY(4px) scale(.95)", opacity: 1, offset: 0.6 },
+    { transform: "translateY(0) scale(1)" }], { duration: 380, easing: "cubic-bezier(.3,1.4,.6,1)" });
 }
 
 // ---------- lo que pasa después de dibujar ----------

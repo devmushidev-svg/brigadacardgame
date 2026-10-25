@@ -340,7 +340,9 @@ for (let k = 0; k < 20; k++) {
   assert.ok(e.j[s].mano.some((c) => c.id === "leche" && c.uid !== "t2"), "Lechero da una Leche");
   const res = M.aplicar(e, s, { t: "jugar", uid: "t1" }, db, 0);
   assert.ok(res.ev.some((x) => x.e === "fx" && x.fx === "vomito"));
-  assert.equal(e.j[r].tablero[0].vida, 2); assert.equal(e.j[s].tablero.find((m) => m.id === "lechero").vida, 2);
+  assert.equal(e.j[r].tablero[0].vida, 2);
+  assert.ok(!e.j[s].tablero.some((m) => m.id === "lechero"), "Lechero 1/1 muere con el vómito");
+  assert.equal(e.j[s].mano.filter((c) => c.id === "leche").length, 2, "y ya no da Leche al morir");
   assert.equal(e.j[s].tablero.find((m) => m.id === "cruit_intolerante").vida, 3, "no se pega a si mismo");
   const cru = e.j[s].tablero.find((m) => m.id === "cruit_intolerante").uid;
   M.aplicar(e, s, { t: "jugar", uid: "t2", objetivo: cru }, db, 0);

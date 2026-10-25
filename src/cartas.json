@@ -547,17 +547,11 @@
    "tipo": "esbirro",
    "coste": 1,
    "ataque": 1,
-   "vida": 3,
+   "vida": 1,
    "clase": "cruit",
    "arte": "/arte/lechero.webp",
-   "texto": "Grito de batalla y último aliento: obtenés una Leche.",
+   "texto": "Grito de batalla: obtenés una Leche.",
    "grito": [
-    {
-     "tipo": "dar_carta",
-     "carta": "leche"
-    }
-   ],
-   "aliento": [
     {
      "tipo": "dar_carta",
      "carta": "leche"
@@ -847,7 +841,7 @@
   {
    "genero": "no_binario",
    "tipo": "esbirro",
-   "tribu": "cruit",
+   "tribu": "vaca",
    "clase": "cruit",
    "id": "cruit_vaca",
    "nombre": "Cruit Vaca",
@@ -878,7 +872,7 @@
    "nombre": "Cruit Verity",
    "genero": "no_binario",
    "tipo": "esbirro",
-   "coste": 3,
+   "coste": 5,
    "ataque": 3,
    "vida": 1,
    "tribu": "cruit",
