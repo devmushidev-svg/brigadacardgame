@@ -604,12 +604,12 @@
    "tribu": "cruit",
    "clase": "cruit",
    "arte": "/arte/cruit_intolerante.webp",
-   "texto": "Grito de batalla y último aliento: inflige 1 de daño a todos los demás esbirros.",
+   "texto": "Grito de batalla y último aliento: inflige 2 de daño a todos los demás esbirros.",
    "grito": [
     {
      "tipo": "dano",
      "objetivo": "otros_esbirros",
-     "cantidad": 1,
+     "cantidad": 2,
      "fx": "vomito"
     }
    ],
@@ -617,7 +617,7 @@
     {
      "tipo": "dano",
      "objetivo": "otros_esbirros",
-     "cantidad": 1,
+     "cantidad": 2,
      "fx": "vomito"
     }
    ]
@@ -891,15 +891,15 @@
    "tribu": "cruit",
    "clase": "cruit",
    "arte": "/arte/cruit_vampiro.webp",
-   "texto": "Tus Cruit roban +1 de vida. Grito de batalla: invoca 2 Cruit Sangre (se fusionan en una).",
-   "aumenta_robo_vida": 1,
+   "texto": "Tus Cruit Sangre roban el doble de vida. Grito de batalla: invoca 2 Cruit Sangre (se fusionan en una).",
    "grito": [
     {
      "tipo": "invocar",
      "carta": "cruit_sangre",
      "cantidad": 2
     }
-   ]
+   ],
+   "duplica_robo_de": "cruit_sangre"
   },
   {
    "genero": "no_binario",

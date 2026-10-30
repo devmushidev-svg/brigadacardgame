@@ -114,7 +114,7 @@ En el texto de las cartas, las palabras clave salen en **negrita** y al ver la c
 | `grito_extra` | el próximo grito de batalla de un esbirro del `filtro` que juegues se activa `cantidad` veces (Cruit Rage; se ve en la placa) |
 | `rebajar` | una carta de tu mano del `filtro` al azar cuesta `cantidad` menos (se ve en verde en la mano) |
 | `repartir` | daño de a 1 punto a enemigos vivos al azar (héroe o esbirros), `cantidad` veces; `"cantidad": "ataque"` usa el ataque actual de quien lo lanza (Cruit Baño; con Leche pega más, y si lo repite Coco Supremo usa el ataque de Coco) |
-| `robar_vida` | daño que se **suma** a la vida de tu héroe (puede pasar de la vida máxima y la sube); cada esbirro tuyo con `aumenta_robo_vida` suma ese número (Cruit Vampiro) |
+| `robar_vida` | daño que se **suma** a la vida de tu héroe (puede pasar de la vida máxima y la sube); cada esbirro tuyo con `duplica_robo_de` igual a la carta que roba lo duplica (Cruit Vampiro: tus Cruit Sangre roban el doble; dos Vampiros, el cuádruple) |
 | `dar_azar` | te da N cartas distintas al azar de las que cumplen el `filtro` (Unislop) |
 | `moneda` | 50/50: aplica `cara` o `cruz` (listas de efectos) con animación de moneda |
 | `pelea` | como Pelea de Hearthstone: todos los esbirros hacen parkour y solo uno al azar sobrevive |
@@ -204,7 +204,7 @@ Diseño de Mario. Marco azul (provisional). Cruit es no binario: toda carta con 
 |---|---|---|---|---|
 | Héroe Cruit | — | 50 | Poder (2): invoca un Coco 1/1 con carga que muere al final del turno y obtenés una Leche | hecho (retrato con fondo de leche) |
 | Coco ⚧ (ficha, el hámster) | — | 1/1 | Carga. Muere al final de tu turno | hecho |
-| Cruit Intolerante a la Lactosa ⚧ (tribu Cruit) | 2 | 1/3 | Grito y último aliento: 1 de daño a todos los demás esbirros (vómito) | hecho |
+| Cruit Intolerante a la Lactosa ⚧ (tribu Cruit) | 2 | 1/3 | Grito y último aliento: 2 de daño a todos los demás esbirros (vómito) | hecho |
 | Lechero ♂ | 1 | 1/1 | Grito: obtenés una Leche | hecho |
 | Leche (hechizo) | 1 | — | +1/+1 a un esbirro; si es un Cruit, activa su grito y su último aliento | hecho |
 | Nullscape (hechizo) | 4 | — | Todos los esbirros hacen parkour; solo uno al azar sobrevive | hecho |
@@ -213,7 +213,7 @@ Diseño de Mario. Marco azul (provisional). Cruit es no binario: toda carta con 
 | **Coco Supremo** ⚧ (legendaria) | 9 | 7/5 | Grito: repite los gritos y últimos alientos de los Cruit que jugaste esta partida, y se da una Leche por cada Leche que usaste en tus esbirros. Orden: Leches y demás, después los que crecen por cada cosa (Excel) y al último los que pegan según su ataque (Baño) | hecho |
 | Estreñido Cruit ⚧ | 1 | 1/2 | Grito y último aliento: mete 2 Cacas en el mazo del rival (al robarlas: 2 de daño y roba otra) | hecho |
 | Cruit Sangre ⚧ | 2 | 2/2 | Se fusiona con tus otros Cruit Sangre (suma stats, ×N en la carta). Al final de tu turno, roba 1 de vida por cada Sangre fusionada al enemigo con menos vida | hecho |
-| Cruit Vampiro ⚧ | 5 | 3/3 | Tus Cruit roban +1 de vida. Grito: invoca 2 Cruit Sangre (se fusionan en una, con animación) | hecho |
+| Cruit Vampiro ⚧ | 5 | 3/3 | Tus Cruit Sangre roban el doble de vida. Grito: invoca 2 Cruit Sangre (se fusionan en una, con animación) | hecho |
 | Caca (ficha) | 0 | — | Se lanza al robarla: 2 de daño a quien la roba y roba otra | hecho |
 | Cruit Tostadora ⚧ | 1 | 1/2 | Grito: robás una carta | hecho |
 | Cruit Baño ⚧ | 2 | 4/2 | Grito: inflige daño igual a su ataque, repartido al azar entre todos los enemigos (chorros de agua) | hecho |

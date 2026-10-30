@@ -335,19 +335,19 @@ for (let k = 0; k < 20; k++) {
 // --- Cruit: Intolerante, Lechero, Leche, Nullscape ---
 {
   const e = nueva(42, ["cruit", "cruit"]); const s = e.turno, r = 1 - s;
-  e.j[s].tablero = []; e.j[r].tablero = [{ uid: "rv", id: "x", tribu: null, ataque: 1, vida: 5, vidaMax: 5, ataques: 0 }];
+  e.j[s].tablero = []; e.j[r].tablero = [{ uid: "rv", id: "x", tribu: null, ataque: 1, vida: 9, vidaMax: 9, ataques: 0 }];
   preparar(e, s, ["lechero", "cruit_intolerante", "leche", "nullscape"]);
   M.aplicar(e, s, { t: "jugar", uid: "t0" }, db, 0);
   assert.ok(e.j[s].mano.some((c) => c.id === "leche" && c.uid !== "t2"), "Lechero da una Leche");
   const res = M.aplicar(e, s, { t: "jugar", uid: "t1" }, db, 0);
   assert.ok(res.ev.some((x) => x.e === "fx" && x.fx === "vomito"));
-  assert.equal(e.j[r].tablero[0].vida, 4);
+  assert.equal(e.j[r].tablero[0].vida, 7);
   assert.ok(!e.j[s].tablero.some((m) => m.id === "lechero"), "Lechero 1/1 muere con el vómito");
   assert.equal(e.j[s].mano.filter((c) => c.id === "leche").length, 2, "y ya no da Leche al morir");
   assert.equal(e.j[s].tablero.find((m) => m.id === "cruit_intolerante").vida, 3, "no se pega a si mismo");
   const cru = e.j[s].tablero.find((m) => m.id === "cruit_intolerante").uid;
   M.aplicar(e, s, { t: "jugar", uid: "t2", objetivo: cru }, db, 0);
-  assert.equal(e.j[r].tablero[0].vida, 2, "la Leche en el Intolerante repite el grito y el último aliento");
+  assert.equal(e.j[r].tablero[0].vida, 3, "la Leche en el Intolerante repite el grito y el último aliento (2 + 2)");
   assert.equal(e.j[s].tablero.find((m) => m.id === "cruit_intolerante").ataque, 2);
   M.aplicar(e, s, { t: "jugar", uid: "t3" }, db, 0);
   assert.equal(e.j[0].tablero.length + e.j[1].tablero.length, 1, "Nullscape: solo uno sobrevive");
@@ -392,16 +392,16 @@ for (let k = 0; k < 20; k++) {
 // --- Coco Supremo: repite gritos y alientos de los Cruit jugados ---
 {
   const e = nueva(45, ["cruit", "cruit"]); const s = e.turno, r = 1 - s;
-  e.j[s].tablero = []; e.j[r].tablero = [{ uid: "rv", id: "x", tribu: null, ataque: 1, vida: 9, vidaMax: 9, ataques: 0 }];
+  e.j[s].tablero = []; e.j[r].tablero = [{ uid: "rv", id: "x", tribu: null, ataque: 1, vida: 30, vidaMax: 30, ataques: 0 }];
   preparar(e, s, ["cruit_intolerante", "cruit_intolerante", "coco_supremo"]);
   M.aplicar(e, s, { t: "jugar", uid: "t0" }, db, 0);
   M.aplicar(e, s, { t: "jugar", uid: "t1" }, db, 0);
-  assert.equal(e.j[r].tablero[0].vida, 7);
+  assert.equal(e.j[r].tablero[0].vida, 26);
   e.j[s].mana = 10;
   const res = M.aplicar(e, s, { t: "jugar", uid: "t2" }, db, 0);
   assert.ok(!res.error, res.error);
   assert.equal(res.ev.filter((x) => x.e === "repite").length, 2);
-  assert.equal(e.j[r].tablero[0].vida, 1, "grito y último aliento repetidos de los dos (4 vómitos) y, al morir los Intolerantes, 2 más");
+  assert.equal(e.j[r].tablero[0].vida, 26 - 8 - 4, "grito y último aliento repetidos de los dos (4 vómitos de 2) y, al morir los Intolerantes, 2 más");
 }
 {
   const e = nueva(46, ["cruit", "cruit"]); const s = e.turno;
@@ -455,10 +455,10 @@ for (let k = 0; k < 20; k++) {
   e.j[s].vida = 20;
   const vr = e.j[r].vida, mr = e.j[r].mano.length;
   const res = M.aplicar(e, s, { t: "fin" }, db, 0);
-  // Sangre fusionada (×2) con un Vampiro: roba 1×2 + 1 al enemigo con menos vida (el héroe rival, sin esbirros)
-  assert.equal(e.j[s].vida, 23, "+3 de vida");
+  // Sangre fusionada (×2) con un Vampiro: roba 1×2, doble por el Vampiro = 4, al enemigo con menos vida (el héroe rival, sin esbirros)
+  assert.equal(e.j[s].vida, 24, "+4 de vida");
   assert.ok(res.ev.some((x) => x.e === "se_lanza"), "el rival robó una caca al empezar su turno");
-  assert.equal(e.j[r].vida, vr - 3 - 2, "3 robados + 2 de la caca");
+  assert.equal(e.j[r].vida, vr - 4 - 2, "4 robados + 2 de la caca");
   assert.equal(e.j[r].mano.length, mr + 1, "la caca no va a la mano, roba otra");
   e.j[s].vida = M.CONFIG.VIDA_HEROE - 1; e.turno = s; M.aplicar(e, s, { t: "fin" }, db, 0);
   assert.ok(e.j[s].vida > M.CONFIG.VIDA_HEROE && e.j[s].vidaMax === e.j[s].vida, "robar vida suma, pasa del máximo");
@@ -605,7 +605,7 @@ console.log("ok: tutorial");
   const ci = e.j[s].tablero[0]; ci.dormido = false;
   M.aplicar(e, s, { t: "atacar", de: ci.uid, a: "rv" }, db, 0);
   assert.ok(!e.j[s].tablero.length, "murió");
-  assert.equal(e.j[r].tablero.find((m) => m.uid === "rw").vida, 3, "1 del grito + 1 del último aliento");
+  assert.equal(e.j[r].tablero.find((m) => m.uid === "rw").vida, 1, "2 del grito + 2 del último aliento");
 }
 console.log("ok: intolerante");
 

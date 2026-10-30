@@ -549,15 +549,17 @@ function aplicarEfectos(estado, s, efectos, elegido, ev, db, fuente, ctx = {}) {
       continue;
     }
     if (ef.tipo === "robar_vida") {
-      // daño que se suma a la vida de tu héroe; cada Cruit Vampiro en tu mesa suma +1 (aumenta_robo_vida)
-      const extra = estado.j[s].tablero.filter((m) => m.vida > 0).reduce((t, m) => t + (db[m.id]?.aumenta_robo_vida || 0), 0);
+      // daño que se suma a la vida de tu héroe; cada esbirro tuyo con "duplica_robo_de" igual a quien roba lo duplica
+      // (Cruit Vampiro: tus Cruit Sangre roban el doble; con dos Vampiros, el cuádruple)
+      const quien = fuente && buscar(estado, fuente)?.obj.id;
+      const mult = 2 ** estado.j[s].tablero.filter((m) => m.vida > 0 && quien && db[m.id]?.duplica_robo_de === quien).length;
       for (const ref of objetivos(estado, s, ef, elegido, fuente)) {
         const t = buscar(estado, ref);
         if (!t) continue;
         const antes = t.tipo === "heroe" ? t.obj.vida : t.obj.vida, escudo = t.tipo === "esbirro" && t.obj.escudo;
         ev.push({ e: "fx", fx: "sangre", de: ref, a: "h" + s });
         const veces = ef.porApilado ? buscar(estado, fuente)?.obj.apilado || 1 : 1; // Cruit Sangre fusionada roba por cada una
-        danar(estado, ref, n * veces + extra, ev);
+        danar(estado, ref, n * veces * mult, ev);
         const quitado = escudo ? 0 : Math.max(0, antes - t.obj.vida);
         if (quitado) {
           // robar vida SUMA: puede pasar de 30 (sube la vida máxima)
