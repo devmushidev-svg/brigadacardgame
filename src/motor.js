@@ -54,6 +54,8 @@ export function cabeEsbirro(estado, s, c) {
   const p = estado.j[s];
   return p.tablero.length < CONFIG.MAX_TABLERO || (!!c?.fusionar && p.tablero.some((x) => x.id === c.id && x.vida > 0));
 }
+// cuántas veces se lanza algo con estas etiquetas: las Tareas, una vez más por cada efecto de Unislop
+const vecesTarea = (estado, s, etiquetas) => (etiquetas || []).includes("tarea") ? 1 + estado.globales.filter((g) => g.disparador === "tareas_dobles" && g.seat === s).length : 1;
 // coste de una carta concreta de la mano: el de la carta menos lo que le rebajaron (ej. Tun Astrónomo)
 export function costeCarta(estado, s, c, db) {
   return c ? Math.max(0, costeDe(estado, s, db[c.id]) - (c.rebaja || 0)) : 99;
@@ -901,8 +903,12 @@ export function aplicar(estado, s, accion, db, ahora) {
     p.poderUsado = true;
     registrar(estado, `${p.nombre} uso ${p.poder.nombre}`);
     ev.push({ e: "poder", seat: s, objetivo: accion.objetivo || null });
-    aplicarEfectos(estado, s, p.poder.efectos, accion.objetivo, ev, db, null);
-    resolverMuertes(estado, ev, db);
+    // un poder con etiquetas cuenta como esas cartas (Cruit: "Hacer la tarea" es una Tarea para Excel y Unislop)
+    for (const et of p.poder.etiquetas || []) (p.jugadosEtiqueta ||= {})[et] = (p.jugadosEtiqueta[et] || 0) + 1;
+    for (let k = 0; k < vecesTarea(estado, s, p.poder.etiquetas) && estado.fase === "jugando"; k++) {
+      aplicarEfectos(estado, s, p.poder.efectos, accion.objetivo, ev, db, null);
+      resolverMuertes(estado, ev, db);
+    }
     return { ev };
   }
 
@@ -932,7 +938,7 @@ export function aplicar(estado, s, accion, db, ahora) {
     } else if (carta.tipo === "hechizo") {
       ev.push({ e: "hechizo", seat: s, carta: carta.id, objetivo: accion.objetivo || null });
       // Unislop: por el resto de la partida tus Tareas se lanzan dos veces (una vez más por cada efecto así)
-      const veces = (carta.etiquetas || []).includes("tarea") ? 1 + estado.globales.filter((g) => g.disparador === "tareas_dobles" && g.seat === s).length : 1;
+      const veces = vecesTarea(estado, s, carta.etiquetas);
       for (let k = 0; k < veces && estado.fase === "jugando"; k++) {
         if (k) ev.push({ e: "repite", seat: s, carta: carta.id });
         aplicarEfectos(estado, s, carta.efectos, accion.objetivo, ev, db, null);

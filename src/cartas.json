@@ -1305,14 +1305,21 @@
    "clase": "cruit",
    "marco": "linear-gradient(160deg, #7fb2ff, #2f62c4 40%, #16306e 80%, #2f62c4)",
    "poder": {
-    "nombre": "Coco",
+    "nombre": "Hacer la tarea",
     "coste": 1,
-    "texto": "Invoca un Coco 1/1 con carga que muere al final del turno.",
-    "arte": "/arte/poder_cruit.webp",
+    "etiquetas": [
+     "tarea"
+    ],
+    "arte": "/arte/tarea_uni.webp",
+    "texto": "Recibís 2 de daño y robás una carta. Cuenta como Tarea.",
     "efectos": [
      {
-      "tipo": "invocar",
-      "carta": "coco",
+      "tipo": "dano",
+      "objetivo": "heroe_propio",
+      "cantidad": 2
+     },
+     {
+      "tipo": "robar",
       "cantidad": 1
      }
     ]

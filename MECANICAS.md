@@ -33,7 +33,7 @@ Se definen en `heroes` dentro de `src/cartas.json`:
 ```
 
 - **Color de clase (`marco`):** como en Hearthstone, las cartas de clase usan el marco del color de su héroe (Tun = verde selva); las neutrales son de piedra gris y dicen "Neutral". La misión mantiene su marco dorado.
-- **Poder de héroe:** una vez por turno; usa los mismos efectos que las cartas, y puede pedir objetivo.
+- **Poder de héroe:** una vez por turno; usa los mismos efectos que las cartas, y puede pedir objetivo. Con `etiquetas` cuenta como esas cartas (ej. `["tarea"]`).
 
 ## Imágenes
 
@@ -201,7 +201,7 @@ Diseño de Mario. Marco azul (provisional). Cruit es no binario: toda carta con 
 
 | Carta | Coste | Stats | Efecto | Estado |
 |---|---|---|---|---|
-| Héroe Cruit | — | 50 | Poder (1): invoca un Coco 1/1 con carga que muere al final del turno | hecho (retrato con fondo de leche) |
+| Héroe Cruit | — | 50 | Poder (1) "Hacer la tarea": recibís 2 de daño y robás una carta. Cuenta como Tarea (Cruit Excel la cuenta; con Unislop se lanza dos veces) | hecho (retrato con fondo de leche) |
 | Coco ⚧ (ficha, el hámster) | — | 1/1 | Carga. Muere al final de tu turno | hecho |
 | Cruit Intolerante a la Lactosa ⚧ (tribu Cruit) | 2 | 1/3 | Grito y último aliento: 2 de daño a todos los demás esbirros (vómito) | hecho |
 | Lechero ♂ | 1 | 1/1 | Grito: obtenés una Leche | hecho |
@@ -257,4 +257,4 @@ Con los mazos de 20, bot contra bot, Cruit le ganaba a Tun ~68% (era ~95% antes 
 - transformar esbirros
 - reinvocar los que murieron esta partida
 
-Con 50 de vida y mazos de 40 (poder de Cruit de 1 maná), bot contra bot: Cruit gana ~45%.
+Con 50 de vida y mazos de 40, bot contra bot: Cruit gana ~45% con el poder del Coco y ~48% con "Hacer la tarea".

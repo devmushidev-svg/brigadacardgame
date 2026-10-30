@@ -314,22 +314,24 @@ for (let k = 0; k < 20; k++) {
   assert.deepEqual(todas.sort(), cartas.slice().sort(), "usa el mazo elegido");
 }
 
-// --- Cruit: el poder invoca un Coco con carga que muere al final del turno ---
+// --- Cruit: el poder "Hacer la tarea": 2 de daño a tu héroe, roba una carta y cuenta como Tarea ---
 {
   const e = M.crearPartida(db, 41); e.j[0].nombre = "A"; e.j[1].nombre = "B";
   e.j[0].heroe = "cruit"; e.j[1].heroe = "cruit";
   M.empezar(e, db, 0, heroes, false);
-  const s = e.turno, r = 1 - s;
-  assert.equal(e.j[s].heroe, "cruit");
-  e.j[s].mana = 1; e.j[r].tablero = [];
+  const s = e.turno;
+  e.j[s].mana = 1;
+  const v = e.j[s].vida, mano = e.j[s].mano.length;
+  assert.ok(!M.aplicar(e, s, { t: "poder" }, db, 0).error);
+  assert.equal(e.j[s].mana, 0, "cuesta 1");
+  assert.equal(e.j[s].vida, v - 2); assert.equal(e.j[s].mano.length, mano + 1);
+  assert.equal(e.j[s].jugadosEtiqueta.tarea, 1, "cuenta como Tarea");
+  // con Unislop se lanza dos veces (y cuenta una vez)
+  e.globales.push({ disparador: "tareas_dobles", efectos: [], seat: s });
+  e.j[s].poderUsado = false; e.j[s].mana = 1;
   M.aplicar(e, s, { t: "poder" }, db, 0);
-  assert.equal(e.j[s].mana, 0, "el poder cuesta 1");
-  const coco = e.j[s].tablero.find((m) => m.id === "coco");
-  assert.ok(coco && M.puedeAtacar(coco), "carga");
-  M.aplicar(e, s, { t: "atacar", de: coco.uid, a: "h" + r }, db, 0);
-  assert.equal(e.j[r].vida, M.CONFIG.VIDA_HEROE - 1);
-  M.aplicar(e, s, { t: "fin" }, db, 0);
-  assert.ok(!e.j[s].tablero.some((m) => m.id === "coco"), "muere al final del turno");
+  assert.equal(e.j[s].vida, v - 2 - 4); assert.equal(e.j[s].mano.length, mano + 3);
+  assert.equal(e.j[s].jugadosEtiqueta.tarea, 2);
 }
 
 // --- Cruit: Intolerante, Lechero, Leche, Nullscape ---
