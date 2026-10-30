@@ -4,7 +4,7 @@
 // Las mecánicas están documentadas en MECANICAS.md.
 
 export const CONFIG = {
-  VIDA_HEROE: 30,
+  VIDA_HEROE: 50,
   MAX_MANA: 10,
   MAX_TABLERO: 7,
   MAX_MANO: 10,
@@ -48,6 +48,10 @@ export function costeDe(estado, s, c) {
   }
   if (d?.por === "tribu_muertos") coste -= estado.muertosTribu?.[d.tribu] || 0;
   return Math.max(0, coste);
+}
+// coste de una carta concreta de la mano: el de la carta menos lo que le rebajaron (ej. Tun Astrónomo)
+export function costeCarta(estado, s, c, db) {
+  return c ? Math.max(0, costeDe(estado, s, db[c.id]) - (c.rebaja || 0)) : 99;
 }
 // cartas que pueden salir al azar o en un descubrir
 const pozo = (db, filtro) => Object.values(db).filter((c) => !c.token && c.tipo === "esbirro" && cumpleFiltro(c, filtro));
@@ -485,6 +489,15 @@ function aplicarEfectos(estado, s, efectos, elegido, ev, db, fuente, ctx = {}) {
       ev.push({ e: "baraja", seat: lado, carta: ef.carta, n });
       continue;
     }
+    if (ef.tipo === "rebajar") {
+      // una carta de tu mano (del filtro) al azar cuesta N menos (Tun Astrónomo)
+      const ok = estado.j[s].mano.filter((c) => db[c.id] && cumpleFiltro(db[c.id], ef.filtro) && costeCarta(estado, s, c, db) > 0);
+      if (!ok.length) continue;
+      const c = elegir(estado, ok);
+      c.rebaja = (c.rebaja || 0) + n;
+      ev.push({ e: "rebaja", seat: s, uid: c.uid, n });
+      continue;
+    }
     if (ef.tipo === "repartir") {
       // daño repartido al azar de a 1 punto entre los enemigos vivos; "cantidad": "ataque" usa el ataque de quien lo lanza (Cruit Baño)
       const total = ef.cantidad === "ataque" ? buscar(estado, fuente)?.obj.ataque || 0 : n;
@@ -619,7 +632,7 @@ function aplicarEfectos(estado, s, efectos, elegido, ev, db, fuente, ctx = {}) {
       continue;
     }
     if (ef.tipo === "global") {
-      estado.globales.push({ disparador: ef.disparador, efectos: ef.efectos, origen: ef.origen || null });
+      estado.globales.push({ disparador: ef.disparador, tribu: ef.tribu || null, efectos: ef.efectos, origen: ef.origen || null, seat: s });
       ev.push({ e: "global", seat: s });
       continue;
     }
@@ -695,8 +708,12 @@ function resolverMuertes(estado, ev, db) {
       if (c && c.aliento) aplicarEfectos(estado, s, c.aliento, null, ev, db, null);
     }
     // "cada vez que muere un <tribu>": se activa en los esbirros vivos de los dos lados
-    for (const { m } of muertos) {
+    for (const { s, m } of muertos) {
       if (!m.tribu) continue;
+      // efectos por el resto de la partida: "cada vez que muere uno de tus <tribu>" (Tun Iguana)
+      for (const g of estado.globales) {
+        if (g.disparador === "muere_tribu" && g.seat === s && g.tribu === m.tribu && estado.fase === "jugando") aplicarEfectos(estado, s, g.efectos, null, ev, db, null);
+      }
       for (const s2 of [0, 1]) {
         for (const v of [...estado.j[s2].tablero]) {
           const cm = db[v.id]?.cuando_muere;
@@ -846,7 +863,7 @@ export function aplicar(estado, s, accion, db, ahora) {
     if (i < 0) return { error: "esa carta no esta en tu mano" };
     const carta = db[p.mano[i].id];
     if (!carta) return { error: "carta desconocida" };
-    const coste = costeDe(estado, s, carta);
+    const coste = costeCarta(estado, s, p.mano[i], db);
     if (coste > p.mana) return { error: "no te alcanza el mana" };
     if (carta.tipo === "esbirro" && p.tablero.length >= CONFIG.MAX_TABLERO) return { error: "tablero lleno" };
     if (carta.tipo === "mision" && p.mision) return { error: "ya tenes una mision activa" };
@@ -886,6 +903,12 @@ export function aplicar(estado, s, accion, db, ahora) {
     if (!puedeAtacar(m)) return { error: m.dormido ? "acaba de entrar, espera un turno" : "no puede atacar" };
     if (!objetivosAtaque(estado, s, m).includes(accion.a)) return { error: m.soloEsbirros && accion.a[0] === "h" ? "con acometida solo puede atacar esbirros este turno" : "tenes que atacar a los de provocar" };
     m.ataques++;
+    // "cada vez que ataca" (Tun Astrónomo)
+    const alAtacar = db[m.id]?.al_atacar;
+    if (alAtacar) {
+      ev.push({ e: "dispara", uid: m.uid, por: "ataque" });
+      aplicarEfectos(estado, s, alAtacar, null, ev, db, m.uid);
+    }
     // "cuando uno de tus <tribu> ataca": se buffea antes del golpe (ej. Tun Amor)
     for (const v of [...p.tablero]) {
       const ca = db[v.id]?.cuando_ataca_aliado;
@@ -955,7 +978,7 @@ export function vista(estado, yo, db0 = {}) {
         const d = db0[c.id], mej = d?.tipo === "esbirro" && d.tribu && p.mejoras?.[d.tribu];
         const ef = d && [...(d.efectos || []), ...(d.grito || [])].find((x) => x.bonus);
         const pc = d && [...(d.efectos || []), ...(d.grito || [])].find((x) => x.porCada)?.porCada;
-        return { ...c, coste: d ? costeDe(estado, s, d) : undefined, ...(mej ? { ataque: d.ataque + mej.ataque, vida: d.vida + mej.vida } : {}),
+        return { ...c, coste: d ? costeCarta(estado, s, c, db0) : undefined, ...(mej ? { ataque: d.ataque + mej.ataque, vida: d.vida + mej.vida } : {}),
           ...(ef ? { cantidad: cantidadDe(estado, s, ef) } : {}), ...(pc ? { veces: contarPorCada(estado, s, pc) } : {}) };
       }) : undefined,
       mejoras: p.mejoras || null,

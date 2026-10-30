@@ -168,7 +168,7 @@ const PALABRAS = [
   { n: "Viento furioso", re: "viento furioso", clave: "doble", d: "Puede atacar dos veces por turno." },
   { n: "No puede atacar", re: "no puede atacar", clave: "no_ataca", d: "Este esbirro nunca ataca." },
   { n: "Descubre", re: "descubre|descubrir", d: "Elegís una de tres cartas al azar y va a tu mano." },
-  { n: "Robar vida", re: "roban? (?:\\+?\\d+ )?de vida", d: "Hace ese daño y lo suma a la vida de tu héroe (puede pasar de 30)." },
+  { n: "Robar vida", re: "roban? (?:\\+?\\d+ )?de vida", d: "Hace ese daño y lo suma a la vida de tu héroe (puede pasar de tu vida máxima)." },
   { n: "Activar", re: "activan?|activar", d: "Repite el grito de batalla y el último aliento del esbirro." },
   { n: "Tarea", re: "tareas?", d: "Hechizo universitario. Algunas cartas (como Cruit Excel) se hacen más fuertes por cada Tarea que lanzaste." },
   { n: "Misión", re: "misión", d: "Empieza siempre en tu mano. Al jugarla queda activa y, cuando cumplís el objetivo, recibís la recompensa." },
@@ -671,7 +671,7 @@ function pantallaTutorial(paso = 0) {
   const pal = (n) => PALABRAS.find((p) => p.n === n);
   const PASOS = [
     { t: "¿De qué se trata?", h: `<p>Puto Cartas es un juego de cartas 1 contra 1, como Hearthstone.</p>
-      <p>Cada jugador es un <b>héroe</b> con <b>30 de vida</b>. <b>Ganás cuando la vida del héroe rival llega a 0.</b></p>
+      <p>Cada jugador es un <b>héroe</b> con <b>50 de vida</b>. <b>Ganás cuando la vida del héroe rival llega a 0.</b></p>
       <p>Para eso jugás cartas: <b>esbirros</b> que pelean en la mesa y <b>hechizos</b> que hacen efectos.</p>
       <div class="tuto-fila">${Object.values(HEROES).map((h) => `<div class="tuto-heroe"><div class="mazo-heroe">${artHTML(h.arte)}</div><b>${esc(h.nombre)}</b></div>`).join("")}</div>` },
     { t: "El maná", h: `<p>Las cartas cuestan <b>maná</b> (el número azul arriba a la izquierda de cada carta).</p>

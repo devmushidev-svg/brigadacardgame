@@ -45,20 +45,20 @@ for (let k = 0; k < 50; k++) {
     assert.ok(!todo.includes("tun_maestro"), "la recompensa no va en el mazo");
   }
 }
-// --- mision: invoca 15 Tun (con el poder y Choza de Monos) -> Tun Maestro a la mano ---
+// --- mision: invoca 20 Tun (con el poder y Choza de Monos) -> Tun Maestro a la mano ---
 {
   const e = nueva(5); const s = e.turno;
   preparar(e, s, ["tun_awarded"]);
   M.aplicar(e, s, { t: "jugar", uid: "t0" }, db, 0);
-  assert.equal(e.j[s].mision.meta, 15);
+  assert.equal(e.j[s].mision.meta, 20);
   let res;
-  for (let k = 0; k < 15; k++) {
+  for (let k = 0; k < 20; k++) {
     if (e.j[s].tablero.length >= 7) e.j[s].tablero = []; // mesa llena: los que no entran no cuentan
     e.j[s].poderUsado = false; e.j[s].mana = 10;
     res = M.aplicar(e, s, { t: "poder" }, db, 0);
     assert.ok(!res.error, res.error);
   }
-  assert.equal(e.j[s].mision.progreso, 15);
+  assert.equal(e.j[s].mision.progreso, 20);
   assert.ok(e.j[s].mision.completa && res.ev.some((x) => x.e === "mision_completa"));
   assert.ok(e.j[s].mano.some((c) => c.id === "tun_maestro"), "Tun Maestro en la mano");
 }
@@ -85,7 +85,7 @@ for (let k = 0; k < 50; k++) {
 // --- mazo completo aunque haya pocas cartas diseñadas ---
 for (let k = 0; k < 20; k++) {
   const e = nueva(300 + k);
-  for (const p of e.j) assert.equal(p.mazo.length + p.mano.filter((c) => c.id !== "moneda" && c.id !== "tun_awarded").length, M.CONFIG.TAM_MAZO, "mazo de 30");
+  for (const p of e.j) assert.equal(p.mazo.length + p.mano.filter((c) => c.id !== "moneda" && c.id !== "tun_awarded").length, M.CONFIG.TAM_MAZO, "mazo completo");
 }
 // --- Tun Puto: cada Tun que muere pega 1 a un enemigo ---
 // Mauro Sosa: roba una mujer de la mano rival (y no toca lo demás)
@@ -171,30 +171,25 @@ for (let k = 0; k < 20; k++) {
   e.j[s].mana = 5;
   assert.ok(!M.aplicar(e, s, { t: "jugar", uid: "t0" }, db, 0).error); assert.equal(e.j[s].mana, 0);
 }
-// --- Tun Mujer: tus Tun la atacan y cada golpe hace 1 a un enemigo ---
+// --- Tun Mujer: transforma a tus otros esbirros en Tun Puto ---
 {
   const e = nueva(23); const s = e.turno, r = 1 - s;
   preparar(e, s, ["tun_mujer"]);
-  e.j[r].tablero = [];
+  e.j[r].tablero = [{ uid: "rv", id: "x", tribu: null, ataque: 1, vida: 9, vidaMax: 9, ataques: 0 }];
   e.j[s].tablero = [0, 1, 2].map((k) => ({ uid: "q" + k, id: "tun", tribu: "tun", ataque: 1, vida: 1, vidaMax: 1, ataques: 0 }));
-  const vidaRival = e.j[r].vida;
   const res = M.aplicar(e, s, { t: "jugar", uid: "t0" }, db, 0);
   assert.ok(!res.error, res.error);
-  const mujer = e.j[s].tablero.find((m) => m.id === "tun_mujer");
-  assert.equal(mujer.vida, 5, "3 Tun le pegaron 1 cada uno");
-  assert.equal(tuns(e, s), 1, "los Tun murieron contra ella (2 de ataque)");
-  assert.equal(e.j[r].vida, vidaRival - 6, "3 golpes = 2 de daño cada uno al rival");
+  assert.deepEqual(e.j[s].tablero.map((m) => m.id).sort(), ["tun_mujer", "tun_puto", "tun_puto", "tun_puto"]);
+  assert.equal(e.j[r].tablero[0].id, "x", "los del rival no se tocan");
 }
-// --- Tun Maestro: 5 Tun al azar, el jugador elige a quién lanza cada uno ---
+// --- Tun Maestro: llena la mesa de Tun al azar ---
 {
   const e = nueva(24); const s = e.turno, r = 1 - s;
   preparar(e, s, ["tun_maestro"]);
   e.j[s].tablero = []; e.j[r].tablero = [];
   M.aplicar(e, s, { t: "jugar", uid: "t0" }, db, 0);
-  assert.equal(e.j[s].tablero.length, 6); assert.equal(e.pendiente.tipo, "disparar");
-  let n = 0;
-  while (e.pendiente && n++ < 10) assert.ok(!M.aplicar(e, s, { t: "elegir", a: "h" + r }, db, 0).error);
-  assert.ok(e.j[r].vida < 30 - 4 || e.fase === "fin", "los 5 le pegaron a la cara");
+  assert.equal(e.j[s].tablero.length, 7, "mesa llena");
+  assert.ok(e.j[s].tablero.every((m) => m.tribu === "tun"));
 }
 
 // --- Novia de Tun: al morir invoca 2 Tun y tus Tun tienen +1 de ataque (los de ahora, los de la mano y los que vengan) ---
@@ -218,19 +213,20 @@ for (let k = 0; k < 20; k++) {
   M.aplicar(e, s, { t: "jugar", uid: "t1" }, db, 0);
   assert.equal(e.j[s].tablero.find((m) => m.id === "tun_brawl").ataque, 3, "los nuevos salen con +1");
 }
-// --- Tun Mastermind: 1 menos por Tun muerto, acometida, +1 de ataque a tus Tun ---
+// --- Tun Mastermind: 1 menos por Tun muerto, acometida, invoca 3 Tun, +1 de ataque a tus Tun ---
 {
   const e = nueva(32); const s = e.turno, r = 1 - s;
   e.j[s].tablero = []; e.j[r].tablero = [];
   preparar(e, s, ["tun_mastermind"]);
-  assert.equal(M.costeDe(e, s, db.tun_mastermind), 25);
-  e.muertosTribu = { tun: 18 };
+  assert.equal(M.costeDe(e, s, db.tun_mastermind), 15);
+  e.muertosTribu = { tun: 8 };
   assert.equal(M.costeDe(e, s, db.tun_mastermind), 7);
   e.j[s].mana = 7;
   e.j[r].tablero = [{ uid: "rv", id: "x", tribu: null, ataque: 1, vida: 9, vidaMax: 9, ataques: 0 }];
   assert.ok(!M.aplicar(e, s, { t: "jugar", uid: "t0" }, db, 0).error);
   const mm = e.j[s].tablero.find((m) => m.id === "tun_mastermind");
   assert.equal(mm.ataque, 7, "se da +1 a si mismo (es Tun)");
+  assert.equal(tuns(e, s), 4, "él y 3 Tun");
   assert.ok(M.aplicar(e, s, { t: "atacar", de: mm.uid, a: "h" + r }, db, 0).error, "acometida: no a la cara");
   assert.ok(!M.aplicar(e, s, { t: "atacar", de: mm.uid, a: "rv" }, db, 0).error, "acometida: si a esbirros");
 }
@@ -328,7 +324,7 @@ for (let k = 0; k < 20; k++) {
   const coco = e.j[s].tablero.find((m) => m.id === "coco");
   assert.ok(coco && M.puedeAtacar(coco), "carga");
   M.aplicar(e, s, { t: "atacar", de: coco.uid, a: "h" + r }, db, 0);
-  assert.equal(e.j[r].vida, 29);
+  assert.equal(e.j[r].vida, M.CONFIG.VIDA_HEROE - 1);
   M.aplicar(e, s, { t: "fin" }, db, 0);
   assert.ok(!e.j[s].tablero.some((m) => m.id === "coco"), "muere al final del turno");
 }
@@ -383,7 +379,7 @@ for (let k = 0; k < 20; k++) {
   if (mon.resultado === "cara") assert.equal(e.j[r].vida, vr - 6); else assert.equal(e.j[s].vida, vs - 3);
   const antes = e.j[s].vida;
   M.aplicar(e, s, { t: "fin" }, db, 0);
-  assert.equal(e.j[s].vida, Math.min(30, antes + 3), "Elliot cura al heroe herido");
+  assert.equal(e.j[s].vida, Math.min(M.CONFIG.VIDA_HEROE, antes + 3), "Elliot cura al heroe herido");
 }
 
 // --- Coco Supremo: repite gritos y alientos de los Cruit jugados ---
@@ -432,8 +428,8 @@ for (let k = 0; k < 20; k++) {
   assert.ok(res.ev.some((x) => x.e === "se_lanza"), "el rival robó una caca al empezar su turno");
   assert.equal(e.j[r].vida, vr - 4 - 2, "4 robados + 2 de la caca");
   assert.equal(e.j[r].mano.length, mr + 1, "la caca no va a la mano, roba otra");
-  e.j[s].vida = 29; e.turno = s; M.aplicar(e, s, { t: "fin" }, db, 0);
-  assert.ok(e.j[s].vida > 30 && e.j[s].vidaMax === e.j[s].vida, "robar vida suma, pasa de 30");
+  e.j[s].vida = M.CONFIG.VIDA_HEROE - 1; e.turno = s; M.aplicar(e, s, { t: "fin" }, db, 0);
+  assert.ok(e.j[s].vida > M.CONFIG.VIDA_HEROE && e.j[s].vidaMax === e.j[s].vida, "robar vida suma, pasa del máximo");
 }
 
 // --- Cruit Tostadora, Baño y Vaca ---
@@ -441,7 +437,7 @@ for (let k = 0; k < 20; k++) {
   const e = nueva(48, ["cruit", "cruit"]); const s = e.turno, r = 1 - s;
   e.j[s].tablero = []; e.j[r].tablero = [{ uid: "rv", id: "x", tribu: null, ataque: 9, vida: 20, vidaMax: 20, ataques: 0 }];
   preparar(e, s, ["cruit_tostadora", "cruit_bano", "cruit_vaca"]);
-  const danoTotal = () => (30 - e.j[r].vida) + (20 - e.j[r].tablero[0].vida);
+  const danoTotal = () => (M.CONFIG.VIDA_HEROE - e.j[r].vida) + (20 - e.j[r].tablero[0].vida);
   M.aplicar(e, s, { t: "jugar", uid: "t0" }, db, 0);
   assert.equal(e.j[s].mano.length, 3, "tostadora roba");
   M.aplicar(e, s, { t: "jugar", uid: "t1" }, db, 0);
@@ -580,3 +576,50 @@ console.log("ok: tutorial");
   assert.equal(e.j[r].tablero.find((m) => m.uid === "rw").vida, 3, "1 del grito + 1 del último aliento");
 }
 console.log("ok: intolerante");
+
+// --- Tun Guapo: provocar; cada vez que recibe daño invoca un Tun ---
+{
+  const e = nueva(70); const s = e.turno, r = 1 - s;
+  e.j[s].tablero = []; e.j[r].tablero = [];
+  preparar(e, s, ["tun_guapo"]);
+  M.aplicar(e, s, { t: "jugar", uid: "t0" }, db, 0);
+  const g = e.j[s].tablero[0];
+  assert.ok(g.provocar);
+  e.j[r].tablero = [{ uid: "rv", id: "x", tribu: null, ataque: 1, vida: 9, vidaMax: 9, ataques: 0 }];
+  e.turno = r;
+  M.aplicar(e, r, { t: "atacar", de: "rv", a: g.uid }, db, 0);
+  assert.equal(tuns(e, s), 2, "le pegaron: invoca un Tun");
+}
+// --- Tun Iguana: tus Tun al morir invocan un Tun Zombie que ataca (aunque la Iguana muera) ---
+{
+  const e = nueva(71); const s = e.turno, r = 1 - s;
+  e.j[s].tablero = []; e.j[r].tablero = [];
+  preparar(e, s, ["tun_iguana"]);
+  M.aplicar(e, s, { t: "jugar", uid: "t0" }, db, 0);
+  e.j[s].tablero = [{ uid: "q0", id: "tun", tribu: "tun", ataque: 1, vida: 1, vidaMax: 1, ataques: 0 }]; // la Iguana ya no está
+  e.j[r].tablero = [{ uid: "rv", id: "x", tribu: null, ataque: 5, vida: 50, vidaMax: 50, ataques: 0 }];
+  const vr = e.j[r].vida;
+  e.turno = r;
+  const res = M.aplicar(e, r, { t: "atacar", de: "rv", a: "q0" }, db, 0);
+  assert.ok(!res.error && res.ev.some((x) => x.e === "invoca" && x.carta === "tun_zombie"), "sale un zombie");
+  assert.ok(res.ev.some((x) => x.e === "ataque"), "y ataca");
+  assert.ok(e.j[r].vida < vr || e.j[r].tablero[0].vida < 50, "le pegó a un enemigo");
+  assert.ok(res.ev.length < 400, "termina");
+}
+// --- Tun Astrónomo: al atacar, un Tun de tu mano cuesta 2 menos ---
+{
+  const e = nueva(72); const s = e.turno, r = 1 - s;
+  e.j[s].tablero = []; e.j[r].tablero = [];
+  preparar(e, s, ["tun_astronomo", "tun_amor", "mascotas_tun"]);
+  M.aplicar(e, s, { t: "jugar", uid: "t0" }, db, 0);
+  const a = e.j[s].tablero[0]; a.dormido = false;
+  M.aplicar(e, s, { t: "atacar", de: a.uid, a: "h" + r }, db, 0);
+  const amor = e.j[s].mano.find((c) => c.id === "tun_amor");
+  assert.equal(M.costeCarta(e, s, amor, db), db.tun_amor.coste - 2, "el Tun de la mano cuesta 2 menos");
+  assert.equal(M.costeCarta(e, s, e.j[s].mano.find((c) => c.id === "mascotas_tun"), db), db.mascotas_tun.coste, "lo que no es Tun no cambia");
+  assert.equal(M.vista(e, s, db).j[s].mano.find((c) => c.id === "tun_amor").coste, db.tun_amor.coste - 2, "se ve en la mano");
+  e.j[s].mana = db.tun_amor.coste - 2;
+  assert.ok(!M.aplicar(e, s, { t: "jugar", uid: amor.uid }, db, 0).error, "se juega con el descuento");
+  assert.equal(e.j[s].mana, 0);
+}
+console.log("ok: cartas nuevas de Tun");

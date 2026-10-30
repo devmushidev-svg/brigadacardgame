@@ -10,7 +10,7 @@ Meta actual: **100 cartas**. Todos los personajes hasta ahora son hombres salvo 
 
 | Regla | Valor |
 |---|---|
-| Vida del héroe | 30 |
+| Vida del héroe | 50 |
 | Maná | sube 1 por turno, máximo 10 |
 | Mano | máximo 10 (si robás con la mano llena, la carta se quema) |
 | Mesa | máximo 7 esbirros por lado |
@@ -85,8 +85,9 @@ En el texto de las cartas, las palabras clave salen en **negrita** y al ver la c
 | `cuando_ataca_aliado` | `{ "tribu": "tun", "ataque": 1, "vida": 1 }`: cada vez que uno de tus esbirros de esa tribu ataca, gana esos stats antes del golpe |
 | `al_robarse` | (en la carta) se lanza sola cuando la robás: no va a la mano y robás otra (Caca, como las plagas del Rey Exánime) |
 | `al_recibir_dano` | cada vez que este esbirro recibe daño (aunque muera por ese golpe) |
+| `al_atacar` | cada vez que este esbirro ataca, antes del golpe (Tun Astrónomo) |
 | `cuando_muere` | `{ "tribu": "tun", "efectos": [...] }`: cada vez que muere un esbirro de esa tribu (de cualquier lado) |
-| efecto `global` | por el resto de la partida, aunque la carta muera (ej. `al_robar`) |
+| efecto `global` | por el resto de la partida, aunque la carta muera: `al_robar` (Panamá, para quien roba) o `muere_tribu` con `tribu` (cada vez que muere uno de TUS esbirros de esa tribu: Tun Iguana) |
 
 ## Efectos
 
@@ -108,8 +109,9 @@ En el texto de las cartas, las palabras clave salen en **negrita** y al ver la c
 | `atraer_ataques` | tus otros esbirros (del `filtro`) atacan a esta carta, uno por uno, con choque normal |
 | `repetir_jugados` | repite los gritos y últimos alientos de las cartas del `filtro` que jugaste esta partida, en orden (Coco Supremo). Como Shudderwock: los efectos salen de quien los repite, así que un "gana +3/+3" lo buffea a él |
 | `barajar` | mete N copias de `carta` en lugares al azar del mazo (`lado: "enemigo"` = del rival) |
+| `rebajar` | una carta de tu mano del `filtro` al azar cuesta `cantidad` menos (se ve en verde en la mano) |
 | `repartir` | daño de a 1 punto a enemigos vivos al azar (héroe o esbirros), `cantidad` veces; `"cantidad": "ataque"` usa el ataque actual de quien lo lanza (Cruit Baño; con Leche pega más, y si lo repite Coco Supremo usa el ataque de Coco) |
-| `robar_vida` | daño que se **suma** a la vida de tu héroe (puede pasar de 30, sube la vida máxima); cada esbirro tuyo con `aumenta_robo_vida` suma ese número (Cruit Vampiro) |
+| `robar_vida` | daño que se **suma** a la vida de tu héroe (puede pasar de la vida máxima y la sube); cada esbirro tuyo con `aumenta_robo_vida` suma ese número (Cruit Vampiro) |
 | `dar_azar` | te da N cartas distintas al azar de las que cumplen el `filtro` (Unislop) |
 | `moneda` | 50/50: aplica `cara` o `cruz` (listas de efectos) con animación de moneda |
 | `pelea` | como Pelea de Hearthstone: todos los esbirros hacen parkour y solo uno al azar sobrevive |
@@ -152,24 +154,27 @@ Diseño de Mario. Arquetipo: paladín molesto — llenar la mesa de Tun, buffear
 |---|---|---|---|---|
 | Héroe Tun | — | 30 | Poder (1): invoca un Tun 1/1 | hecho |
 | Tun (ficha) | 1 | 1/1 | tribu Tun | hecho |
-| **Tun the Awarded** (misión, legendaria) | 1 | — | Invoca 15 Tun (cuenta todo, incluido el poder) → Tun Maestro del Universo | hecho |
-| **Tun Maestro del Universo** (legendaria, recompensa) | 5 | 8/8 | Grito: invoca 5 Tun al azar (cualquier Tun del juego) y elegís contra quién se lanza cada uno | hecho |
+| **Tun the Awarded** (misión, legendaria) | 1 | — | Invoca 20 Tun (cuenta todo, incluido el poder) → Tun Maestro del Universo | hecho |
+| **Tun Maestro del Universo** (legendaria, recompensa) | 5 | 8/8 | Grito: llena tu mesa de Tun al azar (cualquier Tun del juego) | hecho |
 | **Panamá** (legendaria) | 1 | 1/1 | Grito: por el resto de la partida, cada vez que un jugador robe, invoca un Tun para él | hecho |
 | Tun Puto | 3 | 1/5 | Cada vez que muere un Tun (de cualquier lado), 1 de daño a un enemigo al azar | hecho |
 | Tun Tung Sahur | 1 | 1/1 | Grito: invoca un Tun 1/1 | hecho |
-| Tun Mujer ♀ | 5 | 2/8 | Grito: tus Tun la atacan. Cada vez que recibe daño, 2 de daño a un enemigo al azar | hecho |
+| Tun Mujer ♀ | 5 | 2/8 | Grito: transforma a tus otros esbirros en Tun Puto | hecho |
 | Tun Cool | 10 | 6/7 | Cuesta 1 menos por cada otro Tun en el campo (los dos lados) | hecho |
 | Novia de Tun ♀ | 3 | 2/1 | Último aliento: invoca 2 Tun y tus Tun tienen +1 de ataque por el resto de la partida | hecho |
-| Tun Mastermind | 25 | 6/3 | Acometida. 1 menos por cada Tun muerto en la partida. Grito: tus Tun tienen +1 de ataque por el resto de la partida | hecho |
+| Tun Mastermind | 15 | 6/3 | Acometida. 1 menos por cada Tun muerto en la partida. Grito: invoca 3 Tun y tus Tun tienen +1 de ataque por el resto de la partida | hecho |
 | Comida (hechizo) | 3 | — | Invoca 4 Tun 1/1 | hecho |
 | Plátano (hechizo) | 1 | — | +2/+2 y provocar a uno de tus Tun | hecho |
 | Tuna (hechizo) | 2 | — | +1 de vida a tus Tun | hecho |
 | Tunita (hechizo) | 2 | — | 1 de daño a un esbirro, +1 por cada Tun que jugaste esta partida | hecho |
 | **Funeral de Tun** (hechizo legendario) | 10 | — | Un Tun Zombie por cada Tun muerto en la partida; cada uno que no cabe da +1 de ataque o de vida a un Tun al azar | hecho |
 | Tun Zombie (ficha) | — | 1/1 | Lo invoca Funeral de Tun | hecho — **stats provisionales** |
-| **Porque Me Monean** (legendaria) | 7 | 3/5 | Grito: convierte a todos los esbirros del rival en Tun 1/1 | hecho |
+| **Porque Me Monean** (legendaria) | 6 | 3/5 | Grito: convierte a todos los esbirros del rival en Tun 1/1 | hecho |
 | Tun Amor (sin género) | 5 | 3/5 | Cada vez que uno de tus Tun ataca, gana +1/+1 | hecho |
-| Choza de Monos | 4 | 0/8 | Al final de tu turno, invoca dos Tun | hecho |
+| Choza de Monos | 3 | 0/6 | Al final de tu turno, invoca dos Tun | hecho |
+| Tun Guapo | 4 | 3/6 | Provocar. Cada vez que recibe daño, invoca un Tun 1/1 | hecho — falta imagen (😎); coste y stats propuestos |
+| Tun Iguana | 5 | 5/5 | Grito: por el resto de la partida, cada vez que muere uno de tus Tun, invoca un Tun Zombie que ataca a un enemigo al azar | hecho — falta imagen (🦎) y confirmar género |
+| Tun Astrónomo | 3 | 2/4 | Cada vez que ataca, un Tun de tu mano al azar cuesta 2 menos | hecho — falta imagen (🔭); coste y stats propuestos, falta confirmar género |
 | Tun Satánico | **5** | **3/3** | Grito: destruye a tus otros Tun y gana +2/+2 por cada uno | hecho — **coste y stats provisionales**, falta que Mario los defina |
 
 ## Neutrales
@@ -224,7 +229,7 @@ Sin mazo armado, el héroe sale al azar.
 
 **Cruit (30):** 2 Cruit Tostadora, 2 Estreñido Cruit, 2 Lechero, 2 Leche, 2 Tarea de la U, 2 Cruit Intolerante, 2 Elliot Cruit, 2 Cruit Sangre, 2 Tun Brawl Stars, 2 Chance Cruit, 2 Cruit Baño, 2 Cruit Excel, 2 Cruit Vampiro, Cruit Verity, Cruit Vaca, Unislop, Coco Supremo.
 
-Con los mazos de 20, bot contra bot, Cruit le ganaba a Tun ~68% (era ~95% antes de los nerfs a Estreñido, Cruit Baño y Cruit Sangre y el buff a Novia de Tun). Con los mazos de 30 y mulligan (Lechero 1/1, Cruit Vaca fuera de la tribu, Cruit Verity 3 de maná con Verity 5/5, Cruit Baño 4/2 de 2 de maná que reparte su ataque, Novia de Tun 3 de maná 2/1 que al morir invoca 2 Tun, Intolerante y Estreñido también al morir), Cruit gana ~46%.
+Con los mazos de 20, bot contra bot, Cruit le ganaba a Tun ~68% (era ~95% antes de los nerfs a Estreñido, Cruit Baño y Cruit Sangre y el buff a Novia de Tun). Con los mazos de 30 y mulligan (Lechero 1/1, Cruit Vaca fuera de la tribu, Cruit Verity 3 de maná con Verity 5/5, Cruit Baño 4/2 de 2 de maná que reparte su ataque, Novia de Tun 3 de maná 2/1 que al morir invoca 2 Tun, Intolerante y Estreñido también al morir), Cruit gana ~46%. Con 50 de vida y los cambios a Tun (Tun Mujer, Mastermind, Porque Me Monean, Choza, misión de 20), ~41%.
 
 ### Tareas universitarias (fichas de Unislop, etiqueta Tarea: cuentan para Cruit Excel)
 

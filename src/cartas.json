@@ -38,11 +38,11 @@
    "clase": "tun",
    "rareza": "legendaria",
    "arte": "/arte/tun_awarded.webp",
-   "texto": "Misión: invoca 15 Tun. Recompensa: Tun Maestro del Universo.",
+   "texto": "Misión: invoca 20 Tun. Recompensa: Tun Maestro del Universo.",
    "mision": {
     "contar": "invocar_tribu",
     "tribu": "tun",
-    "meta": 15,
+    "meta": 20,
     "recompensa": [
      {
       "tipo": "dar_carta",
@@ -64,15 +64,14 @@
    "rareza": "legendaria",
    "token": true,
    "arte": "/arte/tun_maestro.webp",
-   "texto": "Grito de batalla: invoca 5 Tun al azar y lanzalos contra los enemigos que elijas.",
+   "texto": "Grito de batalla: llena tu mesa de Tun al azar.",
    "grito": [
     {
      "tipo": "invocar",
      "azar": {
       "tribu": "tun"
      },
-     "cantidad": 5,
-     "disparar": "elegir"
+     "cantidad": 7
     }
    ]
   },
@@ -145,9 +144,9 @@
    "genero": "hombre",
    "nombre": "Choza de Monos",
    "tipo": "esbirro",
-   "coste": 4,
+   "coste": 3,
    "ataque": 0,
-   "vida": 8,
+   "vida": 6,
    "clase": "tun",
    "arte": "/arte/choza_monos.webp",
    "texto": "Al final de tu turno, invoca dos Tun.",
@@ -155,6 +154,80 @@
     {
      "tipo": "invocar",
      "carta": "tun",
+     "cantidad": 2
+    }
+   ]
+  },
+  {
+   "id": "tun_guapo",
+   "nombre": "Tun Guapo",
+   "genero": "hombre",
+   "tipo": "esbirro",
+   "coste": 4,
+   "ataque": 3,
+   "vida": 6,
+   "tribu": "tun",
+   "clase": "tun",
+   "arte": "😎",
+   "claves": [
+    "provocar"
+   ],
+   "texto": "Provocar. Cada vez que recibe daño, invoca un Tun 1/1.",
+   "al_recibir_dano": [
+    {
+     "tipo": "invocar",
+     "carta": "tun",
+     "cantidad": 1
+    }
+   ]
+  },
+  {
+   "id": "tun_iguana",
+   "nombre": "Tun Iguana",
+   "genero": "hombre",
+   "tipo": "esbirro",
+   "coste": 5,
+   "ataque": 5,
+   "vida": 5,
+   "tribu": "tun",
+   "clase": "tun",
+   "arte": "🦎",
+   "texto": "Grito de batalla: por el resto de la partida, cada vez que muere uno de tus Tun, invoca un Tun Zombie que ataca a un enemigo al azar.",
+   "grito": [
+    {
+     "tipo": "global",
+     "disparador": "muere_tribu",
+     "tribu": "tun",
+     "origen": "tun_iguana",
+     "efectos": [
+      {
+       "tipo": "invocar",
+       "carta": "tun_zombie",
+       "cantidad": 1,
+       "disparar": true
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "tun_astronomo",
+   "nombre": "Tun Astrónomo",
+   "genero": "hombre",
+   "tipo": "esbirro",
+   "coste": 3,
+   "ataque": 2,
+   "vida": 4,
+   "tribu": "tun",
+   "clase": "tun",
+   "arte": "🔭",
+   "texto": "Cada vez que ataca, un Tun de tu mano al azar cuesta 2 menos.",
+   "al_atacar": [
+    {
+     "tipo": "rebajar",
+     "filtro": {
+      "tribu": "tun"
+     },
      "cantidad": 2
     }
    ]
@@ -253,20 +326,12 @@
    "tribu": "tun",
    "clase": "tun",
    "arte": "/arte/tun_mujer.webp",
-   "texto": "Grito de batalla: tus Tun atacan a este esbirro. Cada vez que recibe daño, inflige 2 de daño a un enemigo al azar.",
+   "texto": "Grito de batalla: transforma a tus otros esbirros en Tun Puto.",
    "grito": [
     {
-     "tipo": "atraer_ataques",
-     "filtro": {
-      "tribu": "tun"
-     }
-    }
-   ],
-   "al_recibir_dano": [
-    {
-     "tipo": "dano",
-     "objetivo": "enemigo_azar",
-     "cantidad": 2
+     "tipo": "transformar",
+     "objetivo": "aliados",
+     "carta": "tun_puto"
     }
    ]
   },
@@ -357,7 +422,7 @@
    "nombre": "Tun Mastermind",
    "genero": "hombre",
    "tipo": "esbirro",
-   "coste": 25,
+   "coste": 15,
    "ataque": 6,
    "vida": 3,
    "tribu": "tun",
@@ -370,8 +435,13 @@
     "por": "tribu_muertos",
     "tribu": "tun"
    },
-   "texto": "Acometida. Cuesta 1 menos por cada Tun que murió esta partida. Grito de batalla: tus Tun tienen +1 de ataque por el resto de la partida.",
+   "texto": "Acometida. Cuesta 1 menos por cada Tun que murió esta partida. Grito de batalla: invoca 3 Tun y tus Tun tienen +1 de ataque por el resto de la partida.",
    "grito": [
+    {
+     "tipo": "invocar",
+     "carta": "tun",
+     "cantidad": 3
+    },
     {
      "tipo": "mejora_tribu",
      "tribu": "tun",
@@ -468,7 +538,7 @@
    "nombre": "Porque Me Monean",
    "genero": "hombre",
    "tipo": "esbirro",
-   "coste": 7,
+   "coste": 6,
    "ataque": 3,
    "vida": 5,
    "tribu": "tun",
