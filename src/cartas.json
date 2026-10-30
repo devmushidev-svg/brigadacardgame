@@ -785,14 +785,13 @@
    "rareza": "legendaria",
    "clase": "cruit",
    "arte": "/arte/coco_supremo.webp",
-   "texto": "Grito de batalla: repite los gritos de batalla y últimos alientos de los Cruit que jugaste esta partida, y se da una Leche por cada Leche que usaste en tus esbirros.",
+   "texto": "Grito de batalla: repite los gritos de batalla y últimos alientos de los Cruit que jugaste esta partida, también los que activaste con Leche.",
    "grito": [
     {
      "tipo": "repetir_jugados",
      "filtro": {
       "tribu": "cruit"
-     },
-     "contar_leches": "leche"
+     }
     }
    ],
    "genero": "no_binario"

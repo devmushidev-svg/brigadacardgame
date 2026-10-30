@@ -492,21 +492,13 @@ function aplicarEfectos(estado, s, efectos, elegido, ev, db, fuente, ctx = {}) {
     }
     if (ef.tipo === "repetir_jugados") {
       // Coco Supremo: repite los gritos y últimos alientos de las cartas del filtro que jugaste esta partida
-      const ids = (estado.j[s].jugados || []).filter((id) => db[id] && cumpleFiltro(db[id], ef.filtro) &&
+      // lo que jugaste y también lo que activaste de nuevo (Leche, Cruit Vaca, Cruit Rage)
+      const ids = [...(estado.j[s].jugados || []), ...(estado.j[s].activados || [])].filter((id) => db[id] && cumpleFiltro(db[id], ef.filtro) &&
         ![...(db[id].grito || []), ...(db[id].aliento || [])].some((x) => x.tipo === "repetir_jugados"));
       // para el combo: los que crecen por cada cosa (Cruit Excel) van al final, y los que pegan según su ataque (Cruit Baño) al último
       const orden = (id) => { const efs = [...(db[id].grito || []), ...(db[id].aliento || [])]; return efs.some((x) => x.tipo === "repartir") ? 2 : efs.some((x) => x.porCada) ? 1 : 0; };
       ids.sort((a, b) => orden(a) - orden(b));
-      // "contar_leches": además, una Leche sobre sí mismo por cada Leche que usaste en tus esbirros (antes de Excel y Baño)
-      const leche = ef.contar_leches && db[ef.contar_leches];
-      const f0 = fuente && buscar(estado, fuente) ? fuente : null;
-      if (leche && f0) {
-        for (let k = 0; k < Math.min(30, estado.j[s].lechesAliados || 0) && estado.fase === "jugando"; k++) {
-          ev.push({ e: "repite", seat: s, carta: leche.id });
-          aplicarEfectos(estado, s, leche.efectos, f0, ev, db, null, ctx);
-        }
-      }
-      for (const id of ids.slice(0, 30)) {
+      for (const id of ids.slice(0, 40)) {
         if (estado.fase !== "jugando") break;
         const c = db[id];
         ev.push({ e: "repite", seat: s, carta: id });
@@ -600,6 +592,7 @@ function aplicarEfectos(estado, s, efectos, elegido, ev, db, fuente, ctx = {}) {
         const c = db[t.obj.id];
         if (!c?.grito && !c?.aliento) continue;
         activos.push(ref);
+        (estado.j[t.seat].activados ||= []).push(t.obj.id); // Coco Supremo también repite lo que activaste con Leche
         ev.push({ e: "dispara", uid: ref, por: "leche" });
         if (c.grito) aplicarEfectos(estado, t.seat, c.grito, null, ev, db, ref);
         if (c.aliento) aplicarEfectos(estado, t.seat, c.aliento, null, ev, db, ref);
@@ -944,8 +937,6 @@ export function aplicar(estado, s, accion, db, ahora) {
         aplicarEfectos(estado, s, carta.efectos, accion.objetivo, ev, db, null);
         resolverMuertes(estado, ev, db);
       }
-      // Leches usadas en tus esbirros (las cuenta Coco Supremo)
-      if (carta.id === "leche" && p.tablero.some((m) => m.uid === accion.objetivo)) p.lechesAliados = (p.lechesAliados || 0) + 1;
     } else {
       const m = invocar(estado, s, carta.id, ev, db, accion.pos);
       if (m && carta.grito) {
@@ -954,6 +945,7 @@ export function aplicar(estado, s, accion, db, ahora) {
         if (extra) delete p.gritoExtra;
         for (let k = 0; k < (extra ? extra.veces : 1) && estado.fase === "jugando" && buscar(estado, m.uid); k++) {
           ev.push(k ? { e: "dispara", uid: m.uid, por: "rage" } : { e: "grito", uid: m.uid, objetivo: accion.objetivo || null });
+          if (k) (p.activados ||= []).push(carta.id);
           aplicarEfectos(estado, s, carta.grito, accion.objetivo, ev, db, m.uid);
           if (extra) resolverMuertes(estado, ev, db);
         }
