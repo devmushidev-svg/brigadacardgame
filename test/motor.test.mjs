@@ -609,14 +609,13 @@ console.log("ok: tutorial");
 }
 console.log("ok: intolerante");
 
-// --- Tun Guapo: provocar; cada vez que recibe daño invoca un Tun ---
+// --- Tun Cool: cada vez que recibe daño invoca un Tun ---
 {
   const e = nueva(70); const s = e.turno, r = 1 - s;
   e.j[s].tablero = []; e.j[r].tablero = [];
-  preparar(e, s, ["tun_guapo"]);
+  preparar(e, s, ["tun_cool"]);
   M.aplicar(e, s, { t: "jugar", uid: "t0" }, db, 0);
   const g = e.j[s].tablero[0];
-  assert.ok(g.provocar);
   e.j[r].tablero = [{ uid: "rv", id: "x", tribu: null, ataque: 1, vida: 9, vidaMax: 9, ataques: 0 }];
   e.turno = r;
   M.aplicar(e, r, { t: "atacar", de: "rv", a: g.uid }, db, 0);

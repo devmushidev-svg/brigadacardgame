@@ -159,29 +159,6 @@
    ]
   },
   {
-   "id": "tun_guapo",
-   "nombre": "Tun Guapo",
-   "genero": "hombre",
-   "tipo": "esbirro",
-   "coste": 4,
-   "ataque": 3,
-   "vida": 6,
-   "tribu": "tun",
-   "clase": "tun",
-   "arte": "😎",
-   "claves": [
-    "provocar"
-   ],
-   "texto": "Provocar. Cada vez que recibe daño, invoca un Tun 1/1.",
-   "al_recibir_dano": [
-    {
-     "tipo": "invocar",
-     "carta": "tun",
-     "cantidad": 1
-    }
-   ]
-  },
-  {
    "id": "tun_iguana",
    "nombre": "Tun Iguana",
    "genero": "hombre",
@@ -208,7 +185,8 @@
       }
      ]
     }
-   ]
+   ],
+   "rareza": "legendaria"
   },
   {
    "id": "tun_astronomo",
@@ -309,11 +287,18 @@
    "tribu": "tun",
    "clase": "tun",
    "arte": "/arte/tun_cool.webp",
-   "texto": "Cuesta 1 menos por cada otro Tun en el campo de batalla.",
+   "texto": "Cuesta 1 menos por cada otro Tun en el campo de batalla. Cada vez que recibe daño, invoca un Tun 1/1.",
    "descuento": {
     "por": "tribu_en_mesa",
     "tribu": "tun"
-   }
+   },
+   "al_recibir_dano": [
+    {
+     "tipo": "invocar",
+     "carta": "tun",
+     "cantidad": 1
+    }
+   ]
   },
   {
    "id": "tun_mujer",
