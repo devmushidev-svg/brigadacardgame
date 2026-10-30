@@ -708,15 +708,17 @@
     "tarea"
    ],
    "arte": "/arte/tarea_uni.webp",
-   "texto": "Tarea. Inflige 2 de daño a tu héroe. Roba una carta.",
+   "texto": "Tarea. Robás una carta y obtenés una tarea universitaria al azar.",
    "efectos": [
     {
-     "tipo": "dano",
-     "objetivo": "heroe_propio",
-     "cantidad": 2
+     "tipo": "robar",
+     "cantidad": 1
     },
     {
-     "tipo": "robar",
+     "tipo": "dar_azar",
+     "filtro": {
+      "etiqueta": "tarea_util"
+     },
      "cantidad": 1
     }
    ]

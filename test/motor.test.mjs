@@ -368,7 +368,8 @@ for (let k = 0; k < 20; k++) {
   const v = e.j[s].vida, mano = e.j[s].mano.length;
   M.aplicar(e, s, { t: "jugar", uid: "t0" }, db, 0);
   M.aplicar(e, s, { t: "jugar", uid: "t1" }, db, 0);
-  assert.equal(e.j[s].vida, v - 4); assert.equal(e.j[s].mano.length, mano - 2 + 2, "roba una por tarea");
+  assert.equal(e.j[s].vida, v, "ya no hace daño"); assert.equal(e.j[s].mano.length, mano - 2 + 4, "cada tarea: roba una y da una tarea universitaria");
+  assert.equal(e.j[s].mano.filter((c) => db[c.id]?.etiquetas?.includes("tarea_util")).length, 2);
   assert.equal(M.vista(e, s, db).j[s].mano.find((c) => c.id === "cruit_excel").veces, 2);
   M.aplicar(e, s, { t: "jugar", uid: "t2" }, db, 0);
   const x = e.j[s].tablero.find((m) => m.id === "cruit_excel");
@@ -671,9 +672,9 @@ console.log("ok: cartas nuevas de Tun");
   assert.equal(e.j[s].mana, 0);
   M.aplicar(e, s, { t: "jugar", uid: "t1" }, db, 0);
   assert.equal(e.j[s].mana, 4, "Desvelada: 0 de maná y +2, lanzada dos veces");
-  const v = e.j[s].vida;
+  const n = e.j[s].mano.length;
   M.aplicar(e, s, { t: "jugar", uid: "t2" }, db, 0);
-  assert.equal(e.j[s].vida, v - 4, "Tarea de la U también se lanza dos veces");
+  assert.equal(e.j[s].mano.length, n - 1 + 4, "Tarea de la U también se lanza dos veces: 2 robadas y 2 tareas");
   assert.equal(e.j[s].jugadosEtiqueta.tarea, 2, "cada tarea cuenta una vez para Excel");
 }
 // --- Escuela Alumnos: descubre dos tareas universitarias, una después de la otra ---
