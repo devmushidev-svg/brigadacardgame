@@ -319,8 +319,11 @@ for (let k = 0; k < 20; k++) {
   M.empezar(e, db, 0, heroes, false);
   const s = e.turno, r = 1 - s;
   assert.equal(e.j[s].heroe, "cruit");
-  e.j[s].mana = 1; e.j[r].tablero = [];
+  e.j[s].mana = 2; e.j[r].tablero = [];
+  const leches = e.j[s].mano.filter((c) => c.id === "leche").length;
   M.aplicar(e, s, { t: "poder" }, db, 0);
+  assert.equal(e.j[s].mana, 0, "el poder cuesta 2");
+  assert.equal(e.j[s].mano.filter((c) => c.id === "leche").length, leches + 1, "y da una Leche");
   const coco = e.j[s].tablero.find((m) => m.id === "coco");
   assert.ok(coco && M.puedeAtacar(coco), "carga");
   M.aplicar(e, s, { t: "atacar", de: coco.uid, a: "h" + r }, db, 0);
@@ -362,7 +365,11 @@ for (let k = 0; k < 20; k++) {
   assert.equal(M.vista(e, s, db).j[s].mano.find((c) => c.id === "cruit_excel").veces, 2);
   M.aplicar(e, s, { t: "jugar", uid: "t2" }, db, 0);
   const x = e.j[s].tablero.find((m) => m.id === "cruit_excel");
-  assert.deepEqual([x.ataque, x.vida], [8, 8], "2/2 + 2 tareas x +3/+3");
+  assert.deepEqual([x.ataque, x.vida], [4, 4], "2/2 + 2 tareas x +1/+1");
+  // es un programa: no se le puede dar Leche
+  preparar(e, s, ["leche"]);
+  assert.ok(!M.objetivoValido(e, s, db.leche, x.uid), "Leche no puede ir en Cruit Excel");
+  assert.ok(M.aplicar(e, s, { t: "jugar", uid: "t0", objetivo: x.uid }, db, 0).error);
 }
 
 // --- Elliot y Chance ---
@@ -405,7 +412,29 @@ for (let k = 0; k < 20; k++) {
   e.j[s].mana = 10;
   M.aplicar(e, s, { t: "jugar", uid: "t2" }, db, 0);
   const cs = e.j[s].tablero.find((m) => m.id === "coco_supremo");
-  assert.deepEqual([cs.ataque, cs.vida], [10, 8], "el grito de Excel repetido buffea a Coco Supremo (+3/+3 por 1 tarea)");
+  assert.deepEqual([cs.ataque, cs.vida], [8, 6], "el grito de Excel repetido buffea a Coco Supremo (+1/+1 por 1 tarea)");
+}
+// --- Coco Supremo: Leches en aliados, y el orden del combo: Excel al final y Cruit Baño al último ---
+{
+  const e = nueva(47, ["cruit", "cruit"]); const s = e.turno, r = 1 - s;
+  e.j[s].tablero = []; e.j[r].tablero = [{ uid: "rv", id: "x", tribu: null, ataque: 0, vida: 40, vidaMax: 40, ataques: 0 }];
+  preparar(e, s, ["cruit_bano", "cruit_excel", "tarea_uni", "leche", "leche", "coco_supremo"]);
+  M.aplicar(e, s, { t: "jugar", uid: "t0" }, db, 0); // Baño
+  M.aplicar(e, s, { t: "jugar", uid: "t1" }, db, 0); // Excel
+  M.aplicar(e, s, { t: "jugar", uid: "t2" }, db, 0); // tarea
+  const bano = e.j[s].tablero.find((m) => m.id === "cruit_bano").uid;
+  M.aplicar(e, s, { t: "jugar", uid: "t3", objetivo: bano }, db, 0);
+  M.aplicar(e, s, { t: "jugar", uid: "t4", objetivo: bano }, db, 0);
+  assert.equal(e.j[s].lechesAliados, 2);
+  e.j[s].mana = 10; e.j[r].vida = M.CONFIG.VIDA_HEROE; e.j[r].tablero[0].vida = 40;
+  const res = M.aplicar(e, s, { t: "jugar", uid: "t5" }, db, 0);
+  assert.ok(!res.error, res.error);
+  const rep = res.ev.filter((x) => x.e === "repite").map((x) => x.carta);
+  assert.deepEqual(rep, ["leche", "leche", "cruit_excel", "cruit_bano"], "Leches, después Excel y Baño al último");
+  const cs = e.j[s].tablero.find((m) => m.id === "coco_supremo");
+  assert.equal(cs.ataque, 7 + 2 + 1, "+1/+1 por cada Leche y +1/+1 de Excel");
+  const dano = (M.CONFIG.VIDA_HEROE - e.j[r].vida) + (40 - e.j[r].tablero[0].vida);
+  assert.equal(dano, 10, "el Baño repetido reparte el ataque de Coco ya buffeado");
 }
 
 // --- Estreñido Cruit, Cruit Sangre, Cruit Vampiro ---
@@ -419,14 +448,17 @@ for (let k = 0; k < 20; k++) {
   assert.deepEqual(db.cruit_estrenido.aliento, db.cruit_estrenido.grito, "al morir mete otras 2 Cacas");
   e.j[r].mazo = ["caca", "mauro_sosa", "mauro_sosa"]; // mazo fijo para que la cuenta no dependa del azar
   M.aplicar(e, s, { t: "jugar", uid: "t1" }, db, 0);
-  assert.equal(e.j[s].tablero.filter((m) => m.id === "cruit_sangre").length, 2);
+  const sangres = e.j[s].tablero.filter((m) => m.id === "cruit_sangre");
+  assert.equal(sangres.length, 1, "las 2 Cruit Sangre se fusionan en una");
+  assert.deepEqual([sangres[0].ataque, sangres[0].vida, sangres[0].apilado], [4, 4, 2]);
+  assert.equal(e.j[s].tablero.length, 3, "Estreñido, Vampiro y una sola Sangre");
   e.j[s].vida = 20;
   const vr = e.j[r].vida, mr = e.j[r].mano.length;
   const res = M.aplicar(e, s, { t: "fin" }, db, 0);
-  // 2 Cruit Sangre con un Vampiro: roban 2 cada uno al enemigo con menos vida (el héroe rival, sin esbirros)
-  assert.equal(e.j[s].vida, 24, "+4 de vida");
+  // Sangre fusionada (×2) con un Vampiro: roba 1×2 + 1 al enemigo con menos vida (el héroe rival, sin esbirros)
+  assert.equal(e.j[s].vida, 23, "+3 de vida");
   assert.ok(res.ev.some((x) => x.e === "se_lanza"), "el rival robó una caca al empezar su turno");
-  assert.equal(e.j[r].vida, vr - 4 - 2, "4 robados + 2 de la caca");
+  assert.equal(e.j[r].vida, vr - 3 - 2, "3 robados + 2 de la caca");
   assert.equal(e.j[r].mano.length, mr + 1, "la caca no va a la mano, roba otra");
   e.j[s].vida = M.CONFIG.VIDA_HEROE - 1; e.turno = s; M.aplicar(e, s, { t: "fin" }, db, 0);
   assert.ok(e.j[s].vida > M.CONFIG.VIDA_HEROE && e.j[s].vidaMax === e.j[s].vida, "robar vida suma, pasa del máximo");
@@ -623,3 +655,58 @@ console.log("ok: intolerante");
   assert.equal(e.j[s].mana, 0);
 }
 console.log("ok: cartas nuevas de Tun");
+
+// --- Unislop: tus Tareas se lanzan dos veces; Desvelada cuesta 0 y da 2 ---
+{
+  const e = nueva(80, ["cruit", "cruit"]); const s = e.turno;
+  e.j[s].tablero = [];
+  preparar(e, s, ["unislop", "t_desvelada", "tarea_uni"], 4);
+  M.aplicar(e, s, { t: "jugar", uid: "t0" }, db, 0);
+  assert.ok(e.j[s].mano.filter((c) => db[c.id]?.etiquetas?.includes("tarea_util")).length >= 3, "3 tareas universitarias");
+  assert.equal(e.j[s].mana, 0);
+  M.aplicar(e, s, { t: "jugar", uid: "t1" }, db, 0);
+  assert.equal(e.j[s].mana, 4, "Desvelada: 0 de maná y +2, lanzada dos veces");
+  const v = e.j[s].vida;
+  M.aplicar(e, s, { t: "jugar", uid: "t2" }, db, 0);
+  assert.equal(e.j[s].vida, v - 4, "Tarea de la U también se lanza dos veces");
+  assert.equal(e.j[s].jugadosEtiqueta.tarea, 2, "cada tarea cuenta una vez para Excel");
+}
+// --- Escuela Alumnos: descubre dos tareas universitarias, una después de la otra ---
+{
+  const e = nueva(81, ["cruit", "cruit"]); const s = e.turno;
+  e.j[s].tablero = [];
+  preparar(e, s, ["escuela_alumnos"]);
+  M.aplicar(e, s, { t: "jugar", uid: "t0" }, db, 0);
+  assert.equal(e.pendiente?.tipo, "descubrir");
+  assert.ok(e.pendiente.opciones.every((id) => db[id].etiquetas.includes("tarea_util")));
+  M.aplicar(e, s, { t: "elegir", i: 0 }, db, 0);
+  assert.equal(e.pendiente?.tipo, "descubrir", "segunda elección");
+  M.aplicar(e, s, { t: "elegir", i: 1 }, db, 0);
+  assert.equal(e.pendiente, null);
+  assert.equal(e.j[s].mano.length, 2, "dos tareas a la mano");
+}
+// --- Cruit Rage: el próximo grito de un Cruit se activa 3 veces (solo el próximo) ---
+{
+  const e = nueva(82, ["cruit", "cruit"]); const s = e.turno;
+  e.j[s].tablero = [];
+  preparar(e, s, ["cruit_rage", "cruit_tostadora", "cruit_tostadora"]);
+  M.aplicar(e, s, { t: "jugar", uid: "t0" }, db, 0);
+  const n = e.j[s].mano.length;
+  M.aplicar(e, s, { t: "jugar", uid: "t1" }, db, 0);
+  assert.equal(e.j[s].mano.length, n - 1 + 3, "la Tostadora roba 3");
+  M.aplicar(e, s, { t: "jugar", uid: "t2" }, db, 0);
+  assert.equal(e.j[s].mano.length, n - 1 + 3 - 1 + 1, "la siguiente roba 1");
+}
+// --- Cruit Sangre desde la mano: se fusiona aunque la mesa esté llena ---
+{
+  const e = nueva(83, ["cruit", "cruit"]); const s = e.turno;
+  e.j[s].tablero = Array.from({ length: 6 }, (_, k) => ({ uid: "z" + k, id: "x", tribu: null, ataque: 1, vida: 1, vidaMax: 1, ataques: 0 }));
+  preparar(e, s, ["cruit_sangre", "cruit_sangre"]);
+  M.aplicar(e, s, { t: "jugar", uid: "t0" }, db, 0);
+  assert.equal(e.j[s].tablero.length, 7);
+  const res = M.aplicar(e, s, { t: "jugar", uid: "t1" }, db, 0);
+  assert.ok(!res.error, res.error);
+  assert.ok(res.ev.some((x) => x.e === "fusiona"));
+  assert.equal(e.j[s].tablero.find((m) => m.id === "cruit_sangre").apilado, 2);
+}
+console.log("ok: cambios de Cruit");

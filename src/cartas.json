@@ -653,13 +653,19 @@
      "tipo": "buff",
      "objetivo": "elegido_esbirro",
      "ataque": 1,
-     "vida": 1
+     "vida": 1,
+     "excluir": {
+      "etiqueta": "programa"
+     }
     },
     {
      "tipo": "activar",
      "objetivo": "elegido_esbirro",
      "filtro": {
       "tribu": "cruit"
+     },
+     "excluir": {
+      "etiqueta": "programa"
      }
     }
    ]
@@ -689,18 +695,21 @@
    "tribu": "cruit",
    "clase": "cruit",
    "arte": "/arte/cruit_excel.webp",
-   "texto": "Grito de batalla: gana +3/+3 por cada Tarea que lanzaste esta partida.",
+   "texto": "Grito de batalla: gana +1/+1 por cada Tarea que lanzaste esta partida. No se le puede dar Leche (es un programa).",
    "grito": [
     {
      "tipo": "buff",
      "objetivo": "yo",
-     "ataque": 3,
-     "vida": 3,
+     "ataque": 1,
+     "vida": 1,
      "porCada": {
       "por": "etiqueta_jugados",
       "etiqueta": "tarea"
      }
     }
+   ],
+   "etiquetas": [
+    "programa"
    ]
   },
   {
@@ -791,13 +800,14 @@
    "rareza": "legendaria",
    "clase": "cruit",
    "arte": "/arte/coco_supremo.webp",
-   "texto": "Grito de batalla: repite los gritos de batalla y últimos alientos de todos los Cruit que jugaste esta partida.",
+   "texto": "Grito de batalla: repite los gritos de batalla y últimos alientos de los Cruit que jugaste esta partida, y se da una Leche por cada Leche que usaste en tus esbirros.",
    "grito": [
     {
      "tipo": "repetir_jugados",
      "filtro": {
       "tribu": "cruit"
-     }
+     },
+     "contar_leches": "leche"
     }
    ],
    "genero": "no_binario"
@@ -859,14 +869,16 @@
    "tribu": "cruit",
    "clase": "cruit",
    "arte": "/arte/cruit_sangre.webp",
-   "texto": "Al final de tu turno, le roba 1 de vida al enemigo con menos vida y se la suma a tu héroe.",
+   "texto": "Se fusiona con tus otros Cruit Sangre. Al final de tu turno, roba 1 de vida por cada Sangre fusionada al enemigo con menos vida.",
    "fin_turno": [
     {
      "tipo": "robar_vida",
      "objetivo": "enemigo_menos_vida",
-     "cantidad": 1
+     "cantidad": 1,
+     "porApilado": true
     }
-   ]
+   ],
+   "fusionar": true
   },
   {
    "id": "cruit_vampiro",
@@ -879,7 +891,7 @@
    "tribu": "cruit",
    "clase": "cruit",
    "arte": "/arte/cruit_vampiro.webp",
-   "texto": "Tus Cruit roban +1 de vida. Grito de batalla: invoca 2 Cruit Sangre.",
+   "texto": "Tus Cruit roban +1 de vida. Grito de batalla: invoca 2 Cruit Sangre (se fusionan en una).",
    "aumenta_robo_vida": 1,
    "grito": [
     {
@@ -945,13 +957,19 @@
      "tipo": "buff",
      "objetivo": "aliados",
      "ataque": 1,
-     "vida": 1
+     "vida": 1,
+     "excluir": {
+      "etiqueta": "programa"
+     }
     },
     {
      "tipo": "activar",
      "objetivo": "aliados",
      "filtro": {
       "tribu": "cruit"
+     },
+     "excluir": {
+      "etiqueta": "programa"
      }
     }
    ],
@@ -1001,12 +1019,57 @@
    "rareza": "legendaria",
    "clase": "cruit",
    "arte": "/arte/unislop.webp",
-   "texto": "Grito de batalla: obtenés 3 tareas universitarias distintas al azar.",
+   "texto": "Grito de batalla: obtenés 3 tareas universitarias distintas al azar. Por el resto de la partida, tus Tareas se lanzan dos veces.",
    "grito": [
     {
      "tipo": "dar_azar",
      "filtro": {
       "etiqueta": "tarea_util"
+     },
+     "cantidad": 3
+    },
+    {
+     "tipo": "global",
+     "disparador": "tareas_dobles",
+     "origen": "unislop",
+     "efectos": []
+    }
+   ]
+  },
+  {
+   "id": "escuela_alumnos",
+   "nombre": "Escuela Alumnos",
+   "tipo": "esbirro",
+   "coste": 2,
+   "ataque": 2,
+   "vida": 2,
+   "clase": "cruit",
+   "arte": "🏫",
+   "texto": "Grito de batalla: descubre dos tareas universitarias.",
+   "grito": [
+    {
+     "tipo": "descubrir",
+     "todas": true,
+     "filtro": {
+      "etiqueta": "tarea_util"
+     },
+     "cantidad": 2
+    }
+   ]
+  },
+  {
+   "id": "cruit_rage",
+   "nombre": "Cruit Rage",
+   "tipo": "hechizo",
+   "coste": 2,
+   "clase": "cruit",
+   "arte": "😡",
+   "texto": "El próximo grito de batalla de un Cruit que juegues se activa 3 veces.",
+   "efectos": [
+    {
+     "tipo": "grito_extra",
+     "filtro": {
+      "tribu": "cruit"
      },
      "cantidad": 3
     }
@@ -1170,7 +1233,7 @@
    "id": "t_desvelada",
    "nombre": "Desvelada",
    "tipo": "hechizo",
-   "coste": 2,
+   "coste": 0,
    "clase": "cruit",
    "token": true,
    "etiquetas": [
@@ -1178,11 +1241,11 @@
     "tarea_util"
    ],
    "arte": "/arte/t_desvelada.webp",
-   "texto": "Tarea. Ganás 3 de maná este turno.",
+   "texto": "Tarea. Ganás 2 de maná este turno.",
    "efectos": [
     {
      "tipo": "mana",
-     "cantidad": 3
+     "cantidad": 2
     }
    ]
   }
@@ -1248,14 +1311,18 @@
    "marco": "linear-gradient(160deg, #7fb2ff, #2f62c4 40%, #16306e 80%, #2f62c4)",
    "poder": {
     "nombre": "Coco",
-    "coste": 1,
-    "texto": "Invoca un Coco 1/1 con carga que muere al final del turno.",
+    "coste": 2,
+    "texto": "Invoca un Coco 1/1 con carga que muere al final del turno y obtenés una Leche.",
     "arte": "/arte/poder_cruit.webp",
     "efectos": [
      {
       "tipo": "invocar",
       "carta": "coco",
       "cantidad": 1
+     },
+     {
+      "tipo": "dar_carta",
+      "carta": "leche"
      }
     ]
    },

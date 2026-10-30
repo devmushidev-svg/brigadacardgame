@@ -47,7 +47,7 @@ export function jugadas(e, s, db) {
   for (const c of p.mano) {
     const carta = db[c.id];
     if (!carta || M.costeCarta(e, s, c, db) > p.mana) continue;
-    if (carta.tipo === "esbirro" && p.tablero.length >= M.CONFIG.MAX_TABLERO) continue;
+    if (carta.tipo === "esbirro" && !M.cabeEsbirro(e, s, carta)) continue;
     if (carta.tipo === "mision" && p.mision) continue;
     if (M.necesitaObjetivo(carta) && M.hayObjetivos(e, s, carta)) {
       for (const r of refs) if (M.objetivoValido(e, s, carta, r)) out.push({ t: "jugar", uid: c.uid, objetivo: r });

@@ -169,6 +169,7 @@ const PALABRAS = [
   { n: "No puede atacar", re: "no puede atacar", clave: "no_ataca", d: "Este esbirro nunca ataca." },
   { n: "Descubre", re: "descubre|descubrir", d: "Elegís una de tres cartas al azar y va a tu mano." },
   { n: "Robar vida", re: "roban? (?:\\+?\\d+ )?de vida", d: "Hace ese daño y lo suma a la vida de tu héroe (puede pasar de tu vida máxima)." },
+  { n: "Se fusiona", re: "se fusiona", d: "Si ya tenés uno igual en la mesa, se une a ese: le suma su ataque y su vida, y su efecto cuenta una vez más." },
   { n: "Activar", re: "activan?|activar", d: "Repite el grito de batalla y el último aliento del esbirro." },
   { n: "Tarea", re: "tareas?", d: "Hechizo universitario. Algunas cartas (como Cruit Excel) se hacen más fuertes por cada Tarea que lanzaste." },
   { n: "Misión", re: "misión", d: "Empieza siempre en tu mano. Al jugarla queda activa y, cuando cumplís el objetivo, recibís la recompensa." },
@@ -941,6 +942,23 @@ async function animarUno(e, ev, v, nuevos, yo) {
         }
         break;
       }
+      case "fusiona": { // otra Cruit Sangre vuela y se une a la que ya estaba
+        const el = refEl(e.uid);
+        if (el) {
+          const desde = (ev.__origen && refEl(ev.__origen)) || $(e.seat === yo ? ".mano" : ".mano-rival") || el;
+          await lanzarCosa(desde, el, artHTML(DB[e.carta]?.arte || "🩸"), 46, 520, true);
+          Sonido.escudo();
+          const c = centro(el);
+          particulas(c.x, c.y, "#c0102a", 22, 70);
+          el.animate([{ transform: "scale(1)" }, { transform: "scale(1.35)", filter: "brightness(1.8) drop-shadow(0 0 14px #ff3048)" }, { transform: "scale(1)" }], 450);
+          numero(el, `+${e.ataque}/+${e.vida}`, "buff");
+          const st = $(".stat.atk", el), sv = $(".stat.hp", el);
+          if (st) st.textContent = +st.textContent + e.ataque;
+          if (sv) sv.textContent = +sv.textContent + e.vida;
+          await esperar(300);
+        }
+        break;
+      }
       case "repite": { // Coco Supremo: cada carta repetida aparece un momento
         Sonido.hechizo();
         await mostrarCarta(e.carta, 650);
@@ -1164,7 +1182,7 @@ function contadorMuertos(c) {
 function jugable(v, c) {
   const p = v.j[v.yo];
   if (!c || c.coste > p.mana) return false;
-  if (c.tipo === "esbirro" && p.tablero.length >= 7) return false;
+  if (c.tipo === "esbirro" && p.tablero.length >= 7 && !(c.fusionar && p.tablero.some((m) => m.id === c.id))) return false;
   if (c.tipo === "mision" && p.mision) return false;
   if (c.tipo === "hechizo" && pideObjetivo(c) && !objetivosCarta(v, v.yo, c).size) return false;
   return true;
@@ -1195,13 +1213,14 @@ function esbirroHTML(m, s, v) {
   const mio = v.yo === s && v.turno === s && v.fase === "jugando";
   const cls = [m.provocar && "provocar", m.escudo && "escudo", m.dormido && !m.carga && "dormido", mio && puedeAtacar(m) && objetivosAtaque(v, s, m).size && "puede"].filter(Boolean).join(" ");
   return `<div class="esbirro ${cls}" data-ref="${m.uid}" data-seat="${s}" data-carta="${esc(m.id)}" style="--fondo:${colorDe(c.arquetipo || c.id)}">
-    <div class="arte">${artHTML(c.arte)}</div><span class="zz">z z</span>
+    <div class="arte">${artHTML(c.arte)}</div><span class="zz">z z</span>${m.apilado > 1 ? `<span class="apilado" title="fusionadas">×${m.apilado}</span>` : ""}
     <div class="stat atk ${m.ataque > c.ataque ? "subido" : ""}">${m.ataque}</div>
     <div class="stat hp ${m.vida < m.vidaMax ? "herido" : m.vidaMax > c.vida ? "subido" : ""}">${m.vida}</div></div>`;
 }
 
 const mejorasHTML = (p) => Object.entries(p.mejoras || {}).filter(([, m]) => m.ataque || m.vida)
-  .map(([t, m]) => `<div class="mejora" title="por el resto de la partida">${esc(t[0].toUpperCase() + t.slice(1))} ${m.ataque ? `+${m.ataque}⚔` : ""}${m.vida ? ` +${m.vida}❤` : ""}</div>`).join("");
+  .map(([t, m]) => `<div class="mejora" title="por el resto de la partida">${esc(t[0].toUpperCase() + t.slice(1))} ${m.ataque ? `+${m.ataque}⚔` : ""}${m.vida ? ` +${m.vida}❤` : ""}</div>`).join("")
+  + (p.gritoExtra ? `<div class="mejora" title="el próximo grito de batalla se activa ${p.gritoExtra.veces} veces">Grito ×${p.gritoExtra.veces}</div>` : "");
 function render(v) {
   V = v;
   if (preview) preview.style.display = "none";

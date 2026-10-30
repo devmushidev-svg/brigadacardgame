@@ -471,3 +471,5 @@ img[src^="/arte/unislop-tareas/"] { filter: invert(1) drop-shadow(0 2px 3px #000
 @keyframes guia-entra { from { opacity: 0; transform: translate(-50%, -40%); } }
 .guia-foco { z-index: 6; animation: guia-pulso 1.1s ease-in-out infinite !important; }
 @keyframes guia-pulso { 0%, 100% { filter: drop-shadow(0 0 4px #ffd34f) drop-shadow(0 0 2px #ffd34f); } 50% { filter: drop-shadow(0 0 16px #ffd34f) drop-shadow(0 0 6px #fff3b0) brightness(1.15); } }
+.esbirro .apilado { position: absolute; top: -6px; left: -4px; z-index: 3; padding: 1px 6px; border-radius: 10px; font: 900 clamp(11px, calc(var(--esb) * .15), 17px) var(--f-tit);
+  color: #fff; background: #9b0f22; border: 1.5px solid #ffb3bd; box-shadow: 0 2px 4px #000a; }

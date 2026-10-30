@@ -49,6 +49,11 @@ export function costeDe(estado, s, c) {
   if (d?.por === "tribu_muertos") coste -= estado.muertosTribu?.[d.tribu] || 0;
   return Math.max(0, coste);
 }
+// si un esbirro entra en la mesa: hay lugar, o se fusiona con uno igual (Cruit Sangre)
+export function cabeEsbirro(estado, s, c) {
+  const p = estado.j[s];
+  return p.tablero.length < CONFIG.MAX_TABLERO || (!!c?.fusionar && p.tablero.some((x) => x.id === c.id && x.vida > 0));
+}
 // coste de una carta concreta de la mano: el de la carta menos lo que le rebajaron (ej. Tun Astrónomo)
 export function costeCarta(estado, s, c, db) {
   return c ? Math.max(0, costeDe(estado, s, db[c.id]) - (c.rebaja || 0)) : 99;
@@ -352,12 +357,22 @@ function esbirroDe(estado, c) {
     soloEsbirros: claves.has("acometida") && !claves.has("carga"), // acometida: el turno que entra solo ataca esbirros
     ataques: 0,
     alRecibirDano: !!c.al_recibir_dano,
+    ...(c.etiquetas ? { etiquetas: c.etiquetas } : {}),
   };
 }
 
 function invocar(estado, s, id, ev, db, pos) {
   const p = estado.j[s];
   const c = db[id];
+  // "fusionar": si ya tenés uno igual, se suma a ese en vez de ocupar otro lugar (Cruit Sangre)
+  const igual = c?.fusionar && p.tablero.find((x) => x.id === id && x.vida > 0);
+  if (igual) {
+    igual.ataque += c.ataque; igual.vida += c.vida; igual.vidaMax += c.vida;
+    igual.apilado = (igual.apilado || 1) + 1;
+    ev.push({ e: "fusiona", seat: s, uid: igual.uid, carta: id, ataque: c.ataque, vida: c.vida, n: igual.apilado });
+    avanzarMision(estado, s, "invocar_tribu", igual.tribu, ev, db);
+    return igual;
+  }
   if (!c || p.tablero.length >= CONFIG.MAX_TABLERO) return null;
   const m = esbirroDe(estado, c);
   // "tus Tun tienen +1 de ataque por el resto de la partida"
@@ -390,7 +405,8 @@ function avanzarMision(estado, s, tipo, tribu, ev, db) {
 //           enemigo_azar | yo
 // filtro: { tribu } limita los esbirros afectados
 function objetivos(estado, s, efecto, elegido, fuente) {
-  const tribuOk = (m) => !efecto.filtro?.tribu || m.tribu === efecto.filtro.tribu;
+  // "excluir": { "etiqueta": "programa" } deja afuera a esos esbirros (a Cruit Excel no se le puede dar Leche)
+  const tribuOk = (m) => (!efecto.filtro?.tribu || m.tribu === efecto.filtro.tribu) && !(efecto.excluir?.etiqueta && (m.etiquetas || []).includes(efecto.excluir.etiqueta));
   const yo = estado.j[s].tablero.filter((m) => m.uid !== fuente && tribuOk(m)).map((m) => m.uid);
   const ene = estado.j[otro(s)].tablero.filter(tribuOk).map((m) => m.uid);
   switch (efecto.objetivo) {
@@ -458,18 +474,36 @@ function aplicarEfectos(estado, s, efectos, elegido, ev, db, fuente, ctx = {}) {
     }
     if (ef.tipo === "descubrir") {
       // como Hearthstone: 3 opciones distintas, el jugador se queda con una
-      const lista = pozo(db, ef.filtro).map((c) => c.id);
-      const ops = [];
-      while (ops.length < 3 && lista.length) ops.push(lista.splice(Math.floor(azar(estado) * lista.length), 1)[0]);
-      if (!ops.length) continue;
-      if (estado.pendiente) darCarta(estado, s, elegir(estado, ops), ev); // ya hay otra elección abierta
-      else { estado.pendiente = { seat: s, tipo: "descubrir", opciones: ops }; ev.push({ e: "elegir", seat: s, tipo: "descubrir" }); }
+      // "todas": true también ofrece fichas y hechizos (Escuela Alumnos: tareas universitarias)
+      const base = ef.todas ? Object.values(db).filter((c) => c.tipo !== "mision" && cumpleFiltro(c, ef.filtro)) : pozo(db, ef.filtro);
+      const tandas = [];
+      for (let k = 0; k < n; k++) {
+        const lista = base.map((c) => c.id), ops = [];
+        while (ops.length < 3 && lista.length) ops.push(lista.splice(Math.floor(azar(estado) * lista.length), 1)[0]);
+        if (ops.length) tandas.push(ops);
+      }
+      if (!tandas.length) continue;
+      if (estado.pendiente) { for (const ops of tandas) darCarta(estado, s, elegir(estado, ops), ev); continue; } // ya hay otra elección abierta
+      estado.pendiente = { seat: s, tipo: "descubrir", opciones: tandas.shift(), siguientes: tandas };
+      ev.push({ e: "elegir", seat: s, tipo: "descubrir" });
       continue;
     }
     if (ef.tipo === "repetir_jugados") {
       // Coco Supremo: repite los gritos y últimos alientos de las cartas del filtro que jugaste esta partida
       const ids = (estado.j[s].jugados || []).filter((id) => db[id] && cumpleFiltro(db[id], ef.filtro) &&
         ![...(db[id].grito || []), ...(db[id].aliento || [])].some((x) => x.tipo === "repetir_jugados"));
+      // para el combo: los que crecen por cada cosa (Cruit Excel) van al final, y los que pegan según su ataque (Cruit Baño) al último
+      const orden = (id) => { const efs = [...(db[id].grito || []), ...(db[id].aliento || [])]; return efs.some((x) => x.tipo === "repartir") ? 2 : efs.some((x) => x.porCada) ? 1 : 0; };
+      ids.sort((a, b) => orden(a) - orden(b));
+      // "contar_leches": además, una Leche sobre sí mismo por cada Leche que usaste en tus esbirros (antes de Excel y Baño)
+      const leche = ef.contar_leches && db[ef.contar_leches];
+      const f0 = fuente && buscar(estado, fuente) ? fuente : null;
+      if (leche && f0) {
+        for (let k = 0; k < Math.min(30, estado.j[s].lechesAliados || 0) && estado.fase === "jugando"; k++) {
+          ev.push({ e: "repite", seat: s, carta: leche.id });
+          aplicarEfectos(estado, s, leche.efectos, f0, ev, db, null, ctx);
+        }
+      }
       for (const id of ids.slice(0, 30)) {
         if (estado.fase !== "jugando") break;
         const c = db[id];
@@ -487,6 +521,12 @@ function aplicarEfectos(estado, s, efectos, elegido, ev, db, fuente, ctx = {}) {
       const lado = ef.lado === "enemigo" ? otro(s) : s, mazo = estado.j[lado].mazo;
       for (let k = 0; k < n; k++) mazo.splice(Math.floor(azar(estado) * (mazo.length + 1)), 0, ef.carta);
       ev.push({ e: "baraja", seat: lado, carta: ef.carta, n });
+      continue;
+    }
+    if (ef.tipo === "grito_extra") {
+      // Cruit Rage: el próximo grito de batalla de un esbirro del filtro que juegues se activa N veces
+      estado.j[s].gritoExtra = { tribu: ef.filtro?.tribu || null, veces: n };
+      ev.push({ e: "global", seat: s });
       continue;
     }
     if (ef.tipo === "rebajar") {
@@ -516,7 +556,8 @@ function aplicarEfectos(estado, s, efectos, elegido, ev, db, fuente, ctx = {}) {
         if (!t) continue;
         const antes = t.tipo === "heroe" ? t.obj.vida : t.obj.vida, escudo = t.tipo === "esbirro" && t.obj.escudo;
         ev.push({ e: "fx", fx: "sangre", de: ref, a: "h" + s });
-        danar(estado, ref, n + extra, ev);
+        const veces = ef.porApilado ? buscar(estado, fuente)?.obj.apilado || 1 : 1; // Cruit Sangre fusionada roba por cada una
+        danar(estado, ref, n * veces + extra, ev);
         const quitado = escudo ? 0 : Math.max(0, antes - t.obj.vida);
         if (quitado) {
           // robar vida SUMA: puede pasar de 30 (sube la vida máxima)
@@ -742,6 +783,7 @@ export function objetivoValido(estado, s, carta, ref) {
   const t = buscar(estado, ref);
   if (!t) return false;
   if (ef.filtro?.tribu && (t.tipo !== "esbirro" || t.obj.tribu !== ef.filtro.tribu)) return false;
+  if (ef.excluir?.etiqueta && t.tipo === "esbirro" && (t.obj.etiquetas || []).includes(ef.excluir.etiqueta)) return false;
   if (ef.objetivo === "elegido_enemigo") return t.seat !== s;
   if (ef.objetivo === "elegido_aliado") return t.seat === s && t.tipo === "esbirro";
   if (ef.objetivo === "elegido_esbirro") return t.tipo === "esbirro";
@@ -787,6 +829,10 @@ function resolverPendiente(estado, eleccion, ev, db) {
     estado.pendiente = null;
     const id = pe.opciones[eleccion];
     if (darCarta(estado, pe.seat, id, ev)) ev.push({ e: "descubierta", seat: pe.seat });
+    if (pe.siguientes?.length) { // "descubre dos": se abre la siguiente elección
+      estado.pendiente = { seat: pe.seat, tipo: "descubrir", opciones: pe.siguientes.shift(), siguientes: pe.siguientes };
+      ev.push({ e: "elegir", seat: pe.seat, tipo: "descubrir" });
+    }
     return;
   }
   const uid = pe.cola.shift();
@@ -865,7 +911,7 @@ export function aplicar(estado, s, accion, db, ahora) {
     if (!carta) return { error: "carta desconocida" };
     const coste = costeCarta(estado, s, p.mano[i], db);
     if (coste > p.mana) return { error: "no te alcanza el mana" };
-    if (carta.tipo === "esbirro" && p.tablero.length >= CONFIG.MAX_TABLERO) return { error: "tablero lleno" };
+    if (carta.tipo === "esbirro" && !cabeEsbirro(estado, s, carta)) return { error: "tablero lleno" };
     if (carta.tipo === "mision" && p.mision) return { error: "ya tenes una mision activa" };
     const pide = necesitaObjetivo(carta);
     if (pide && hayObjetivos(estado, s, carta)) {
@@ -883,12 +929,26 @@ export function aplicar(estado, s, accion, db, ahora) {
       ev.push({ e: "mision", seat: s, carta: carta.id });
     } else if (carta.tipo === "hechizo") {
       ev.push({ e: "hechizo", seat: s, carta: carta.id, objetivo: accion.objetivo || null });
-      aplicarEfectos(estado, s, carta.efectos, accion.objetivo, ev, db, null);
+      // Unislop: por el resto de la partida tus Tareas se lanzan dos veces (una vez más por cada efecto así)
+      const veces = (carta.etiquetas || []).includes("tarea") ? 1 + estado.globales.filter((g) => g.disparador === "tareas_dobles" && g.seat === s).length : 1;
+      for (let k = 0; k < veces && estado.fase === "jugando"; k++) {
+        if (k) ev.push({ e: "repite", seat: s, carta: carta.id });
+        aplicarEfectos(estado, s, carta.efectos, accion.objetivo, ev, db, null);
+        resolverMuertes(estado, ev, db);
+      }
+      // Leches usadas en tus esbirros (las cuenta Coco Supremo)
+      if (carta.id === "leche" && p.tablero.some((m) => m.uid === accion.objetivo)) p.lechesAliados = (p.lechesAliados || 0) + 1;
     } else {
       const m = invocar(estado, s, carta.id, ev, db, accion.pos);
       if (m && carta.grito) {
-        ev.push({ e: "grito", uid: m.uid, objetivo: accion.objetivo || null });
-        aplicarEfectos(estado, s, carta.grito, accion.objetivo, ev, db, m.uid);
+        // Cruit Rage: este grito se activa varias veces
+        const extra = p.gritoExtra && (!p.gritoExtra.tribu || p.gritoExtra.tribu === carta.tribu) ? p.gritoExtra : null;
+        if (extra) delete p.gritoExtra;
+        for (let k = 0; k < (extra ? extra.veces : 1) && estado.fase === "jugando" && buscar(estado, m.uid); k++) {
+          ev.push(k ? { e: "dispara", uid: m.uid, por: "rage" } : { e: "grito", uid: m.uid, objetivo: accion.objetivo || null });
+          aplicarEfectos(estado, s, carta.grito, accion.objetivo, ev, db, m.uid);
+          if (extra) resolverMuertes(estado, ev, db);
+        }
       }
       if (carta.tribu) (p.jugadosTribu ||= {})[carta.tribu] = (p.jugadosTribu[carta.tribu] || 0) + 1;
       avanzarMision(estado, s, "jugar_tribu", carta.tribu || null, ev, db);
@@ -982,6 +1042,7 @@ export function vista(estado, yo, db0 = {}) {
           ...(ef ? { cantidad: cantidadDe(estado, s, ef) } : {}), ...(pc ? { veces: contarPorCada(estado, s, pc) } : {}) };
       }) : undefined,
       mejoras: p.mejoras || null,
+      gritoExtra: p.gritoExtra || null,
       tablero: p.tablero,
     })),
   };
