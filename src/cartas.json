@@ -1296,18 +1296,14 @@
    "marco": "linear-gradient(160deg, #7fb2ff, #2f62c4 40%, #16306e 80%, #2f62c4)",
    "poder": {
     "nombre": "Coco",
-    "coste": 2,
-    "texto": "Invoca un Coco 1/1 con carga que muere al final del turno y obtenés una Leche.",
+    "coste": 1,
+    "texto": "Invoca un Coco 1/1 con carga que muere al final del turno.",
     "arte": "/arte/poder_cruit.webp",
     "efectos": [
      {
       "tipo": "invocar",
       "carta": "coco",
       "cantidad": 1
-     },
-     {
-      "tipo": "dar_carta",
-      "carta": "leche"
      }
     ]
    },

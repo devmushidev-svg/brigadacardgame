@@ -319,11 +319,9 @@ for (let k = 0; k < 20; k++) {
   M.empezar(e, db, 0, heroes, false);
   const s = e.turno, r = 1 - s;
   assert.equal(e.j[s].heroe, "cruit");
-  e.j[s].mana = 2; e.j[r].tablero = [];
-  const leches = e.j[s].mano.filter((c) => c.id === "leche").length;
+  e.j[s].mana = 1; e.j[r].tablero = [];
   M.aplicar(e, s, { t: "poder" }, db, 0);
-  assert.equal(e.j[s].mana, 0, "el poder cuesta 2");
-  assert.equal(e.j[s].mano.filter((c) => c.id === "leche").length, leches + 1, "y da una Leche");
+  assert.equal(e.j[s].mana, 0, "el poder cuesta 1");
   const coco = e.j[s].tablero.find((m) => m.id === "coco");
   assert.ok(coco && M.puedeAtacar(coco), "carga");
   M.aplicar(e, s, { t: "atacar", de: coco.uid, a: "h" + r }, db, 0);

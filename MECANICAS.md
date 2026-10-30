@@ -201,7 +201,7 @@ Diseño de Mario. Marco azul (provisional). Cruit es no binario: toda carta con 
 
 | Carta | Coste | Stats | Efecto | Estado |
 |---|---|---|---|---|
-| Héroe Cruit | — | 50 | Poder (2): invoca un Coco 1/1 con carga que muere al final del turno y obtenés una Leche | hecho (retrato con fondo de leche) |
+| Héroe Cruit | — | 50 | Poder (1): invoca un Coco 1/1 con carga que muere al final del turno | hecho (retrato con fondo de leche) |
 | Coco ⚧ (ficha, el hámster) | — | 1/1 | Carga. Muere al final de tu turno | hecho |
 | Cruit Intolerante a la Lactosa ⚧ (tribu Cruit) | 2 | 1/3 | Grito y último aliento: 2 de daño a todos los demás esbirros (vómito) | hecho |
 | Lechero ♂ | 1 | 1/1 | Grito: obtenés una Leche | hecho |
