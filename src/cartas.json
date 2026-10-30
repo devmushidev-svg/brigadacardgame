@@ -64,14 +64,15 @@
    "rareza": "legendaria",
    "token": true,
    "arte": "/arte/tun_maestro.webp",
-   "texto": "Grito de batalla: llena tu mesa de Tun al azar.",
+   "texto": "Grito de batalla: llena tu mesa de Tun al azar y lanzalos contra los enemigos que elijas.",
    "grito": [
     {
      "tipo": "invocar",
      "azar": {
       "tribu": "tun"
      },
-     "cantidad": 7
+     "cantidad": 7,
+     "disparar": "elegir"
     }
    ]
   },

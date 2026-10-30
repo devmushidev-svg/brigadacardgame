@@ -158,7 +158,7 @@ Diseño de Mario. Arquetipo: paladín molesto — llenar la mesa de Tun, buffear
 | Héroe Tun | — | 30 | Poder (1): invoca un Tun 1/1 | hecho |
 | Tun (ficha) | 1 | 1/1 | tribu Tun | hecho |
 | **Tun the Awarded** (misión, legendaria) | 1 | — | Invoca 20 Tun (cuenta todo, incluido el poder) → Tun Maestro del Universo | hecho |
-| **Tun Maestro del Universo** (legendaria, recompensa) | 5 | 8/8 | Grito: llena tu mesa de Tun al azar (cualquier Tun del juego) | hecho |
+| **Tun Maestro del Universo** (legendaria, recompensa) | 5 | 8/8 | Grito: llena tu mesa de Tun al azar (cualquier Tun del juego) y elegís contra quién se lanza cada uno | hecho |
 | **Panamá** (legendaria) | 1 | 1/1 | Grito: por el resto de la partida, cada vez que un jugador robe, invoca un Tun para él | hecho |
 | Tun Puto | 3 | 1/5 | Cada vez que muere un Tun (de cualquier lado), 1 de daño a un enemigo al azar | hecho |
 | Tun Tung Sahur | 1 | 1/1 | Grito: invoca un Tun 1/1 | hecho |

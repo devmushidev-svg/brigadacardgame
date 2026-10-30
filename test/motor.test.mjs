@@ -182,7 +182,7 @@ for (let k = 0; k < 20; k++) {
   assert.deepEqual(e.j[s].tablero.map((m) => m.id).sort(), ["tun_mujer", "tun_puto", "tun_puto", "tun_puto"]);
   assert.equal(e.j[r].tablero[0].id, "x", "los del rival no se tocan");
 }
-// --- Tun Maestro: llena la mesa de Tun al azar ---
+// --- Tun Maestro: llena la mesa de Tun al azar y el jugador elige a quién lanza cada uno ---
 {
   const e = nueva(24); const s = e.turno, r = 1 - s;
   preparar(e, s, ["tun_maestro"]);
@@ -190,6 +190,11 @@ for (let k = 0; k < 20; k++) {
   M.aplicar(e, s, { t: "jugar", uid: "t0" }, db, 0);
   assert.equal(e.j[s].tablero.length, 7, "mesa llena");
   assert.ok(e.j[s].tablero.every((m) => m.tribu === "tun"));
+  assert.equal(e.pendiente?.tipo, "disparar"); assert.equal(e.pendiente.cola.length, 6);
+  const v = e.j[r].vida;
+  let n = 0;
+  while (e.pendiente && n++ < 10) assert.ok(!M.aplicar(e, s, { t: "elegir", a: "h" + r }, db, 0).error);
+  assert.ok(e.j[r].vida <= v - 6, "los 6 le pegaron a la cara");
 }
 
 // --- Novia de Tun: al morir invoca 2 Tun y tus Tun tienen +1 de ataque (los de ahora, los de la mano y los que vengan) ---
