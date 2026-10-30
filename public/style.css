@@ -126,7 +126,7 @@ button { font-family: var(--f-tit); cursor: pointer; }
 .medio .linea { flex: 1; height: 5px; background: #4a2e1066; border-radius: 4px; overflow: hidden; }
 .medio .cuerda { height: 100%; width: 100%; background: linear-gradient(90deg, #ff4d00, #ffb000, #fff3a0); transform-origin: left; box-shadow: 0 0 8px #ff8c00; }
 .medio .reloj { font: 900 clamp(15px, calc(var(--esb) * .16), 20px) var(--f-tit); min-width: 40px; text-align: center; color: #fff; text-shadow: 0 1px 3px #000; }
-.global { font-size: 20px; filter: drop-shadow(0 0 6px #ffd34f); cursor: help; }
+.global { display: inline-grid; place-items: center; width: clamp(26px, calc(var(--esb) * .42), 40px); height: clamp(26px, calc(var(--esb) * .42), 40px); flex: none; overflow: hidden; border-radius: 50%; font-size: 20px; filter: drop-shadow(0 0 6px #ffd34f); cursor: help; }
 
 /* esbirros: retrato ovalado con aro de piedra y oro */
 .esbirro { position: relative; width: var(--esb); height: calc(var(--esb) * 1.28); flex: none; cursor: default;
