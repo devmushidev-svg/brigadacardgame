@@ -519,7 +519,7 @@ const misMazos = () => leerLS("mazos", []);
 const mazosFijos = () => Object.values(HEROES).filter((h) => h.mazoMeta)
   .map((h) => ({ id: "fijo_" + h.id, nombre: "Mazo de " + h.nombre, heroe: h.id, cartas: h.mazoMeta.slice(), fijo: true }));
 const todosMazos = () => [...mazosFijos(), ...misMazos()];
-const TAM_MAZO = 30;
+const TAM_MAZO = 40;
 const maxCopias = (c) => (c.rareza === "legendaria" ? 1 : 2);
 // cartas que puede llevar un héroe: las de su clase y las neutrales (sin fichas ni la misión, que va sola a la mano)
 const cartasDe = (heroe) => Object.values(DB).filter((c) => !c.token && c.tipo !== "mision" && (!c.clase || c.clase === heroe))
@@ -701,7 +701,7 @@ function pantallaTutorial(paso = 0) {
       <p>Algunos héroes tienen una <b>misión</b> que empieza siempre en tu mano (no cuenta como carta del mazo).</p>
       <p>Al jugarla queda arriba de tu retrato con un contador. Cuando cumplís el objetivo, te da una recompensa muy fuerte.</p>` },
     { t: "Mazo y reglas", h: `<ul class="tuto-lista">
-      <li>El mazo tiene <b>30 cartas</b>: de la clase de tu héroe y neutrales. Máximo <b>2 copias</b> de cada carta y <b>1</b> si es legendaria (★).</li>
+      <li>El mazo tiene <b>40 cartas</b>: de la clase de tu héroe y neutrales. Máximo <b>2 copias</b> de cada carta y <b>1</b> si es legendaria (★).</li>
       <li>Robás 1 carta al empezar cada turno.</li>
       <li>Mano: máximo <b>10 cartas</b>. Si robás con la mano llena, la carta se quema.</li>
       <li>Mesa: máximo <b>7 esbirros</b> por lado.</li>
@@ -1458,7 +1458,7 @@ function renderFinal(v) {
     const m = document.createElement("div");
     m.className = "modal final";
     m.innerHTML = `<div class="modal-caja"><h1 class="${gane ? "gano" : "perdio"}">${gane ? "¡TUTORIAL COMPLETO!" : "CASI..."}</h1>
-      <div class="mull-info" style="max-width:340px">${gane ? "Ya sabés jugar. En las partidas de verdad elegís tu mazo en <b>Mis mazos</b> (hay uno precargado de cada héroe), los mazos son de 30 cartas y al empezar hay <b>mulligan</b>: podés cambiar las cartas que no quieras." : "Esta vez ganó el bot. ¿Otra vez?"}</div>
+      <div class="mull-info" style="max-width:340px">${gane ? "Ya sabés jugar. En las partidas de verdad elegís tu mazo en <b>Mis mazos</b> (hay uno precargado de cada héroe), los mazos son de 40 cartas y al empezar hay <b>mulligan</b>: podés cambiar las cartas que no quieras." : "Esta vez ganó el bot. ¿Otra vez?"}</div>
       <button class="boton" id="fin-bot">${gane ? "Jugar contra el bot" : "Repetir el tutorial"}</button>
       <button class="boton sec" onclick="location.href='/'">Salir</button></div>`;
     app.append(m);

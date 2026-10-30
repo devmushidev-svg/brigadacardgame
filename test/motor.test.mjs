@@ -295,16 +295,18 @@ for (let k = 0; k < 20; k++) {
 
 // --- mazo armado por el jugador ---
 {
-  const ok = { heroe: "tun", cartas: [...Array(15)].flatMap(() => ["tun_puto", "mascotas_tun"]) };
+  const ok = { heroe: "tun", cartas: [...Array(20)].flatMap(() => ["tun_puto", "mascotas_tun"]) };
   assert.ok(!M.validarMazo(db, heroes, ok), "no mas de 2 copias");
   const cartas = ["tun_puto", "tun_puto", "mascotas_tun", "mascotas_tun", "tun_brawl", "tun_brawl", "comida", "comida", "tuna", "tuna",
     "tunita", "tunita", "platano", "platano", "tun_cool", "tun_cool", "tun_amor", "tun_amor", "tun_ia", "tun_ia",
-    "tun_tung_sahur", "tun_tung_sahur", "tun_mujer", "tun_mujer", "novia_tun", "novia_tun", "choza_monos", "choza_monos", "panama", "funeral_tun"];
+    "tun_tung_sahur", "tun_tung_sahur", "tun_mujer", "tun_mujer", "novia_tun", "novia_tun", "choza_monos", "choza_monos",
+    "tun_astronomo", "tun_astronomo", "tun_satanico", "tun_satanico", "mauro_sosa", "mauro_sosa", "tun_mastermind", "tun_mastermind",
+    "tun_iguana", "porque_me_monean", "panama", "funeral_tun"];
   const m = M.validarMazo(db, heroes, { heroe: "tun", cartas });
   assert.ok(m, "mazo valido");
-  assert.ok(!M.validarMazo(db, heroes, { heroe: "tun", cartas: cartas.slice(0, 20) }), "tiene que tener 30");
-  assert.ok(!M.validarMazo(db, heroes, { heroe: "tun", cartas: [...cartas.slice(0, 29), "panama"] }), "legendaria solo 1");
-  assert.ok(!M.validarMazo(db, heroes, { heroe: "tun", cartas: [...cartas.slice(0, 29), "tun"] }), "fichas no");
+  assert.ok(!M.validarMazo(db, heroes, { heroe: "tun", cartas: cartas.slice(0, 30) }), "tiene que tener 40");
+  assert.ok(!M.validarMazo(db, heroes, { heroe: "tun", cartas: [...cartas.slice(0, 39), "panama"] }), "legendaria solo 1");
+  assert.ok(!M.validarMazo(db, heroes, { heroe: "tun", cartas: [...cartas.slice(0, 39), "tun"] }), "fichas no");
   const e = M.crearPartida(db, 5); e.j[0].nombre = "A"; e.j[1].nombre = "B";
   e.j[0].mazoElegido = m; e.j[0].heroe = "tun";
   M.empezar(e, db, 0, heroes, false);

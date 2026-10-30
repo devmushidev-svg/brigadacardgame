@@ -14,7 +14,7 @@ Meta actual: **100 cartas**. Todos los personajes hasta ahora son hombres salvo 
 | Maná | sube 1 por turno, máximo 10 |
 | Mano | máximo 10 (si robás con la mano llena, la carta se quema) |
 | Mesa | máximo 7 esbirros por lado |
-| Mazo | 30 cartas. Se elige en el lobby o en **Mis mazos**: siempre hay un mazo **precargado** por héroe (su `mazoMeta` en `heroes`; no se borra, se puede copiar para editar) y los que arme cada uno (héroe + cartas de su clase y neutrales; la misión no va, empieza sola en la mano; se guardan en el navegador). Con "Al azar", héroe al azar con su mazo precargado. Sin mazo meta, uno al azar: 22 de clase + 8 neutrales |
+| Mazo | 40 cartas. Se elige en el lobby o en **Mis mazos**: siempre hay un mazo **precargado** por héroe (su `mazoMeta` en `heroes`; no se borra, se puede copiar para editar) y los que arme cada uno (héroe + cartas de su clase y neutrales; la misión no va, empieza sola en la mano; se guardan en el navegador). Con "Al azar", héroe al azar con su mazo precargado. Sin mazo meta, uno al azar: 32 de clase + 8 neutrales |
 | Copias | 2 por carta, **1 si es legendaria** |
 | Mano inicial | el que empieza roba 3, el otro 4 + **La Moneda** (llega después del mulligan) |
 | Mulligan | antes del primer turno cada uno elige qué cartas de su mano inicial cambiar: vuelven al mazo y se roban otras. La misión no se cambia. 40 segundos; si no elegís, te quedás con tu mano. El bot cambia las cartas de más de 3 de maná |
@@ -229,9 +229,9 @@ Sin mazo armado, el héroe sale al azar.
 
 ## Mazos meta
 
-**Tun (30):** 2 Tun Tung Sahur, 2 Tun IA, 2 Plátano, 2 Tunita, 2 Tun Brawl Stars, 2 Mascotas de Tun, 2 Tun Puto, 2 Comida, 2 Choza de Monos, 2 Novia de Tun, 2 Tun Mujer, 2 Tun Amor, 2 Tun Cool, 2 Tun Mastermind, Porque Me Monean, Funeral de Tun.
+**Tun (40):** todas las cartas que puede usar Tun, al máximo de copias (hoy son justo 40).
 
-**Cruit (30):** 2 Cruit Tostadora, 2 Estreñido Cruit, 2 Lechero, 2 Leche, 2 Tarea de la U, 2 Cruit Intolerante, 2 Elliot Cruit, 2 Cruit Sangre, 2 Tun Brawl Stars, 2 Chance Cruit, 2 Cruit Baño, 2 Cruit Excel, 2 Cruit Vampiro, Cruit Verity, Cruit Vaca, Unislop, Coco Supremo.
+**Cruit (40):** todas las cartas que puede usar Cruit menos los dos Nullscape.
 
 Con los mazos de 20, bot contra bot, Cruit le ganaba a Tun ~68% (era ~95% antes de los nerfs a Estreñido, Cruit Baño y Cruit Sangre y el buff a Novia de Tun). Con los mazos de 30 y mulligan (Lechero 1/1, Cruit Vaca fuera de la tribu, Cruit Verity 3 de maná con Verity 5/5, Cruit Baño 4/2 de 2 de maná que reparte su ataque, Novia de Tun 3 de maná 2/1 que al morir invoca 2 Tun, Intolerante y Estreñido también al morir), Cruit gana ~46%. Con 50 de vida y los cambios a Tun (Tun Mujer, Mastermind, Porque Me Monean, Choza, misión de 20), ~41%.
 
@@ -256,3 +256,5 @@ Con los mazos de 20, bot contra bot, Cruit le ganaba a Tun ~68% (era ~95% antes 
 - cartas que cuestan menos según la mesa
 - transformar esbirros
 - reinvocar los que murieron esta partida
+
+Con 50 de vida y mazos de 40 (poder de Cruit de 1 maná), bot contra bot: Cruit gana ~45%.

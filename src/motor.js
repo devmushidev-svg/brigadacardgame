@@ -8,8 +8,8 @@ export const CONFIG = {
   MAX_MANA: 10,
   MAX_TABLERO: 7,
   MAX_MANO: 10,
-  TAM_MAZO: 30,
-  CARTAS_DE_CLASE: 22, // cuántas cartas del mazo salen de la clase del héroe
+  TAM_MAZO: 40,
+  CARTAS_DE_CLASE: 32, // cuántas cartas del mazo salen de la clase del héroe
   COPIAS_MAX: 2,
   TIEMPO_TURNO: 75, // segundos
   TIEMPO_MULLIGAN: 40, // segundos para elegir qué cartas cambiar al empezar
@@ -562,7 +562,7 @@ function aplicarEfectos(estado, s, efectos, elegido, ev, db, fuente, ctx = {}) {
         danar(estado, ref, n * veces * mult, ev);
         const quitado = escudo ? 0 : Math.max(0, antes - t.obj.vida);
         if (quitado) {
-          // robar vida SUMA: puede pasar de 30 (sube la vida máxima)
+          // robar vida SUMA: puede pasar de la vida máxima (y la sube)
           const h = estado.j[s];
           h.vida += quitado; h.vidaMax = Math.max(h.vidaMax, h.vida);
           ev.push({ e: "cura", a: "h" + s, n: quitado });
