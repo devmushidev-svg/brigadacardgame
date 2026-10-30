@@ -492,8 +492,7 @@ function aplicarEfectos(estado, s, efectos, elegido, ev, db, fuente, ctx = {}) {
     }
     if (ef.tipo === "repetir_jugados") {
       // Coco Supremo: repite los gritos y últimos alientos de las cartas del filtro que jugaste esta partida
-      // lo que jugaste y también lo que activaste de nuevo (Leche, Cruit Vaca, Cruit Rage)
-      const ids = [...(estado.j[s].jugados || []), ...(estado.j[s].activados || [])].filter((id) => db[id] && cumpleFiltro(db[id], ef.filtro) &&
+      const ids = (estado.j[s].jugados || []).filter((id) => db[id] && cumpleFiltro(db[id], ef.filtro) &&
         ![...(db[id].grito || []), ...(db[id].aliento || [])].some((x) => x.tipo === "repetir_jugados"));
       // para el combo: los que crecen por cada cosa (Cruit Excel) van al final, y los que pegan según su ataque (Cruit Baño) al último
       const orden = (id) => { const efs = [...(db[id].grito || []), ...(db[id].aliento || [])]; return efs.some((x) => x.tipo === "repartir") ? 2 : efs.some((x) => x.porCada) ? 1 : 0; };
@@ -592,7 +591,6 @@ function aplicarEfectos(estado, s, efectos, elegido, ev, db, fuente, ctx = {}) {
         const c = db[t.obj.id];
         if (!c?.grito && !c?.aliento) continue;
         activos.push(ref);
-        (estado.j[t.seat].activados ||= []).push(t.obj.id); // Coco Supremo también repite lo que activaste con Leche
         ev.push({ e: "dispara", uid: ref, por: "leche" });
         if (c.grito) aplicarEfectos(estado, t.seat, c.grito, null, ev, db, ref);
         if (c.aliento) aplicarEfectos(estado, t.seat, c.aliento, null, ev, db, ref);
@@ -945,7 +943,6 @@ export function aplicar(estado, s, accion, db, ahora) {
         if (extra) delete p.gritoExtra;
         for (let k = 0; k < (extra ? extra.veces : 1) && estado.fase === "jugando" && buscar(estado, m.uid); k++) {
           ev.push(k ? { e: "dispara", uid: m.uid, por: "rage" } : { e: "grito", uid: m.uid, objetivo: accion.objetivo || null });
-          if (k) (p.activados ||= []).push(carta.id);
           aplicarEfectos(estado, s, carta.grito, accion.objetivo, ev, db, m.uid);
           if (extra) resolverMuertes(estado, ev, db);
         }

@@ -347,12 +347,12 @@
    "coste": 3,
    "clase": "tun",
    "arte": "/arte/comida.webp",
-   "texto": "Invoca 4 Tun 1/1.",
+   "texto": "Llena tu mesa de Tun 1/1.",
    "efectos": [
     {
      "tipo": "invocar",
      "carta": "tun",
-     "cantidad": 4
+     "cantidad": 7
     }
    ]
   },
@@ -785,7 +785,7 @@
    "rareza": "legendaria",
    "clase": "cruit",
    "arte": "/arte/coco_supremo.webp",
-   "texto": "Grito de batalla: repite los gritos de batalla y últimos alientos de los Cruit que jugaste esta partida, también los que activaste con Leche.",
+   "texto": "Grito de batalla: repite los gritos de batalla y últimos alientos de todos los Cruit que jugaste esta partida.",
    "grito": [
     {
      "tipo": "repetir_jugados",

@@ -236,7 +236,7 @@ for (let k = 0; k < 20; k++) {
   e.j[s].tablero = [];
   preparar(e, s, ["comida", "platano"]);
   M.aplicar(e, s, { t: "jugar", uid: "t0" }, db, 0);
-  assert.equal(tuns(e, s), 4);
+  assert.equal(tuns(e, s), 7, "llena la mesa");
   const t = e.j[s].tablero[0].uid;
   assert.ok(!M.aplicar(e, s, { t: "jugar", uid: "t1", objetivo: t }, db, 0).error);
   assert.ok(e.j[s].tablero[0].provocar && e.j[s].tablero[0].ataque === 3);
@@ -416,7 +416,7 @@ for (let k = 0; k < 20; k++) {
   const cs = e.j[s].tablero.find((m) => m.id === "coco_supremo");
   assert.deepEqual([cs.ataque, cs.vida], [8, 6], "el grito de Excel repetido buffea a Coco Supremo (+1/+1 por 1 tarea)");
 }
-// --- Coco Supremo: también repite lo que activaste con Leche; Excel al final y Cruit Baño al último ---
+// --- Coco Supremo: solo repite lo jugado (no lo activado con Leche); Excel al final y Cruit Baño al último ---
 {
   const e = nueva(47, ["cruit", "cruit"]); const s = e.turno, r = 1 - s;
   e.j[s].tablero = []; e.j[r].tablero = [{ uid: "rv", id: "x", tribu: null, ataque: 0, vida: 99, vidaMax: 99, ataques: 0 }];
@@ -427,16 +427,15 @@ for (let k = 0; k < 20; k++) {
   const bano = e.j[s].tablero.find((m) => m.id === "cruit_bano").uid;
   M.aplicar(e, s, { t: "jugar", uid: "t3", objetivo: bano }, db, 0);
   M.aplicar(e, s, { t: "jugar", uid: "t4", objetivo: bano }, db, 0);
-  assert.deepEqual(e.j[s].activados, ["cruit_bano", "cruit_bano"], "las dos Leches activaron al Baño");
   e.j[s].mana = 10; e.j[r].vida = M.CONFIG.VIDA_HEROE; e.j[r].tablero[0].vida = 99;
   const res = M.aplicar(e, s, { t: "jugar", uid: "t5" }, db, 0);
   assert.ok(!res.error, res.error);
   const rep = res.ev.filter((x) => x.e === "repite").map((x) => x.carta);
-  assert.deepEqual(rep, ["cruit_excel", "cruit_bano", "cruit_bano", "cruit_bano"], "Excel primero; el Baño jugado y sus 2 activaciones al último");
+  assert.deepEqual(rep, ["cruit_excel", "cruit_bano"], "Excel primero y el Baño al último; las Leches no se repiten");
   const cs = e.j[s].tablero.find((m) => m.id === "coco_supremo");
   assert.equal(cs.ataque, 7 + 1, "+1/+1 de Excel (1 tarea)");
   const dano = (M.CONFIG.VIDA_HEROE - e.j[r].vida) + (99 - e.j[r].tablero[0].vida);
-  assert.equal(dano, 8 * 3, "cada Baño repetido reparte el ataque de Coco ya buffeado");
+  assert.equal(dano, 8, "el Baño repetido reparte el ataque de Coco ya buffeado");
 }
 
 // --- Estreñido Cruit, Cruit Sangre, Cruit Vampiro ---

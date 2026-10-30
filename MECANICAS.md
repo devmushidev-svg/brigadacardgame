@@ -166,7 +166,7 @@ Diseño de Mario. Arquetipo: paladín molesto — llenar la mesa de Tun, buffear
 | Tun Cool | 10 | 6/7 | Cuesta 1 menos por cada otro Tun en el campo (los dos lados). Cada vez que recibe daño, invoca un Tun 1/1 | hecho |
 | Novia de Tun ♀ | 3 | 2/1 | Último aliento: invoca 2 Tun y tus Tun tienen +1 de ataque por el resto de la partida | hecho |
 | Tun Mastermind | 15 | 6/3 | Acometida. 1 menos por cada Tun muerto en la partida. Grito: invoca 3 Tun y tus Tun tienen +1 de ataque por el resto de la partida | hecho |
-| Comida (hechizo) | 3 | — | Invoca 4 Tun 1/1 | hecho |
+| Comida (hechizo) | 3 | — | Llena tu mesa de Tun 1/1 | hecho |
 | Plátano (hechizo) | 1 | — | +2/+2 y provocar a uno de tus Tun | hecho |
 | Tuna (hechizo) | 2 | — | +1 de vida a tus Tun | hecho |
 | Tunita (hechizo) | 2 | — | 1 de daño a un esbirro, +1 por cada Tun que jugaste esta partida | hecho |
@@ -209,7 +209,7 @@ Diseño de Mario. Marco azul (provisional). Cruit es no binario: toda carta con 
 | Nullscape (hechizo) | 4 | — | Todos los esbirros hacen parkour; solo uno al azar sobrevive | hecho |
 | Cruit Excel ⚧ (tribu Cruit, etiqueta programa) | 5 | 2/2 | Grito: +1/+1 por cada Tarea que lanzaste esta partida. No se le puede dar Leche | hecho |
 | Tarea de la U (hechizo, etiqueta Tarea) | 1 | — | 2 de daño a tu héroe, roba una carta | hecho |
-| **Coco Supremo** ⚧ (legendaria) | 9 | 7/5 | Grito: repite los gritos y últimos alientos de los Cruit que jugaste esta partida, y también cada activación que hiciste con Leche, Cruit Vaca o Cruit Rage. Orden: primero el resto, después los que crecen por cada cosa (Excel) y al último los que pegan según su ataque (Baño) | hecho |
+| **Coco Supremo** ⚧ (legendaria) | 9 | 7/5 | Grito: repite los gritos y últimos alientos de los Cruit que jugaste esta partida. Orden: primero el resto, después los que crecen por cada cosa (Excel) y al último los que pegan según su ataque (Baño) | hecho |
 | Estreñido Cruit ⚧ | 1 | 1/2 | Grito y último aliento: mete 2 Cacas en el mazo del rival (al robarlas: 2 de daño y roba otra) | hecho |
 | Cruit Sangre ⚧ | 2 | 2/2 | Se fusiona con tus otros Cruit Sangre (suma stats, ×N en la carta). Al final de tu turno, roba 1 de vida por cada Sangre fusionada al enemigo con menos vida | hecho |
 | Cruit Vampiro ⚧ | 5 | 3/3 | Tus Cruit Sangre roban el doble de vida. Grito: invoca 2 Cruit Sangre (se fusionan en una, con animación) | hecho |
