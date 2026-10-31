@@ -847,12 +847,4 @@ console.log("ok: armas y Cruit Breakdown");
   assert.ok(!res.error, res.error);
   assert.ok(e.j[s].tablero.some((m) => m.id === "tipo_foto"), "vuelve a salir para su dueño");
 }
-// --- Colosal de clase: Rey Tun entra con un Brazo a cada lado ---
-{
-  const e = nueva(103); const s = e.turno;
-  e.j[s].tablero = [];
-  preparar(e, s, ["rey_tun"]);
-  M.aplicar(e, s, { t: "jugar", uid: "t0" }, db, 0);
-  assert.deepEqual(e.j[s].tablero.map((m) => m.id), ["brazo_tun", "rey_tun", "brazo_tun"]);
-}
-console.log("ok: Mario, Rafael, El Tipo de la Foto y colosales");
+console.log("ok: Mario, Rafael y El Tipo de la Foto");

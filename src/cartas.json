@@ -212,46 +212,6 @@
    ]
   },
   {
-   "id": "rey_tun",
-   "nombre": "Rey Tun",
-   "tipo": "esbirro",
-   "coste": 7,
-   "ataque": 5,
-   "vida": 8,
-   "tribu": "tun",
-   "clase": "tun",
-   "rareza": "legendaria",
-   "arte": "👑",
-   "claves": [
-    "provocar"
-   ],
-   "colosal": {
-    "carta": "brazo_tun",
-    "cantidad": 2
-   },
-   "texto": "Colosal +2. Provocar."
-  },
-  {
-   "id": "brazo_tun",
-   "nombre": "Brazo de Tun",
-   "tipo": "esbirro",
-   "coste": 2,
-   "ataque": 2,
-   "vida": 3,
-   "tribu": "tun",
-   "clase": "tun",
-   "token": true,
-   "arte": "💪",
-   "texto": "Al final de tu turno, invoca un Tun 1/1.",
-   "fin_turno": [
-    {
-     "tipo": "invocar",
-     "carta": "tun",
-     "cantidad": 1
-    }
-   ]
-  },
-  {
    "id": "mauro_sosa",
    "nombre": "Mauro Sosa",
    "genero": "hombre",
@@ -1049,42 +1009,6 @@
    "grito": [
     {
      "tipo": "hechizos_azar"
-    }
-   ]
-  },
-  {
-   "id": "cruit_gigante",
-   "nombre": "Cruit Gigante",
-   "genero": "no_binario",
-   "tipo": "esbirro",
-   "coste": 8,
-   "ataque": 6,
-   "vida": 8,
-   "tribu": "cruit",
-   "clase": "cruit",
-   "rareza": "legendaria",
-   "arte": "🐄",
-   "colosal": {
-    "carta": "ubre_cruit",
-    "cantidad": 2
-   },
-   "texto": "Colosal +2."
-  },
-  {
-   "id": "ubre_cruit",
-   "nombre": "Ubre de Cruit",
-   "tipo": "esbirro",
-   "coste": 2,
-   "ataque": 1,
-   "vida": 5,
-   "clase": "cruit",
-   "token": true,
-   "arte": "🥛",
-   "texto": "Al final de tu turno, obtenés una Leche.",
-   "fin_turno": [
-    {
-     "tipo": "dar_carta",
-     "carta": "leche"
     }
    ]
   },

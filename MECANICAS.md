@@ -180,7 +180,6 @@ Diseño de Mario. Arquetipo: paladín molesto — llenar la mesa de Tun, buffear
 | Choza de Monos | 3 | 0/6 | Al final de tu turno, invoca dos Tun | hecho |
 | **Tun Iguana** (legendaria) | 5 | 5/5 | Grito: por el resto de la partida, cada vez que muere uno de tus Tun, invoca un Tun Zombie que ataca a un enemigo al azar | hecho — falta imagen (🦎) y confirmar género |
 | Tun Astrónomo | 3 | 2/4 | Cada vez que ataca, un Tun de tu mano al azar cuesta 2 menos | hecho — falta imagen (🔭); coste y stats propuestos, falta confirmar género |
-| **Rey Tun** (legendaria) | 7 | 5/8 | Colosal +2. Provocar. Brazos de Tun 2/3: al final de tu turno invocan un Tun 1/1 | hecho — propuesta mía, falta imagen (👑) |
 | Tun Satánico | **5** | **3/3** | Grito: destruye a tus otros Tun y gana +2/+2 por cada uno | hecho — **coste y stats provisionales**, falta que Mario los defina |
 
 ## Neutrales
@@ -229,7 +228,6 @@ Diseño de Mario. Marco azul (provisional). Cruit es no binario: toda carta con 
 | Tarea de la U (hechizo, etiqueta Tarea) | 1 | — | Robás una carta y obtenés una tarea universitaria al azar | hecho |
 | **Coco Supremo** ⚧ (legendaria) | 9 | 7/5 | Grito: repite los gritos y últimos alientos de los Cruit que jugaste esta partida. Orden: primero el resto, después los que crecen por cada cosa (Excel) y al último los que pegan según su ataque (Baño) | hecho |
 | **Cruit Breakdown** ⚧ (legendaria, como Yogg-Saron) | 10 | 7/5 | Grito: lanza un hechizo al azar por cada hechizo que lanzaste esta partida, con objetivos al azar | hecho — falta imagen (🤯) |
-| **Cruit Gigante** ⚧ (legendaria) | 8 | 6/8 | Colosal +2: dos Ubres de Cruit 1/5 que al final de tu turno te dan una Leche | hecho — propuesta mía, falta imagen (🐄) |
 | Estreñido Cruit ⚧ | 1 | 1/2 | Grito y último aliento: mete 2 Cacas en el mazo del rival (al robarlas: 2 de daño y roba otra) | hecho |
 | Cruit Sangre ⚧ | 2 | 2/2 | Se fusiona con tus otros Cruit Sangre (suma stats, ×N en la carta). Al final de tu turno, roba 1 de vida por cada Sangre fusionada al enemigo con menos vida | hecho |
 | Cruit Vampiro ⚧ | 5 | 3/3 | Tus Cruit Sangre roban el doble de vida. Grito: invoca 2 Cruit Sangre (se fusionan en una, con animación) | hecho |
