@@ -314,10 +314,12 @@ function danarHeroe(estado, s, n, ev) {
   ev.push({ e: "dano", a: "h" + s, n: n - abs });
 }
 
-// ---------- PutoVC: las cartas con "vc" se suman al jugarlas; al lanzarlo se activan sus últimos alientos ----------
+// ---------- PutoVC: una ubicación fija (no se ataca ni se destruye). Las cartas con "vc" se suman al jugarlas;
+// al lanzarlo se activan los últimos alientos de todas y vuelve a 0 ----------
+const vcVacio = () => ({ piezas: [], ataque: 0, vida: 0 });
 export function puedeLanzarVC(estado, s) {
   const p = estado.j[s];
-  return !!p.vc?.piezas.length && p.mana >= CONFIG.COSTE_VC && p.tablero.length < CONFIG.MAX_TABLERO;
+  return !!p.vc?.piezas.length && p.mana >= CONFIG.COSTE_VC;
 }
 function lanzarVC(estado, s, vc, ev, db) {
   ev.push({ e: "vc_lanza", seat: s, n: vc.piezas.length });
@@ -329,8 +331,6 @@ function lanzarVC(estado, s, vc, ev, db) {
     aplicarEfectos(estado, s, c.aliento, null, ev, db, null);
     resolverMuertes(estado, ev, db);
   }
-  const m = estado.fase === "jugando" && invocar(estado, s, "putovc", ev, db);
-  if (m) { m.ataque = vc.ataque; m.vida = m.vidaMax = vc.vida; ev.push({ e: "buff", a: m.uid, ataque: vc.ataque, vida: vc.vida }); }
 }
 
 // extra: { fx, de } para que el cliente sepa cómo dibujar el golpe (ej. una piedra desde Tun Puto)
@@ -598,8 +598,8 @@ function aplicarEfectos(estado, s, efectos, elegido, ev, db, fuente, ctx = {}) {
     }
     if (ef.tipo === "destruir_vc") {
       // Enojaste Destroyer of VC: destruye tu PutoVC y elegís una opción (como el Exodar)
-      const vc = estado.j[s].vc || { piezas: [], ataque: 0, vida: 0 };
-      estado.j[s].vc = null;
+      const vc = estado.j[s].vc || vcVacio();
+      if (estado.j[s].vc) estado.j[s].vc = vcVacio(); // la ubicación queda, vacía
       ev.push({ e: "vc_destruido", seat: s });
       if (estado.pendiente) aplicarEfectos(estado, s, db[elegir(estado, ef.opciones)]?.efectos, null, ev, db, fuente, { vc });
       else { estado.pendiente = { seat: s, tipo: "descubrir", elegirUno: true, opciones: ef.opciones.slice(), vc, fuente }; ev.push({ e: "elegir", seat: s, tipo: "descubrir" }); }
@@ -1004,9 +1004,9 @@ export function aplicar(estado, s, accion, db, ahora) {
   }
 
   if (accion.t === "vc") {
-    if (!puedeLanzarVC(estado, s)) return { error: !p.vc?.piezas.length ? "todavía no tenés piezas en el VC" : p.mana < CONFIG.COSTE_VC ? "no te alcanza el mana" : "tablero lleno" };
+    if (!puedeLanzarVC(estado, s)) return { error: !p.vc?.piezas.length ? "todavía no tenés piezas en el VC" : "no te alcanza el mana" };
     p.mana -= CONFIG.COSTE_VC;
-    const vc = p.vc; p.vc = null;
+    const vc = p.vc; p.vc = vcVacio();
     registrar(estado, `${p.nombre} lanzó el PutoVC`);
     lanzarVC(estado, s, vc, ev, db);
     resolverMuertes(estado, ev, db);
@@ -1092,7 +1092,7 @@ export function aplicar(estado, s, accion, db, ahora) {
         }
       }
       if (carta.vc) { // entra al PutoVC: suma sus stats y su último aliento
-        const vc = (p.vc ||= { piezas: [], ataque: 0, vida: 0 });
+        const vc = (p.vc ||= vcVacio());
         vc.piezas.push(carta.id); vc.ataque += carta.ataque; vc.vida += carta.vida;
         ev.push({ e: "vc_suma", seat: s, carta: carta.id });
       }

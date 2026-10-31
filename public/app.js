@@ -172,7 +172,7 @@ const PALABRAS = [
   { n: "Robo de vida", re: "robo de vida", clave: "robo_vida", d: "El daño que hace este esbirro al pelear se suma a la vida de tu héroe." },
   { n: "Colosal", re: "colosal(?: \\+\\d+)?", d: "Entra con apéndices (esbirros extra) a sus costados. El número dice cuántos." },
   { n: "Arma", re: "arma", d: "Se le equipa a tu héroe: puede atacar una vez por turno con el ataque del arma. Cada ataque gasta un uso; si ataca a un esbirro, ese esbirro le pega de vuelta a tu héroe." },
-  { n: "VC", re: "vc", d: "Al jugarla entra a tu PutoVC: le suma su ataque y su vida. Cuando tocás el PutoVC para lanzarlo, se activan los últimos alientos de todas sus piezas y sale un esbirro con la suma de sus stats." },
+  { n: "VC", re: "vc", d: "Al jugarla entra a tu PutoVC (una ubicación en tu mesa que no se puede destruir). Cuando tocás el PutoVC para lanzarlo, se activan los últimos alientos de todo lo que entró, y el VC vuelve a 0." },
   { n: "Armadura", re: "armadura", d: "Absorbe el daño que recibe tu héroe antes que su vida." },
   { n: "Se fusiona", re: "se fusiona", d: "Si ya tenés uno igual en la mesa, se une a ese: le suma su ataque y su vida, y su efecto cuenta una vez más." },
   { n: "Activar", re: "activan?|activar", d: "Repite el grito de batalla y el último aliento del esbirro." },
@@ -1114,7 +1114,7 @@ function ponerEnMesa(e, v, nuevos, caer) {
   const orden = v.j[e.seat].tablero.map((m) => m.uid), i = orden.indexOf(e.uid);
   const sig = i < 0 ? null : [...tab.children].find((ch) => orden.indexOf(ch.dataset.ref) > i);
   tab.insertBefore(el, sig || null);
-  tab.style.setProperty("--n", tab.children.length);
+  tab.style.setProperty("--n", $$(".esbirro", tab).length);
   (nuevos.especial ||= new Set()).add(e.uid);
   if (!caer) return;
   Sonido.jugar();
@@ -1226,13 +1226,13 @@ function heroeHTML(v, s) {
     ${p.arma ? `<div class="stat atk" title="ataque del arma">${p.arma.ataque}</div><div class="arma-heroe" title="${esc(DB[p.arma.id]?.nombre || "arma")}: ${p.arma.durabilidad} usos">${artHTML(DB[p.arma.id]?.arte || "🗡️")}<i>${p.arma.durabilidad}</i></div>` : ""}</div>`;
 }
 const heroePuedeAtacar = (p) => !!p.arma && p.arma.ataque > 0 && !p.heroeAtaco;
-// PutoVC: aparece cuando tenés piezas; se toca para lanzarlo
+// PutoVC: una ubicación fija en el borde de tu mesa (no se ataca ni se destruye); se toca para lanzarlo
 function vcHTML(v, s) {
   const vc = v.j[s].vc;
-  if (!vc?.piezas?.length) return "";
-  const p = v.j[s], listo = s === v.yo && v.turno === s && v.fase === "jugando" && p.mana >= vc.coste && p.tablero.length < 7;
-  return `<button class="poder putovc ${listo ? "listo" : ""}" data-vc="${s}" ${s === v.yo ? 'id="vc"' : ""} title="PutoVC: ${vc.piezas.length} pieza${vc.piezas.length === 1 ? "" : "s"}, ${vc.ataque}/${vc.vida}">
-    <span>🎧</span><div class="stat mana">${vc.coste}</div><b class="vc-stats">${vc.ataque}/${vc.vida}</b></button>`;
+  if (!vc) return "";
+  const p = v.j[s], listo = s === v.yo && v.turno === s && v.fase === "jugando" && vc.piezas.length > 0 && p.mana >= vc.coste;
+  return `<button class="vc-lugar ${listo ? "listo" : ""} ${vc.piezas.length ? "" : "vacio"}" data-vc="${s}" ${s === v.yo ? 'id="vc"' : ""}>
+    <span class="vc-icono">🎧</span><b>PutoVC</b><i>${vc.piezas.length} en el VC</i><div class="stat mana">${vc.coste}</div></button>`;
 }
 function poderHTML(v, s) {
   const p = v.j[s];
@@ -1273,17 +1273,17 @@ function render(v) {
     <div class="zona rival">
       <div class="placa"><div class="nombre">${esc(R.nombre)}</div><div class="mazo" title="cartas en el mazo">${R.mazo}</div>${mejorasHTML(R)}
         ${v.conectados && !v.conectados[riv] ? '<div class="aviso">desconectado</div>' : ""}</div>
-      ${heroeHTML(v, riv)}${poderHTML(v, riv)}${vcHTML(v, riv)}
+      ${heroeHTML(v, riv)}${poderHTML(v, riv)}
       ${cristales(R)}
     </div>
     <div class="campo">
-      <div class="tablero" data-seat="${riv}" style="--n:${R.tablero.length}">${R.tablero.map((m) => esbirroHTML(m, riv, v)).join("")}</div>
+      <div class="tablero ${R.vc ? "con-vc" : ""}" data-seat="${riv}" style="--n:${R.tablero.length}">${vcHTML(v, riv)}${R.tablero.map((m) => esbirroHTML(m, riv, v)).join("")}</div>
       <div class="medio">${(v.globales || []).map((g) => `<span class="global" data-carta="${esc(g)}">${artHTML(DB[g]?.arte || "🌐")}</span>`).join("")}<div class="reloj"></div><div class="linea"><div class="cuerda"></div></div><div class="reloj turno-txt">${v.yo < 0 ? "mirando" : ""}</div></div>
-      <div class="tablero" data-seat="${yo}" id="mi-tablero" style="--n:${P.tablero.length}">${P.tablero.map((m) => esbirroHTML(m, yo, v)).join("")}</div>
+      <div class="tablero ${P.vc ? "con-vc" : ""}" data-seat="${yo}" id="mi-tablero" style="--n:${P.tablero.length}">${vcHTML(v, yo)}${P.tablero.map((m) => esbirroHTML(m, yo, v)).join("")}</div>
     </div>
     <div class="zona yo">
       <div class="placa"><div class="nombre">${esc(P.nombre)}</div><div class="mazo" title="cartas en el mazo">${P.mazo}</div>${mejorasHTML(P)}</div>
-      ${heroeHTML(v, yo)}${poderHTML(v, yo)}${vcHTML(v, yo)}
+      ${heroeHTML(v, yo)}${poderHTML(v, yo)}
       ${cristales(P)}
     </div>
     <div class="mano" style="--n:${Math.max(1, n)};--n1:${Math.max(1, n - 1)}">${mano.map((c, i) => {
@@ -1303,7 +1303,7 @@ function render(v) {
   const bvc = $("#vc");
   if (bvc) bvc.onclick = () => {
     const vc = P.vc;
-    if (!bvc.classList.contains("listo")) { toast(`PutoVC: ${vc.piezas.map((id) => DB[id]?.nombre || id).join(", ")} (${vc.ataque}/${vc.vida}). Lanzarlo cuesta ${vc.coste}.`, 2600); return; }
+    if (!bvc.classList.contains("listo")) { toast(vc.piezas.length ? `En el VC: ${vc.piezas.map((id) => DB[id]?.nombre || id).join(", ")}. Lanzarlo cuesta ${vc.coste}.` : "El VC está vacío: jugá cartas con VC para llenarlo.", 2600); return; }
     bvc.classList.remove("listo"); enviar({ t: "vc" });
   };
   const bp = $("#poder");

@@ -717,7 +717,7 @@ console.log("ok: cartas nuevas de Tun");
 }
 console.log("ok: cambios de Cruit");
 
-// --- PutoVC: las piezas se suman; al lanzarlo se activan sus últimos alientos y sale con la suma de stats ---
+// --- PutoVC (ubicación): las piezas se suman; al lanzarlo se activan sus últimos alientos y vuelve a 0 ---
 {
   const e = nueva(90); const s = e.turno, r = 1 - s;
   e.j[s].tablero = []; e.j[r].tablero = [];
@@ -735,9 +735,8 @@ console.log("ok: cambios de Cruit");
   assert.ok(!e.j[s].tablero.some((m) => m.id === "cuidar_vc" || m.id === "ishowspeed"), "las piezas murieron en la cadena");
   assert.equal(e.j[s].armadura, 8, "Cuidar VC: 4 al lanzar y 4 al morir");
   assert.equal(e.j[r].tablero[0].vida, 3, "Ishowspeed: 3 al lanzar y 3 al morir");
-  const vc = e.j[s].tablero.find((m) => m.id === "putovc");
-  assert.deepEqual([vc.ataque, vc.vida], [7, 7], "sale con la suma de las piezas (después de los efectos)");
-  assert.equal(e.j[s].vc, null, "empieza un VC nuevo");
+  assert.ok(!e.j[s].tablero.some((m) => m.id === "putovc"), "no invoca nada: es una ubicación");
+  assert.deepEqual(e.j[s].vc, { piezas: [], ataque: 0, vida: 0 }, "vuelve a 0 (la ubicación queda)");
   // la armadura absorbe el daño antes que la vida
   const v = e.j[s].vida;
   e.turno = r; e.j[r].tablero[0].dormido = false;
@@ -751,7 +750,7 @@ for (const [i, op] of ["stats", "armadura", "lanzar"].entries()) {
   e.j[s].vc = { piezas: ["cuidar_vc", "ishowspeed"], ataque: 7, vida: 7 };
   preparar(e, s, ["destroyer_vc"]);
   M.aplicar(e, s, { t: "jugar", uid: "t0" }, db, 0);
-  assert.equal(e.j[s].vc, null, "el VC se destruye");
+  assert.deepEqual(e.j[s].vc, { piezas: [], ataque: 0, vida: 0 }, "el VC queda vacío");
   assert.ok(e.pendiente?.elegirUno && e.pendiente.opciones.length === 3);
   const vr = e.j[r].vida;
   assert.ok(!M.aplicar(e, s, { t: "elegir", i }, db, 0).error);
@@ -759,8 +758,7 @@ for (const [i, op] of ["stats", "armadura", "lanzar"].entries()) {
   if (op === "stats") { assert.deepEqual([d.ataque, d.vida], [11, 11]); assert.equal(vr - e.j[r].vida, 14, "reparte el doble del ataque (sin esbirros: todo a la cara)"); }
   if (op === "armadura") assert.equal(e.j[s].armadura, 14);
   if (op === "lanzar") {
-    assert.ok(e.j[s].tablero.some((m) => m.id === "putovc"), "lo lanza");
-    assert.equal(e.j[s].armadura, 4, "con sus efectos");
+    assert.equal(e.j[s].armadura, 4, "lo activa: efectos de las piezas");
     const piezas = e.j[s].mano.filter((c) => c.id === "cuidar_vc" || c.id === "ishowspeed");
     assert.equal(piezas.length, 2); assert.ok(piezas.every((c) => M.costeCarta(e, s, c, db) === 1), "las piezas cuestan 1");
   }

@@ -201,8 +201,8 @@ Diseño de Mario. Arquetipo: paladín molesto — llenar la mesa de Tun, buffear
 
 ### Mecánica: Entrar al VC (como las naves de Hearthstone)
 
-- Las cartas con `"vc": true` entran a la mesa normal y además se suman a tu **PutoVC** (sus stats y su último aliento).
-- El PutoVC aparece como botón al lado del poder de héroe (🎧, con la suma de stats). Tocarlo cuesta `COSTE_VC` (4) de maná: activa los últimos alientos de todas las piezas, en orden, y después invoca un esbirro **PutoVC** con la suma de ataque y vida. Después empezás un VC nuevo.
+- Las cartas con `"vc": true` entran a la mesa normal y además se suman a tu **PutoVC** (su último aliento y sus stats).
+- El PutoVC es una **ubicación** fija en el borde izquierdo de tu mesa (aparece con la primera pieza): no ocupa lugar de esbirro, no se puede atacar ni destruir. Tocarlo cuesta `COSTE_VC` (4) de maná: activa los últimos alientos de todas las piezas, en orden, y vuelve a 0 (no invoca nada). Igual guarda la suma de ataque y vida de las piezas, que usa Enojaste Destroyer of VC.
 - **Armadura** (`armadura` en el jugador, efecto `armadura`): absorbe el daño al héroe antes que la vida. Se ve como un escudo en el retrato.
 - **Elegí una** (efecto `destruir_vc` con `opciones`): usa la pantalla de descubrir, pero la opción elegida se aplica en vez de ir a la mano (cartas ficha `vc_op_*` con efecto `vc_opcion`).
 

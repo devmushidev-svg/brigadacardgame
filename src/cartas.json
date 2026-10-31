@@ -665,7 +665,7 @@
    "coste": 0,
    "token": true,
    "arte": "💥",
-   "texto": "Gana el ataque y la vida del PutoVC y reparte el doble de ese ataque entre los enemigos.",
+   "texto": "Gana el ataque y la vida acumulados en el PutoVC y reparte el doble de ese ataque entre los enemigos.",
    "efectos": [
     {
      "tipo": "vc_opcion",
@@ -680,7 +680,7 @@
    "coste": 0,
    "token": true,
    "arte": "🛡️",
-   "texto": "Ganás armadura igual al doble del ataque del PutoVC.",
+   "texto": "Ganás armadura igual al doble del ataque acumulado en el PutoVC.",
    "efectos": [
     {
      "tipo": "vc_opcion",
@@ -695,24 +695,13 @@
    "coste": 0,
    "token": true,
    "arte": "🔁",
-   "texto": "Lanza el PutoVC gratis y obtenés todas sus piezas a coste 1.",
+   "texto": "Activa el PutoVC gratis y obtenés todas sus piezas a coste 1.",
    "efectos": [
     {
      "tipo": "vc_opcion",
      "opcion": "lanzar"
     }
    ]
-  },
-  {
-   "id": "putovc",
-   "nombre": "PutoVC",
-   "tipo": "esbirro",
-   "coste": 0,
-   "ataque": 0,
-   "vida": 0,
-   "token": true,
-   "arte": "🎧",
-   "texto": "Todas tus piezas de VC juntas."
   },
   {
    "id": "porque_me_monean",

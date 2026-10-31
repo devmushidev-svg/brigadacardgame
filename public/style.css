@@ -278,6 +278,12 @@ img[src^="/arte/unislop-tareas/"] { filter: invert(1) drop-shadow(0 2px 3px #000
   .tablero { gap: 7px; min-height: calc(min(calc((100vw - 60px) / 7), 74px) * 1.34); }
   .tablero .esbirro .stat.atk { left: -3px; } .tablero .esbirro .stat.hp { right: -3px; }
   .esbirro.provocar::before { inset: -6px -5px -4px; }
+  /* con el PutoVC en la mesa, los esbirros se achican para dejarle su lugar */
+  .tablero.con-vc { padding-left: 58px; }
+  .tablero.con-vc { gap: 4px; }
+  .tablero.con-vc .esbirro { --esb: min(calc((100vw - 150px) / max(var(--n, 7), 4.6)), 86px); }
+  .vc-lugar { width: 50px; min-width: 0; padding: 4px 2px; }
+  .vc-lugar i { font-size: 9px; }
   .mano-rival { height: 30px; }
 }
 /* PC: la mano se levanta al pasar el mouse */
@@ -476,9 +482,16 @@ img[src^="/arte/unislop-tareas/"] { filter: invert(1) drop-shadow(0 2px 3px #000
 .heroe .armadura { position: absolute; right: -10px; bottom: calc(var(--esb) * .4); z-index: 3; display: grid; place-items: center; width: calc(var(--esb) * .42); height: calc(var(--esb) * .46);
   font: 900 calc(var(--esb) * .22) var(--f-tit); color: #fff; text-shadow: 0 2px 2px #000; clip-path: polygon(50% 0, 100% 15%, 92% 70%, 50% 100%, 8% 70%, 0 15%);
   background: linear-gradient(160deg, #e6edf5, #8796a8 50%, #4a5566); }
-.putovc > span { background: radial-gradient(circle at 40% 35%, #7a5bd6, #2a1a5c); font-size: calc(var(--esb) * .32); }
-.putovc .vc-stats { position: absolute; left: 50%; bottom: -12px; transform: translateX(-50%); padding: 0 6px; border-radius: 8px; white-space: nowrap;
-  font: 900 12px var(--f-tit); color: #fff; background: #2a1a5c; border: 1.5px solid #b9a2ff; }
+.tablero.con-vc { padding-left: calc(var(--esb) * .9 + 14px); }
+.vc-lugar { position: absolute; left: 4px; top: 50%; transform: translateY(-50%); z-index: 3; width: calc(var(--esb) * .9); min-width: 52px; padding: 6px 4px 5px;
+  border-radius: 12px; display: grid; justify-items: center; gap: 1px; color: #fff; font-family: var(--f-txt);
+  background: var(--ruido), linear-gradient(160deg, #6b4fc8, #2a1a5c); border: 2px solid #b9a2ff; box-shadow: 0 4px 10px #000a; }
+.vc-lugar .vc-icono { font-size: calc(var(--esb) * .34); line-height: 1; }
+.vc-lugar b { font: 900 11px var(--f-tit); letter-spacing: .5px; }
+.vc-lugar i { font: 800 10px var(--f-txt); font-style: normal; opacity: .85; white-space: nowrap; }
+.vc-lugar .stat.mana { left: auto; right: -9px; top: -10px; width: 22px; height: 24px; font-size: 13px; }
+.vc-lugar.vacio { opacity: .55; }
+.vc-lugar.listo { box-shadow: 0 0 0 3px var(--verde), 0 0 18px 4px #5cff86aa; }
 .heroe .stat.atk { left: -12px; bottom: -8px; width: calc(var(--esb) * .44); height: calc(var(--esb) * .44); font-size: calc(var(--esb) * .24); }
 .heroe .arma-heroe { position: absolute; left: calc(var(--esb) * -.62); top: 50%; transform: translateY(-50%); z-index: 2; display: grid; place-items: center;
   width: calc(var(--esb) * .5); height: calc(var(--esb) * .5); border-radius: 50%; overflow: hidden; font-size: calc(var(--esb) * .28);
