@@ -363,8 +363,19 @@ function chocar(estado, de, a, ev) {
   if (!atk || !def) return;
   ev.push({ e: "ataque", de, a });
   const devuelve = def.tipo === "esbirro" ? def.obj.ataque : 0;
+  const escudoDef = def.tipo === "esbirro" && def.obj.escudo, escudoAtk = atk.tipo === "esbirro" && atk.obj.escudo;
   danar(estado, a, atk.obj.ataque, ev);
   if (devuelve) danar(estado, de, devuelve, ev);
+  // robo de vida (clave de esbirro): el daño que hace se suma a la vida de su héroe
+  if (atk.obj.roboVida && !escudoDef) sumarVida(estado, atk.seat, atk.obj.ataque, ev);
+  if (def.tipo === "esbirro" && def.obj.roboVida && devuelve && !escudoAtk) sumarVida(estado, def.seat, devuelve, ev);
+}
+function sumarVida(estado, s, n, ev) {
+  if (n <= 0) return;
+  const h = estado.j[s];
+  h.vida += n;
+  if (h.vida > h.vidaMax) h.vidaMax = h.vida;
+  ev.push({ e: "cura", a: "h" + s, n });
 }
 
 // un esbirro nuevo a partir de su carta (sin mejoras de tribu)
@@ -382,6 +393,7 @@ function esbirroDe(estado, c) {
     escudo: claves.has("escudo"),
     noAtaca: claves.has("no_ataca"),
     doble: claves.has("doble"),
+    roboVida: claves.has("robo_vida"),
     dormido: !claves.has("carga") && !claves.has("acometida"),
     soloEsbirros: claves.has("acometida") && !claves.has("carga"), // acometida: el turno que entra solo ataca esbirros
     ataques: 0,
@@ -541,6 +553,12 @@ function aplicarEfectos(estado, s, efectos, elegido, ev, db, fuente, ctx = {}) {
       const lado = ef.lado === "enemigo" ? otro(s) : s, mazo = estado.j[lado].mazo;
       for (let k = 0; k < n; k++) mazo.splice(Math.floor(azar(estado) * (mazo.length + 1)), 0, ef.carta);
       ev.push({ e: "baraja", seat: lado, carta: ef.carta, n });
+      continue;
+    }
+    if (ef.tipo === "esconder") {
+      // se esconde en una carta al azar de la mano del rival; cuando la juegue, vuelve a salir para vos
+      const mano = estado.j[otro(s)].mano.filter((c) => !c.escondido);
+      if (mano.length) { elegir(estado, mano).escondido = { carta: ef.carta, seat: s }; ev.push({ e: "esconde", seat: s, carta: ef.carta }); }
       continue;
     }
     if (ef.tipo === "robar_legendaria") {
@@ -818,15 +836,19 @@ function resolverMuertes(estado, ev, db) {
     const muertos = [];
     for (const s of [0, 1]) {
       const p = estado.j[s];
-      for (const m of p.tablero) if (m.vida <= 0) muertos.push({ s, m });
+      let quitados = 0;
+      p.tablero.forEach((m, i) => { if (m.vida <= 0) muertos.push({ s, m, pos: i - quitados++ }); });
       p.tablero = p.tablero.filter((m) => m.vida > 0);
     }
     if (!muertos.length) { if (!estado.golpes.length) break; continue; }
-    for (const { s, m } of muertos) {
+    for (const { s, m, pos } of muertos) {
       ev.push({ e: "muere", uid: m.uid, seat: s });
       if (m.tribu) (estado.muertosTribu ||= {})[m.tribu] = (estado.muertosTribu[m.tribu] || 0) + 1;
       const c = db[m.id];
       if (c && c.aliento) aplicarEfectos(estado, s, c.aliento, null, ev, db, null);
+      // apéndices que se reemplazan (Rafael Fernando: Colosal +99) mientras quede reserva
+      const res = estado.j[s].reservas;
+      if (c?.reemplazo && res?.[m.id] > 0 && estado.fase === "jugando") { res[m.id]--; invocar(estado, s, m.id, ev, db, pos); }
     }
     // "cada vez que muere un <tribu>": se activa en los esbirros vivos de los dos lados
     for (const { s, m } of muertos) {
@@ -1026,7 +1048,7 @@ export function aplicar(estado, s, accion, db, ahora) {
       return { error: "no hay objetivos para este hechizo" };
     }
     p.mana -= coste;
-    p.mano.splice(i, 1);
+    const [jugada] = p.mano.splice(i, 1);
     for (const et of carta.etiquetas || []) (p.jugadosEtiqueta ||= {})[et] = (p.jugadosEtiqueta[et] || 0) + 1;
     (p.jugados ||= []).push(carta.id); // historial de cartas jugadas (Coco Supremo)
     registrar(estado, `${p.nombre} jugo ${carta.nombre}`);
@@ -1048,6 +1070,17 @@ export function aplicar(estado, s, accion, db, ahora) {
       }
     } else {
       const m = invocar(estado, s, carta.id, ev, db, accion.pos);
+      // Colosal: entra con sus apéndices a los lados; si el apéndice se reemplaza, lo que no entra queda de reserva
+      if (m && carta.colosal) {
+        const { carta: ap, cantidad } = carta.colosal;
+        let puestos = 0;
+        for (let k = 0; k < cantidad; k++) {
+          const i = p.tablero.indexOf(m);
+          if (!invocar(estado, s, ap, ev, db, k % 2 === 0 ? i + 1 : i)) break;
+          puestos++;
+        }
+        if (db[ap]?.reemplazo) (p.reservas ||= {})[ap] = (p.reservas[ap] || 0) + cantidad - puestos;
+      }
       if (m && carta.grito) {
         // Cruit Rage: este grito se activa varias veces
         const extra = p.gritoExtra && (!p.gritoExtra.tribu || p.gritoExtra.tribu === carta.tribu) ? p.gritoExtra : null;
@@ -1066,6 +1099,9 @@ export function aplicar(estado, s, accion, db, ahora) {
       if (carta.tribu) (p.jugadosTribu ||= {})[carta.tribu] = (p.jugadosTribu[carta.tribu] || 0) + 1;
       avanzarMision(estado, s, "jugar_tribu", carta.tribu || null, ev, db);
     }
+    // si el rival escondió algo en esta carta (El Tipo de la Foto), sale ahora para él
+    const esc = jugada.escondido;
+    if (esc && estado.fase === "jugando") { ev.push({ e: "sale_escondido", seat: esc.seat, carta: esc.carta }); invocar(estado, esc.seat, esc.carta, ev, db); }
     resolverMuertes(estado, ev, db);
     return { ev };
   }
@@ -1168,7 +1204,7 @@ export function vista(estado, yo, db0 = {}) {
       manaMax: p.manaMax,
       mazo: p.mazo.length,
       manoN: p.mano.length,
-      mano: s === yo ? p.mano.map((c) => {
+      mano: s === yo ? p.mano.map(({ escondido, ...c }) => {
         const d = db0[c.id], mej = d?.tipo === "esbirro" && d.tribu && p.mejoras?.[d.tribu];
         const ef = d && [...(d.efectos || []), ...(d.grito || [])].find((x) => x.bonus);
         const pc = d && [...(d.efectos || []), ...(d.grito || [])].find((x) => x.porCada)?.porCada;

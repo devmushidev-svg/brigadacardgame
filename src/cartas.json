@@ -212,6 +212,46 @@
    ]
   },
   {
+   "id": "rey_tun",
+   "nombre": "Rey Tun",
+   "tipo": "esbirro",
+   "coste": 7,
+   "ataque": 5,
+   "vida": 8,
+   "tribu": "tun",
+   "clase": "tun",
+   "rareza": "legendaria",
+   "arte": "👑",
+   "claves": [
+    "provocar"
+   ],
+   "colosal": {
+    "carta": "brazo_tun",
+    "cantidad": 2
+   },
+   "texto": "Colosal +2. Provocar."
+  },
+  {
+   "id": "brazo_tun",
+   "nombre": "Brazo de Tun",
+   "tipo": "esbirro",
+   "coste": 2,
+   "ataque": 2,
+   "vida": 3,
+   "tribu": "tun",
+   "clase": "tun",
+   "token": true,
+   "arte": "💪",
+   "texto": "Al final de tu turno, invoca un Tun 1/1.",
+   "fin_turno": [
+    {
+     "tipo": "invocar",
+     "carta": "tun",
+     "cantidad": 1
+    }
+   ]
+  },
+  {
    "id": "mauro_sosa",
    "nombre": "Mauro Sosa",
    "genero": "hombre",
@@ -592,6 +632,73 @@
    ]
   },
   {
+   "id": "mario_multiplanet",
+   "nombre": "Mario Multiplanet",
+   "tipo": "esbirro",
+   "coste": 7,
+   "ataque": 5,
+   "vida": 6,
+   "rareza": "legendaria",
+   "arte": "🪐",
+   "claves": [
+    "escudo",
+    "robo_vida",
+    "acometida"
+   ],
+   "texto": "Escudo divino. Robo de vida. Acometida. Grito de batalla: invoca una copia de este esbirro.",
+   "grito": [
+    {
+     "tipo": "invocar",
+     "carta": "mario_multiplanet",
+     "cantidad": 1
+    }
+   ]
+  },
+  {
+   "id": "rafael_fernando",
+   "nombre": "Rafael Fernando",
+   "tipo": "esbirro",
+   "coste": 6,
+   "ataque": 3,
+   "vida": 7,
+   "rareza": "legendaria",
+   "arte": "🧍",
+   "colosal": {
+    "carta": "rafael_apendice",
+    "cantidad": 99
+   },
+   "texto": "Colosal +99. Cuando muere un Rafael Fernando que no es el original, invoca otro para reemplazarlo."
+  },
+  {
+   "id": "rafael_apendice",
+   "nombre": "Rafael Fernando",
+   "tipo": "esbirro",
+   "coste": 2,
+   "ataque": 2,
+   "vida": 3,
+   "token": true,
+   "reemplazo": true,
+   "arte": "🧍",
+   "texto": "Apéndice. Cuando muere, otro Rafael Fernando lo reemplaza (mientras queden de los 99)."
+  },
+  {
+   "id": "tipo_foto",
+   "nombre": "El Tipo de la Foto",
+   "genero": "hombre",
+   "tipo": "esbirro",
+   "coste": 4,
+   "ataque": 5,
+   "vida": 5,
+   "arte": "📸",
+   "texto": "Último aliento: se esconde en una carta al azar de la mano del rival. Cuando el rival la juegue, este esbirro vuelve a salir para vos.",
+   "aliento": [
+    {
+     "tipo": "esconder",
+     "carta": "tipo_foto"
+    }
+   ]
+  },
+  {
    "id": "vc_op_stats",
    "nombre": "Absorber el VC",
    "tipo": "hechizo",
@@ -942,6 +1049,42 @@
    "grito": [
     {
      "tipo": "hechizos_azar"
+    }
+   ]
+  },
+  {
+   "id": "cruit_gigante",
+   "nombre": "Cruit Gigante",
+   "genero": "no_binario",
+   "tipo": "esbirro",
+   "coste": 8,
+   "ataque": 6,
+   "vida": 8,
+   "tribu": "cruit",
+   "clase": "cruit",
+   "rareza": "legendaria",
+   "arte": "🐄",
+   "colosal": {
+    "carta": "ubre_cruit",
+    "cantidad": 2
+   },
+   "texto": "Colosal +2."
+  },
+  {
+   "id": "ubre_cruit",
+   "nombre": "Ubre de Cruit",
+   "tipo": "esbirro",
+   "coste": 2,
+   "ataque": 1,
+   "vida": 5,
+   "clase": "cruit",
+   "token": true,
+   "arte": "🥛",
+   "texto": "Al final de tu turno, obtenés una Leche.",
+   "fin_turno": [
+    {
+     "tipo": "dar_carta",
+     "carta": "leche"
     }
    ]
   },

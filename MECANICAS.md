@@ -53,6 +53,8 @@ Recomendado: PNG o WEBP cuadrado de 512×512, con el personaje centrado, porque 
 | `mision` | queda activa con un contador; al cumplirse aplica su `recompensa` |
 | `arma` | se le equipa al héroe (`ataque`, `durabilidad`): ataca una vez por turno, cada ataque gasta un uso, recibe el golpe de vuelta de los esbirros; `al_atacar` en el arma = "cada vez que tu héroe ataca" |
 
+Más campos: `colosal: { carta, cantidad }` (entra con apéndices a los costados; si el apéndice tiene `reemplazo: true`, lo que no entra queda de reserva y cada uno que muere es reemplazado), clave `robo_vida` (el daño que hace al pelear se suma a la vida del héroe), efecto `esconder` (se esconde en una carta al azar de la mano del rival; al jugarla sale para su dueño).
+
 Otros campos: `fusionar: true` (si ya hay uno igual en tu mesa se suma a ese; `porApilado` en un efecto lo multiplica por las fusionadas), `excluir: { "etiqueta": "programa" }` en un efecto (no puede elegir esos esbirros: a Cruit Excel no se le da Leche). Global `tareas_dobles` (Unislop): tus Tareas se lanzan una vez más.
 
 Campos: `id`, `nombre`, `coste`, `ataque`, `vida`, `texto`, `arte` (emoji o `/arte/x.png` en `public/arte/`), `clase`, `tribu`, `rareza` (`legendaria`), `token: true` (no entra al mazo; solo se invoca o se da), `arquetipo`, `genero` (`hombre`, `mujer` o `no_binario`; **toda carta de personaje lleva uno**, se pregunta al crearla; sale como ♂ ♀ ⚧ abajo de la carta), `etiquetas` (lista libre, ej. `["mujer"]`, para efectos que buscan cartas por etiqueta), `descuento` (`{ "por": "tribu_en_mesa", "tribu": "tun" }`: cuesta 1 menos por cada esbirro de esa tribu en la mesa, de los dos lados; `"lados": "propio"` solo cuenta los tuyos; `{ "por": "tribu_muertos", "tribu": "tun" }`: 1 menos por cada Tun que murió en la partida, de los dos lados), `entrada` (animación al entrar: `legendaria` —automática en legendarias— o `demonio`).
@@ -178,6 +180,7 @@ Diseño de Mario. Arquetipo: paladín molesto — llenar la mesa de Tun, buffear
 | Choza de Monos | 3 | 0/6 | Al final de tu turno, invoca dos Tun | hecho |
 | **Tun Iguana** (legendaria) | 5 | 5/5 | Grito: por el resto de la partida, cada vez que muere uno de tus Tun, invoca un Tun Zombie que ataca a un enemigo al azar | hecho — falta imagen (🦎) y confirmar género |
 | Tun Astrónomo | 3 | 2/4 | Cada vez que ataca, un Tun de tu mano al azar cuesta 2 menos | hecho — falta imagen (🔭); coste y stats propuestos, falta confirmar género |
+| **Rey Tun** (legendaria) | 7 | 5/8 | Colosal +2. Provocar. Brazos de Tun 2/3: al final de tu turno invocan un Tun 1/1 | hecho — propuesta mía, falta imagen (👑) |
 | Tun Satánico | **5** | **3/3** | Grito: destruye a tus otros Tun y gana +2/+2 por cada uno | hecho — **coste y stats provisionales**, falta que Mario los defina |
 
 ## Neutrales
@@ -189,6 +192,9 @@ Diseño de Mario. Arquetipo: paladín molesto — llenar la mesa de Tun, buffear
 | Mauro Sosa | 2 | 2/3 | Grito: si el rival tiene una mujer en la mano, te la robás | hecho — roba cartas con `"genero": "mujer"` (todavía no hay ninguna) |
 | Mascotas de Tun (hechizo) | 1 | — | Roba 2 cartas | hecho (ahora cuesta 1) |
 | Nullscape (hechizo) | 4 | — | Todos los esbirros hacen parkour; solo uno al azar sobrevive | hecho (ahora es neutral) |
+| **Mario Multiplanet** (legendaria) | 7 | 5/6 | Escudo divino, robo de vida, acometida. Grito: invoca una copia de este esbirro | hecho — falta imagen (🪐) y género; rareza propuesta |
+| **Rafael Fernando** (legendaria) | 6 | 3/7 | Colosal +99 (apéndices 2/3). Cuando muere un Rafael Fernando que no es el original, otro lo reemplaza (mientras queden de los 99) | hecho — falta imagen (🧍) y género; rareza propuesta |
+| El Tipo de la Foto ♂ | 4 | 5/5 | Último aliento: se esconde en una carta al azar de la mano del rival; cuando la juegue, vuelve a salir para su dueño | hecho — falta imagen (📸) |
 | Doxeo (arma) | 4 | 3 de ataque, 3 usos | Cada vez que tu héroe ataca, robás una carta legendaria de tu mazo | hecho — falta imagen (🕵️); coste propuesto |
 | Cuidar VC (VC) | 3 | 3/4 | Último aliento: obtenés 4 de armadura | hecho — falta imagen (🎧) |
 | Ishowspeed Tocándose ♂ (VC) | 4 | 4/3 | Último aliento: 3 de daño a todos los esbirros | hecho — falta imagen (⚡); coste y stats propuestos |
@@ -223,6 +229,7 @@ Diseño de Mario. Marco azul (provisional). Cruit es no binario: toda carta con 
 | Tarea de la U (hechizo, etiqueta Tarea) | 1 | — | Robás una carta y obtenés una tarea universitaria al azar | hecho |
 | **Coco Supremo** ⚧ (legendaria) | 9 | 7/5 | Grito: repite los gritos y últimos alientos de los Cruit que jugaste esta partida. Orden: primero el resto, después los que crecen por cada cosa (Excel) y al último los que pegan según su ataque (Baño) | hecho |
 | **Cruit Breakdown** ⚧ (legendaria, como Yogg-Saron) | 10 | 7/5 | Grito: lanza un hechizo al azar por cada hechizo que lanzaste esta partida, con objetivos al azar | hecho — falta imagen (🤯) |
+| **Cruit Gigante** ⚧ (legendaria) | 8 | 6/8 | Colosal +2: dos Ubres de Cruit 1/5 que al final de tu turno te dan una Leche | hecho — propuesta mía, falta imagen (🐄) |
 | Estreñido Cruit ⚧ | 1 | 1/2 | Grito y último aliento: mete 2 Cacas en el mazo del rival (al robarlas: 2 de daño y roba otra) | hecho |
 | Cruit Sangre ⚧ | 2 | 2/2 | Se fusiona con tus otros Cruit Sangre (suma stats, ×N en la carta). Al final de tu turno, roba 1 de vida por cada Sangre fusionada al enemigo con menos vida | hecho |
 | Cruit Vampiro ⚧ | 5 | 3/3 | Tus Cruit Sangre roban el doble de vida. Grito: invoca 2 Cruit Sangre (se fusionan en una, con animación) | hecho |

@@ -169,6 +169,8 @@ const PALABRAS = [
   { n: "No puede atacar", re: "no puede atacar", clave: "no_ataca", d: "Este esbirro nunca ataca." },
   { n: "Descubre", re: "descubre|descubrir", d: "Elegís una de tres cartas al azar y va a tu mano." },
   { n: "Robar vida", re: "roban? (?:\\+?\\d+ )?de vida", d: "Hace ese daño y lo suma a la vida de tu héroe (puede pasar de tu vida máxima)." },
+  { n: "Robo de vida", re: "robo de vida", clave: "robo_vida", d: "El daño que hace este esbirro al pelear se suma a la vida de tu héroe." },
+  { n: "Colosal", re: "colosal(?: \\+\\d+)?", d: "Entra con apéndices (esbirros extra) a sus costados. El número dice cuántos." },
   { n: "Arma", re: "arma", d: "Se le equipa a tu héroe: puede atacar una vez por turno con el ataque del arma. Cada ataque gasta un uso; si ataca a un esbirro, ese esbirro le pega de vuelta a tu héroe." },
   { n: "VC", re: "vc", d: "Al jugarla entra a tu PutoVC: le suma su ataque y su vida. Cuando tocás el PutoVC para lanzarlo, se activan los últimos alientos de todas sus piezas y sale un esbirro con la suma de sus stats." },
   { n: "Armadura", re: "armadura", d: "Absorbe el daño que recibe tu héroe antes que su vida." },
@@ -946,6 +948,8 @@ async function animarUno(e, ev, v, nuevos, yo) {
         }
         break;
       }
+      case "esconde": toast(e.seat === yo ? `${DB[e.carta]?.nombre || "Tu esbirro"} se escondió en la mano del rival...` : "algo se escondió en una carta de tu mano...", 2000); await esperar(300); break;
+      case "sale_escondido": Sonido.hechizo(); await banner(`¡${DB[e.carta]?.nombre || "algo"} estaba escondido!`, 1100); break;
       case "arma": { Sonido.escudo(); const h = refEl("h" + e.seat); if (h) { const c = centro(h); particulas(c.x, c.y, "#d0d6e0", 16, 60); } if (e.seat !== yo) await mostrarCarta(e.carta, 900); break; }
       case "arma_rota": { const h = refEl("h" + e.seat); if (h) { const c = centro(h); particulas(c.x, c.y, "#9aa3b0", 20, 70); } toast(`se rompió ${DB[e.carta]?.nombre || "el arma"}`, 1300); break; }
       case "vc_suma": { // la carta se suma al PutoVC

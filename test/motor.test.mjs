@@ -804,3 +804,55 @@ console.log("ok: PutoVC y armadura");
   assert.ok(res.ev.length < 600, "termina");
 }
 console.log("ok: armas y Cruit Breakdown");
+
+// --- Mario Multiplanet: invoca una copia; robo de vida al pegar ---
+{
+  const e = nueva(100); const s = e.turno, r = 1 - s;
+  e.j[s].tablero = []; e.j[r].tablero = [{ uid: "rv", id: "x", tribu: null, ataque: 1, vida: 20, vidaMax: 20, ataques: 0 }];
+  preparar(e, s, ["mario_multiplanet"]);
+  M.aplicar(e, s, { t: "jugar", uid: "t0" }, db, 0);
+  const marios = e.j[s].tablero.filter((m) => m.id === "mario_multiplanet");
+  assert.equal(marios.length, 2, "él y su copia");
+  assert.ok(marios.every((m) => m.escudo && m.roboVida && m.soloEsbirros), "la copia tiene las mismas claves");
+  e.j[s].vida = 30;
+  M.aplicar(e, s, { t: "atacar", de: marios[0].uid, a: "rv" }, db, 0);
+  assert.equal(e.j[s].vida, 35, "robo de vida: +5");
+  assert.ok(!marios[0].escudo && marios[0].vida === 6, "el escudo absorbió el golpe de vuelta");
+}
+// --- Rafael Fernando: Colosal +99; los apéndices se reemplazan mientras haya reserva ---
+{
+  const e = nueva(101); const s = e.turno, r = 1 - s;
+  e.j[s].tablero = []; e.j[r].tablero = [];
+  preparar(e, s, ["rafael_fernando"]);
+  M.aplicar(e, s, { t: "jugar", uid: "t0" }, db, 0);
+  assert.equal(e.j[s].tablero.length, 7, "llena la mesa");
+  assert.equal(e.j[s].tablero.filter((m) => m.id === "rafael_apendice").length, 6);
+  assert.equal(e.j[s].reservas.rafael_apendice, 93);
+  const ap = e.j[s].tablero.find((m) => m.id === "rafael_apendice");
+  ap.vida = 0; M.aplicar(e, s, { t: "fin" }, db, 0); // muere al resolver
+  assert.equal(e.j[s].tablero.filter((m) => m.id === "rafael_apendice").length, 6, "otro lo reemplaza");
+  assert.equal(e.j[s].reservas.rafael_apendice, 92);
+}
+// --- El Tipo de la Foto: al morir se esconde en la mano del rival y vuelve cuando la juega ---
+{
+  const e = nueva(102); const s = e.turno, r = 1 - s;
+  e.j[s].tablero = [{ uid: "tf", id: "tipo_foto", tribu: null, ataque: 5, vida: 0, vidaMax: 5, ataques: 0 }]; e.j[r].tablero = [];
+  e.j[r].mano = [{ uid: "rm", id: "tun_brawl" }];
+  preparar(e, s, []);
+  M.aplicar(e, s, { t: "fin" }, db, 0); // muere al resolver: se esconde
+  assert.deepEqual(e.j[r].mano[0].escondido, { carta: "tipo_foto", seat: s });
+  assert.ok(!("escondido" in M.vista(e, r, db).j[r].mano[0]), "el rival no lo ve");
+  e.j[r].mana = 10;
+  const res = M.aplicar(e, r, { t: "jugar", uid: "rm" }, db, 0);
+  assert.ok(!res.error, res.error);
+  assert.ok(e.j[s].tablero.some((m) => m.id === "tipo_foto"), "vuelve a salir para su dueño");
+}
+// --- Colosal de clase: Rey Tun entra con un Brazo a cada lado ---
+{
+  const e = nueva(103); const s = e.turno;
+  e.j[s].tablero = [];
+  preparar(e, s, ["rey_tun"]);
+  M.aplicar(e, s, { t: "jugar", uid: "t0" }, db, 0);
+  assert.deepEqual(e.j[s].tablero.map((m) => m.id), ["brazo_tun", "rey_tun", "brazo_tun"]);
+}
+console.log("ok: Mario, Rafael, El Tipo de la Foto y colosales");
