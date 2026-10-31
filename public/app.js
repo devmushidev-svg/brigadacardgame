@@ -169,6 +169,7 @@ const PALABRAS = [
   { n: "No puede atacar", re: "no puede atacar", clave: "no_ataca", d: "Este esbirro nunca ataca." },
   { n: "Descubre", re: "descubre|descubrir", d: "Elegís una de tres cartas al azar y va a tu mano." },
   { n: "Robar vida", re: "roban? (?:\\+?\\d+ )?de vida", d: "Hace ese daño y lo suma a la vida de tu héroe (puede pasar de tu vida máxima)." },
+  { n: "Arma", re: "arma", d: "Se le equipa a tu héroe: puede atacar una vez por turno con el ataque del arma. Cada ataque gasta un uso; si ataca a un esbirro, ese esbirro le pega de vuelta a tu héroe." },
   { n: "VC", re: "vc", d: "Al jugarla entra a tu PutoVC: le suma su ataque y su vida. Cuando tocás el PutoVC para lanzarlo, se activan los últimos alientos de todas sus piezas y sale un esbirro con la suma de sus stats." },
   { n: "Armadura", re: "armadura", d: "Absorbe el daño que recibe tu héroe antes que su vida." },
   { n: "Se fusiona", re: "se fusiona", d: "Si ya tenés uno igual en la mesa, se une a ese: le suma su ataque y su vida, y su efecto cuenta una vez más." },
@@ -204,7 +205,8 @@ function cartaHTML(c, { uid = "", clase = "" } = {}) {
     <div class="texto ${((l) => (l > 115 ? "t4" : l > 85 ? "t3" : l > 50 ? "t2" : ""))((c.texto || "").length)}"><span>${textoHTML(c.texto || "")}</span></div>
     ${etiqueta ? `<div class="arq">${esc(etiqueta)}</div>` : ""}
     <div class="stat mana ${DB[c.id] && c.coste < DB[c.id].coste ? "rebajado" : ""}">${c.coste}</div>
-    ${esH ? "" : `<div class="stat atk ${DB[c.id] && c.ataque > DB[c.id].ataque ? "subido" : ""}">${c.ataque}</div><div class="stat hp ${DB[c.id] && c.vida > DB[c.id].vida ? "subido" : ""}">${c.vida}</div>`}
+    ${esH ? "" : c.tipo === "arma" ? `<div class="stat atk">${c.ataque}</div><div class="stat hp dura" title="usos">${c.durabilidad}</div>`
+      : `<div class="stat atk ${DB[c.id] && c.ataque > DB[c.id].ataque ? "subido" : ""}">${c.ataque}</div><div class="stat hp ${DB[c.id] && c.vida > DB[c.id].vida ? "subido" : ""}">${c.vida}</div>`}
   </div>`;
 }
 
@@ -944,6 +946,8 @@ async function animarUno(e, ev, v, nuevos, yo) {
         }
         break;
       }
+      case "arma": { Sonido.escudo(); const h = refEl("h" + e.seat); if (h) { const c = centro(h); particulas(c.x, c.y, "#d0d6e0", 16, 60); } if (e.seat !== yo) await mostrarCarta(e.carta, 900); break; }
+      case "arma_rota": { const h = refEl("h" + e.seat); if (h) { const c = centro(h); particulas(c.x, c.y, "#9aa3b0", 20, 70); } toast(`se rompió ${DB[e.carta]?.nombre || "el arma"}`, 1300); break; }
       case "vc_suma": { // la carta se suma al PutoVC
         const b = $(`[data-vc="${e.seat}"]`) || refEl("h" + e.seat);
         if (b) { const c = centro(b); particulas(c.x, c.y, "#7aa2ff", 12, 50); }
@@ -1209,12 +1213,15 @@ function heroeHTML(v, s) {
   const h = HEROES[p.heroe];
   const desc = v.conectados && !v.conectados[s] && v.fase === "jugando";
   const mi = p.mision;
-  return `<div class="heroe ${desc ? "desconectado" : ""}" data-ref="h${s}" data-seat="${s}" data-heroe="${esc(p.heroe || "")}" style="--fondo:${colorDe(h?.id || p.nombre)}">
+  const puede = s === v.yo && v.turno === s && v.fase === "jugando" && heroePuedeAtacar(p) && objetivosAtaque(v, s).size;
+  return `<div class="heroe ${desc ? "desconectado" : ""} ${puede ? "puede" : ""}" data-ref="h${s}" data-seat="${s}" data-heroe="${esc(p.heroe || "")}" style="--fondo:${colorDe(h?.id || p.nombre)}">
     <span class="heroe-arte">${h ? artHTML(h.arte) : esc((p.nombre || "?")[0].toUpperCase())}</span>
     ${mi ? `<div class="mision-chip ${mi.completa ? "completa" : ""}" data-carta="${esc(mi.id)}" style="--p:${mi.completa ? 1 : Math.min(1, mi.progreso / mi.meta)}">
       <span class="mision-arte">${artHTML(DB[mi.id]?.arte || "🏆")}</span><b>${mi.completa ? "✔" : `${mi.progreso}/${mi.meta}`}</b></div>` : ""}
-    <div class="stat hp ${p.vida < p.vidaMax ? "herido" : ""}">${p.vida}</div>${p.armadura ? `<div class="armadura" title="armadura">${p.armadura}</div>` : ""}</div>`;
+    <div class="stat hp ${p.vida < p.vidaMax ? "herido" : ""}">${p.vida}</div>${p.armadura ? `<div class="armadura" title="armadura">${p.armadura}</div>` : ""}
+    ${p.arma ? `<div class="stat atk" title="ataque del arma">${p.arma.ataque}</div><div class="arma-heroe" title="${esc(DB[p.arma.id]?.nombre || "arma")}: ${p.arma.durabilidad} usos">${artHTML(DB[p.arma.id]?.arte || "🗡️")}<i>${p.arma.durabilidad}</i></div>` : ""}</div>`;
 }
+const heroePuedeAtacar = (p) => !!p.arma && p.arma.ataque > 0 && !p.heroeAtaco;
 // PutoVC: aparece cuando tenés piezas; se toca para lanzarlo
 function vcHTML(v, s) {
   const vc = v.j[s].vc;
@@ -1254,7 +1261,7 @@ function render(v) {
   const mano = (P.mano || []);
   const n = mano.length;
   const poderListo = miTurno && P.poder && !P.poderUsado && P.poder.coste <= P.mana && !(P.tablero.length >= 7 && (P.poder.efectos || []).every((e) => e.tipo === "invocar"));
-  const hayJugadas = miTurno && !v.pendiente && (mano.some((c) => jugable(v, cartaMano(c))) || P.tablero.some(puedeAtacar) || poderListo);
+  const hayJugadas = miTurno && !v.pendiente && (mano.some((c) => jugable(v, cartaMano(c))) || P.tablero.some(puedeAtacar) || poderListo || (heroePuedeAtacar(P) && objetivosAtaque(v, v.yo).size > 0));
   const cristales = (q) => `<div class="cristales"><b>${q.mana}/${q.manaMax}</b>${Array.from({ length: 10 }, (_, i) =>
     `<i class="cristal ${i < q.mana ? "lleno" : i < q.manaMax ? "vacio" : "bloqueado"}"></i>`).join("")}</div>`;
   app.innerHTML = `<div class="mesa">
@@ -1632,6 +1639,12 @@ app.addEventListener("pointerdown", (e) => {
     }
   }, 450);
 
+  if (esbEl && miTurno && esbEl.dataset.ref === "h" + V.yo && heroePuedeAtacar(V.j[V.yo])) { // héroe con arma
+    const validos = objetivosAtaque(V, V.yo);
+    apuntando = { tipo: "ataque", de: "h" + V.yo, origen: centro(esbEl), validos };
+    esbEl.classList.add("seleccionado");
+    marcar(validos);
+  }
   if (esbEl && miTurno && esbEl.dataset.seat == V.yo && esbEl.classList.contains("esbirro")) {
     const m = V.j[V.yo].tablero.find((x) => x.uid === esbEl.dataset.ref);
     if (m && puedeAtacar(m)) {

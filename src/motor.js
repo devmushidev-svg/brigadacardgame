@@ -267,6 +267,7 @@ function inicioTurno(estado, s, ev, db, ahora) {
   p.manaMax = Math.min(CONFIG.MAX_MANA, p.manaMax + 1);
   p.mana = p.manaMax;
   p.poderUsado = false;
+  p.heroeAtaco = false;
   for (const m of p.tablero) {
     m.dormido = false;
     m.soloEsbirros = false;
@@ -540,6 +541,36 @@ function aplicarEfectos(estado, s, efectos, elegido, ev, db, fuente, ctx = {}) {
       const lado = ef.lado === "enemigo" ? otro(s) : s, mazo = estado.j[lado].mazo;
       for (let k = 0; k < n; k++) mazo.splice(Math.floor(azar(estado) * (mazo.length + 1)), 0, ef.carta);
       ev.push({ e: "baraja", seat: lado, carta: ef.carta, n });
+      continue;
+    }
+    if (ef.tipo === "robar_legendaria") {
+      // Doxeo: robás una legendaria de tu mazo (si queda alguna)
+      const p = estado.j[s];
+      for (let k = 0; k < n; k++) {
+        const idx = p.mazo.map((id, i) => (db[id]?.rareza === "legendaria" ? i : -1)).filter((i) => i >= 0);
+        if (!idx.length) break;
+        const [id] = p.mazo.splice(elegir(estado, idx), 1);
+        darCarta(estado, s, id, ev);
+      }
+      continue;
+    }
+    if (ef.tipo === "hechizos_azar") {
+      // Cruit Breakdown (como Yogg-Saron): un hechizo al azar por cada hechizo que lanzaste, con objetivos al azar
+      const total = Math.min(30, estado.j[s].hechizosLanzados || 0);
+      const pool = Object.values(db).filter((c) => c.tipo === "hechizo" && c.id !== "moneda" && !c.al_robarse && !(c.efectos || []).some((x) => x.tipo === "vc_opcion"));
+      for (let k = 0; k < total && pool.length; k++) {
+        if (estado.fase !== "jugando" || (fuente && !buscar(estado, fuente)) || estado.pendiente) break;
+        const c = elegir(estado, pool);
+        let obj = null;
+        if (necesitaObjetivo(c)) {
+          const refs = ["h0", "h1", ...estado.j[0].tablero.map((m) => m.uid), ...estado.j[1].tablero.map((m) => m.uid)].filter((r) => objetivoValido(estado, s, c, r));
+          if (!refs.length) continue;
+          obj = elegir(estado, refs);
+        }
+        ev.push({ e: "repite", seat: s, carta: c.id });
+        aplicarEfectos(estado, s, c.efectos, obj, ev, db, null);
+        resolverMuertes(estado, ev, db);
+      }
       continue;
     }
     if (ef.tipo === "armadura") {
@@ -856,6 +887,12 @@ export function objetivosAtaque(estado, s, atacante = null) {
   return [...(atacante?.soloEsbirros ? [] : ["h" + otro(s)]), ...ene.map((m) => m.uid)];
 }
 
+// armas: tu héroe ataca una vez por turno con el ataque del arma
+export function puedeAtacarHeroe(estado, s) {
+  const p = estado.j[s];
+  return !!p.arma && p.arma.ataque > 0 && !p.heroeAtaco;
+}
+
 export function puedeUsarPoder(estado, s) {
   const p = estado.j[s];
   if (!p.poder || p.poderUsado || p.poder.coste > p.mana) return false;
@@ -993,7 +1030,11 @@ export function aplicar(estado, s, accion, db, ahora) {
     for (const et of carta.etiquetas || []) (p.jugadosEtiqueta ||= {})[et] = (p.jugadosEtiqueta[et] || 0) + 1;
     (p.jugados ||= []).push(carta.id); // historial de cartas jugadas (Coco Supremo)
     registrar(estado, `${p.nombre} jugo ${carta.nombre}`);
-    if (carta.tipo === "mision") {
+    if (carta.tipo === "hechizo") p.hechizosLanzados = (p.hechizosLanzados || 0) + 1; // los cuenta Cruit Breakdown
+    if (carta.tipo === "arma") {
+      p.arma = { id: carta.id, ataque: carta.ataque, durabilidad: carta.durabilidad };
+      ev.push({ e: "arma", seat: s, carta: carta.id });
+    } else if (carta.tipo === "mision") {
       p.mision = { id: carta.id, nombre: carta.nombre, ...copia(carta.mision), progreso: 0, completa: false };
       ev.push({ e: "mision", seat: s, carta: carta.id });
     } else if (carta.tipo === "hechizo") {
@@ -1025,6 +1066,26 @@ export function aplicar(estado, s, accion, db, ahora) {
       if (carta.tribu) (p.jugadosTribu ||= {})[carta.tribu] = (p.jugadosTribu[carta.tribu] || 0) + 1;
       avanzarMision(estado, s, "jugar_tribu", carta.tribu || null, ev, db);
     }
+    resolverMuertes(estado, ev, db);
+    return { ev };
+  }
+
+  if (accion.t === "atacar" && accion.de === "h" + s) {
+    if (!puedeAtacarHeroe(estado, s)) return { error: p.arma ? "tu héroe ya atacó este turno" : "tu héroe no tiene arma" };
+    if (!objetivosAtaque(estado, s).includes(accion.a)) return { error: "tenes que atacar a los de provocar" };
+    p.heroeAtaco = true;
+    const arma = p.arma;
+    // "cada vez que tu héroe ataca" (Doxeo)
+    const alAtacar = db[arma.id]?.al_atacar;
+    if (alAtacar) aplicarEfectos(estado, s, alAtacar, null, ev, db, null);
+    const def = buscar(estado, accion.a);
+    if (def && estado.fase === "jugando") {
+      ev.push({ e: "ataque", de: "h" + s, a: accion.a });
+      const devuelve = def.tipo === "esbirro" ? def.obj.ataque : 0;
+      danar(estado, accion.a, arma.ataque, ev);
+      if (devuelve) danar(estado, "h" + s, devuelve, ev);
+    }
+    if (--arma.durabilidad <= 0 && p.arma === arma) { p.arma = null; ev.push({ e: "arma_rota", seat: s, carta: arma.id }); }
     resolverMuertes(estado, ev, db);
     return { ev };
   }
@@ -1111,12 +1172,15 @@ export function vista(estado, yo, db0 = {}) {
         const d = db0[c.id], mej = d?.tipo === "esbirro" && d.tribu && p.mejoras?.[d.tribu];
         const ef = d && [...(d.efectos || []), ...(d.grito || [])].find((x) => x.bonus);
         const pc = d && [...(d.efectos || []), ...(d.grito || [])].find((x) => x.porCada)?.porCada;
+        const yogg = d && (d.grito || []).some((x) => x.tipo === "hechizos_azar");
         return { ...c, coste: d ? costeCarta(estado, s, c, db0) : undefined, ...(mej ? { ataque: d.ataque + mej.ataque, vida: d.vida + mej.vida } : {}),
-          ...(ef ? { cantidad: cantidadDe(estado, s, ef) } : {}), ...(pc ? { veces: contarPorCada(estado, s, pc) } : {}) };
+          ...(ef ? { cantidad: cantidadDe(estado, s, ef) } : {}), ...(pc ? { veces: contarPorCada(estado, s, pc) } : {}), ...(yogg ? { veces: p.hechizosLanzados || 0 } : {}) };
       }) : undefined,
       mejoras: p.mejoras || null,
       gritoExtra: p.gritoExtra || null,
       armadura: p.armadura || 0,
+      arma: p.arma || null,
+      heroeAtaco: !!p.heroeAtaco,
       vc: p.vc ? { ...p.vc, coste: CONFIG.COSTE_VC } : null,
       tablero: p.tablero,
     })),

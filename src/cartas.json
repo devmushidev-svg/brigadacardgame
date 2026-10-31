@@ -509,7 +509,7 @@
    "id": "mascotas_tun",
    "nombre": "Mascotas de Tun",
    "tipo": "hechizo",
-   "coste": 2,
+   "coste": 1,
    "arte": "/arte/mascotas_tun.webp",
    "texto": "Roba 2 cartas.",
    "efectos": [
@@ -572,6 +572,22 @@
       "vc_op_armadura",
       "vc_op_lanzar"
      ]
+    }
+   ]
+  },
+  {
+   "id": "doxeo",
+   "nombre": "Doxeo",
+   "tipo": "arma",
+   "coste": 4,
+   "ataque": 3,
+   "durabilidad": 3,
+   "arte": "🕵️",
+   "texto": "Arma. Cada vez que tu héroe ataca, robás una carta legendaria de tu mazo.",
+   "al_atacar": [
+    {
+     "tipo": "robar_legendaria",
+     "cantidad": 1
     }
    ]
   },
@@ -773,7 +789,6 @@
    "nombre": "Nullscape",
    "tipo": "hechizo",
    "coste": 4,
-   "clase": "cruit",
    "arte": "/arte/nullscape.webp",
    "texto": "Todos los esbirros hacen parkour. Solo uno al azar sobrevive.",
    "efectos": [
@@ -910,6 +925,25 @@
     }
    ],
    "genero": "no_binario"
+  },
+  {
+   "id": "cruit_breakdown",
+   "nombre": "Cruit Breakdown",
+   "genero": "no_binario",
+   "tipo": "esbirro",
+   "coste": 10,
+   "ataque": 7,
+   "vida": 5,
+   "tribu": "cruit",
+   "clase": "cruit",
+   "rareza": "legendaria",
+   "arte": "🤯",
+   "texto": "Grito de batalla: lanza un hechizo al azar por cada hechizo que lanzaste esta partida (con objetivos al azar).",
+   "grito": [
+    {
+     "tipo": "hechizos_azar"
+    }
+   ]
   },
   {
    "id": "caca",

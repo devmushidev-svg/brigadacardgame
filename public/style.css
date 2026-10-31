@@ -473,9 +473,17 @@ img[src^="/arte/unislop-tareas/"] { filter: invert(1) drop-shadow(0 2px 3px #000
 @keyframes guia-pulso { 0%, 100% { filter: drop-shadow(0 0 4px #ffd34f) drop-shadow(0 0 2px #ffd34f); } 50% { filter: drop-shadow(0 0 16px #ffd34f) drop-shadow(0 0 6px #fff3b0) brightness(1.15); } }
 .esbirro .apilado { position: absolute; top: -6px; left: -4px; z-index: 3; padding: 1px 6px; border-radius: 10px; font: 900 clamp(11px, calc(var(--esb) * .15), 17px) var(--f-tit);
   color: #fff; background: #9b0f22; border: 1.5px solid #ffb3bd; box-shadow: 0 2px 4px #000a; }
-.heroe .armadura { position: absolute; left: -12px; bottom: -8px; z-index: 3; display: grid; place-items: center; width: calc(var(--esb) * .42); height: calc(var(--esb) * .46);
+.heroe .armadura { position: absolute; right: -10px; bottom: calc(var(--esb) * .4); z-index: 3; display: grid; place-items: center; width: calc(var(--esb) * .42); height: calc(var(--esb) * .46);
   font: 900 calc(var(--esb) * .22) var(--f-tit); color: #fff; text-shadow: 0 2px 2px #000; clip-path: polygon(50% 0, 100% 15%, 92% 70%, 50% 100%, 8% 70%, 0 15%);
   background: linear-gradient(160deg, #e6edf5, #8796a8 50%, #4a5566); }
 .putovc > span { background: radial-gradient(circle at 40% 35%, #7a5bd6, #2a1a5c); font-size: calc(var(--esb) * .32); }
 .putovc .vc-stats { position: absolute; left: 50%; bottom: -12px; transform: translateX(-50%); padding: 0 6px; border-radius: 8px; white-space: nowrap;
   font: 900 12px var(--f-tit); color: #fff; background: #2a1a5c; border: 1.5px solid #b9a2ff; }
+.heroe .stat.atk { left: -12px; bottom: -8px; width: calc(var(--esb) * .44); height: calc(var(--esb) * .44); font-size: calc(var(--esb) * .24); }
+.heroe .arma-heroe { position: absolute; left: calc(var(--esb) * -.62); top: 50%; transform: translateY(-50%); z-index: 2; display: grid; place-items: center;
+  width: calc(var(--esb) * .5); height: calc(var(--esb) * .5); border-radius: 50%; overflow: hidden; font-size: calc(var(--esb) * .28);
+  background: radial-gradient(circle at 40% 35%, #8a93a3, #2c3340); box-shadow: 0 0 0 2px #1e160d, 0 0 0 4px #9aa3b0, 0 4px 8px #000a; }
+.heroe .arma-heroe img { width: 100%; height: 100%; object-fit: cover; }
+.heroe .arma-heroe i { position: absolute; right: -2px; bottom: -2px; font: 900 12px var(--f-tit); font-style: normal; color: #fff; background: #3a414e; border-radius: 8px; padding: 0 4px; }
+.heroe.puede { box-shadow: 0 0 0 3px var(--verde), 0 0 18px 4px #5cff86aa; }
+.carta .stat.hp.dura { clip-path: none; border-radius: 6px; background: linear-gradient(#b8c0cc, #5b6472); }

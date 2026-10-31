@@ -766,3 +766,41 @@ for (const [i, op] of ["stats", "armadura", "lanzar"].entries()) {
   }
 }
 console.log("ok: PutoVC y armadura");
+
+// --- Armas: Doxeo 3/3; el héroe ataca una vez por turno, roba una legendaria, recibe el golpe de vuelta ---
+{
+  const e = nueva(95); const s = e.turno, r = 1 - s;
+  e.j[s].tablero = []; e.j[r].tablero = [];
+  preparar(e, s, ["doxeo"]);
+  e.j[s].mazo = ["tun_brawl", "panama", "tun_brawl"];
+  assert.ok(!M.aplicar(e, s, { t: "jugar", uid: "t0" }, db, 0).error);
+  assert.deepEqual(e.j[s].arma, { id: "doxeo", ataque: 3, durabilidad: 3 });
+  const vr = e.j[r].vida;
+  assert.ok(!M.aplicar(e, s, { t: "atacar", de: "h" + s, a: "h" + r }, db, 0).error);
+  assert.equal(e.j[r].vida, vr - 3);
+  assert.ok(e.j[s].mano.some((c) => c.id === "panama"), "robó la legendaria del mazo");
+  assert.deepEqual(e.j[s].mazo, ["tun_brawl", "tun_brawl"]);
+  assert.ok(M.aplicar(e, s, { t: "atacar", de: "h" + s, a: "h" + r }, db, 0).error, "una vez por turno");
+  // contra un esbirro: el héroe recibe su ataque; el arma se rompe al tercer uso
+  e.j[r].tablero = [{ uid: "rv", id: "x", tribu: null, ataque: 2, vida: 9, vidaMax: 9, ataques: 0 }];
+  const vs = e.j[s].vida;
+  for (let k = 0; k < 2; k++) { e.j[s].heroeAtaco = false; assert.ok(!M.aplicar(e, s, { t: "atacar", de: "h" + s, a: "rv" }, db, 0).error); }
+  assert.equal(e.j[s].vida, vs - 4); assert.equal(e.j[r].tablero[0].vida, 3);
+  assert.equal(e.j[s].arma, null, "se rompió");
+}
+// --- Cruit Breakdown: un hechizo al azar por cada hechizo lanzado ---
+{
+  const e = nueva(96, ["cruit", "cruit"]); const s = e.turno;
+  e.j[s].tablero = [];
+  preparar(e, s, ["tarea_uni", "tarea_uni", "mascotas_tun", "cruit_breakdown"]);
+  for (const u of ["t0", "t1", "t2"]) M.aplicar(e, s, { t: "jugar", uid: u }, db, 0);
+  assert.equal(e.j[s].hechizosLanzados, 3);
+  assert.equal(M.vista(e, s, db).j[s].mano.find((c) => c.id === "cruit_breakdown").veces, 3, "se ve en la mano");
+  e.j[s].mana = 10;
+  const res = M.aplicar(e, s, { t: "jugar", uid: "t3" }, db, 0);
+  assert.ok(!res.error, res.error);
+  const n = res.ev.filter((x) => x.e === "repite").length;
+  assert.ok(n >= 1 && n <= 3, "hasta 3 hechizos al azar");
+  assert.ok(res.ev.length < 600, "termina");
+}
+console.log("ok: armas y Cruit Breakdown");

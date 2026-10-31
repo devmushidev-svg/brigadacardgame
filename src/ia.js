@@ -25,6 +25,8 @@ export function evaluar(e, s) {
   for (const m of yo.tablero) p += valorEsbirro(m);
   for (const m of el.tablero) p -= valorEsbirro(m) * 1.15;
   p += yo.mano.length * 1.4 - el.mano.length * 0.4;
+  // armas y armadura
+  for (const [q, signo] of [[yo, 1], [el, -1]]) p += signo * ((q.arma ? q.arma.ataque * q.arma.durabilidad * 0.6 : 0) + (q.armadura || 0) * 0.8);
   // misiones: tenerla activa y avanzarla vale; completarla vale mucho
   for (const [q, signo] of [[yo, 1], [el, -0.6]]) {
     if (q.mision) p += signo * (q.mision.completa ? 12 : 5 + (q.mision.progreso / q.mision.meta) * 10);
@@ -57,6 +59,7 @@ export function jugadas(e, s, db) {
   }
   for (const m of p.tablero) if (M.puedeAtacar(m)) for (const a of M.objetivosAtaque(e, s, m)) out.push({ t: "atacar", de: m.uid, a });
   if (M.puedeLanzarVC(e, s)) out.push({ t: "vc" });
+  if (M.puedeAtacarHeroe(e, s)) for (const a of M.objetivosAtaque(e, s)) out.push({ t: "atacar", de: "h" + s, a });
   if (M.puedeUsarPoder(e, s)) {
     if (M.necesitaObjetivo(p.poder)) { for (const r of refs) if (M.objetivoValido(e, s, p.poder, r)) out.push({ t: "poder", objetivo: r }); }
     else out.push({ t: "poder" });
