@@ -603,7 +603,7 @@
    "ataque": 4,
    "vida": 4,
    "arte": "😤",
-   "texto": "Grito de batalla: destruye tu PutoVC y elegí una: gana sus stats y reparte el doble de su ataque entre los enemigos; ganás armadura igual al doble de su ataque; o lo lanzás y obtenés sus piezas a coste 1.",
+   "texto": "Grito de batalla: destruye tu PutoVC y elegí una opción.",
    "grito": [
     {
      "tipo": "destruir_vc",
@@ -690,7 +690,7 @@
    "ataque": 5,
    "vida": 5,
    "arte": "📸",
-   "texto": "Último aliento: se esconde en una carta al azar de la mano del rival. Cuando el rival la juegue, este esbirro vuelve a salir para vos.",
+   "texto": "Último aliento: se esconde en la mano del rival. Cuando la juegue, vuelve para vos.",
    "aliento": [
     {
      "tipo": "esconder",
