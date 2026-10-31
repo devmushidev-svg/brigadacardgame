@@ -520,6 +520,118 @@
    ]
   },
   {
+   "id": "cuidar_vc",
+   "nombre": "Cuidar VC",
+   "tipo": "esbirro",
+   "coste": 3,
+   "ataque": 3,
+   "vida": 4,
+   "vc": true,
+   "arte": "🎧",
+   "texto": "VC. Último aliento: obtenés 4 de armadura.",
+   "aliento": [
+    {
+     "tipo": "armadura",
+     "cantidad": 4
+    }
+   ]
+  },
+  {
+   "id": "ishowspeed",
+   "nombre": "Ishowspeed Tocándose",
+   "genero": "hombre",
+   "tipo": "esbirro",
+   "coste": 4,
+   "ataque": 4,
+   "vida": 3,
+   "vc": true,
+   "arte": "⚡",
+   "texto": "VC. Último aliento: inflige 3 de daño a todos los esbirros.",
+   "aliento": [
+    {
+     "tipo": "dano",
+     "objetivo": "todos_esbirros",
+     "cantidad": 3
+    }
+   ]
+  },
+  {
+   "id": "destroyer_vc",
+   "nombre": "Enojaste Destroyer of VC",
+   "tipo": "esbirro",
+   "coste": 6,
+   "ataque": 4,
+   "vida": 4,
+   "arte": "😤",
+   "texto": "Grito de batalla: destruye tu PutoVC y elegí una: gana sus stats y reparte el doble de su ataque entre los enemigos; ganás armadura igual al doble de su ataque; o lo lanzás y obtenés sus piezas a coste 1.",
+   "grito": [
+    {
+     "tipo": "destruir_vc",
+     "opciones": [
+      "vc_op_stats",
+      "vc_op_armadura",
+      "vc_op_lanzar"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "vc_op_stats",
+   "nombre": "Absorber el VC",
+   "tipo": "hechizo",
+   "coste": 0,
+   "token": true,
+   "arte": "💥",
+   "texto": "Gana el ataque y la vida del PutoVC y reparte el doble de ese ataque entre los enemigos.",
+   "efectos": [
+    {
+     "tipo": "vc_opcion",
+     "opcion": "stats"
+    }
+   ]
+  },
+  {
+   "id": "vc_op_armadura",
+   "nombre": "Blindarse",
+   "tipo": "hechizo",
+   "coste": 0,
+   "token": true,
+   "arte": "🛡️",
+   "texto": "Ganás armadura igual al doble del ataque del PutoVC.",
+   "efectos": [
+    {
+     "tipo": "vc_opcion",
+     "opcion": "armadura"
+    }
+   ]
+  },
+  {
+   "id": "vc_op_lanzar",
+   "nombre": "Reconectar",
+   "tipo": "hechizo",
+   "coste": 0,
+   "token": true,
+   "arte": "🔁",
+   "texto": "Lanza el PutoVC gratis y obtenés todas sus piezas a coste 1.",
+   "efectos": [
+    {
+     "tipo": "vc_opcion",
+     "opcion": "lanzar"
+    }
+   ]
+  },
+  {
+   "id": "putovc",
+   "nombre": "PutoVC",
+   "tipo": "esbirro",
+   "coste": 0,
+   "ataque": 0,
+   "vida": 0,
+   "token": true,
+   "arte": "🎧",
+   "texto": "Todas tus piezas de VC juntas."
+  },
+  {
    "id": "porque_me_monean",
    "nombre": "Porque Me Monean",
    "genero": "hombre",

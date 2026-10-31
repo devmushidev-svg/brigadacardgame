@@ -716,3 +716,53 @@ console.log("ok: cartas nuevas de Tun");
   assert.equal(e.j[s].tablero.find((m) => m.id === "cruit_sangre").apilado, 2);
 }
 console.log("ok: cambios de Cruit");
+
+// --- PutoVC: las piezas se suman; al lanzarlo se activan sus últimos alientos y sale con la suma de stats ---
+{
+  const e = nueva(90); const s = e.turno, r = 1 - s;
+  e.j[s].tablero = []; e.j[r].tablero = [];
+  preparar(e, s, ["cuidar_vc", "ishowspeed"]);
+  M.aplicar(e, s, { t: "jugar", uid: "t0" }, db, 0);
+  M.aplicar(e, s, { t: "jugar", uid: "t1" }, db, 0);
+  assert.deepEqual(e.j[s].vc, { piezas: ["cuidar_vc", "ishowspeed"], ataque: 7, vida: 7 });
+  e.j[r].tablero = [{ uid: "rv", id: "x", tribu: null, ataque: 1, vida: 9, vidaMax: 9, ataques: 0 }];
+  e.j[s].mana = M.CONFIG.COSTE_VC - 1;
+  assert.ok(M.aplicar(e, s, { t: "vc" }, db, 0).error, "sin maná no se lanza");
+  e.j[s].mana = M.CONFIG.COSTE_VC;
+  const res = M.aplicar(e, s, { t: "vc" }, db, 0);
+  assert.ok(!res.error, res.error);
+  // el 3 a todos de Ishowspeed mata a las dos piezas de la mesa, y sus últimos alientos se activan de nuevo
+  assert.ok(!e.j[s].tablero.some((m) => m.id === "cuidar_vc" || m.id === "ishowspeed"), "las piezas murieron en la cadena");
+  assert.equal(e.j[s].armadura, 8, "Cuidar VC: 4 al lanzar y 4 al morir");
+  assert.equal(e.j[r].tablero[0].vida, 3, "Ishowspeed: 3 al lanzar y 3 al morir");
+  const vc = e.j[s].tablero.find((m) => m.id === "putovc");
+  assert.deepEqual([vc.ataque, vc.vida], [7, 7], "sale con la suma de las piezas (después de los efectos)");
+  assert.equal(e.j[s].vc, null, "empieza un VC nuevo");
+  // la armadura absorbe el daño antes que la vida
+  const v = e.j[s].vida;
+  e.turno = r; e.j[r].tablero[0].dormido = false;
+  M.aplicar(e, r, { t: "atacar", de: "rv", a: "h" + s }, db, 0);
+  assert.equal(e.j[s].armadura, 7); assert.equal(e.j[s].vida, v);
+}
+// --- Enojaste Destroyer of VC: destruye el VC y elegís una de tres ---
+for (const [i, op] of ["stats", "armadura", "lanzar"].entries()) {
+  const e = nueva(91 + i); const s = e.turno, r = 1 - s;
+  e.j[s].tablero = []; e.j[r].tablero = [];
+  e.j[s].vc = { piezas: ["cuidar_vc", "ishowspeed"], ataque: 7, vida: 7 };
+  preparar(e, s, ["destroyer_vc"]);
+  M.aplicar(e, s, { t: "jugar", uid: "t0" }, db, 0);
+  assert.equal(e.j[s].vc, null, "el VC se destruye");
+  assert.ok(e.pendiente?.elegirUno && e.pendiente.opciones.length === 3);
+  const vr = e.j[r].vida;
+  assert.ok(!M.aplicar(e, s, { t: "elegir", i }, db, 0).error);
+  const d = e.j[s].tablero.find((m) => m.id === "destroyer_vc");
+  if (op === "stats") { assert.deepEqual([d.ataque, d.vida], [11, 11]); assert.equal(vr - e.j[r].vida, 14, "reparte el doble del ataque (sin esbirros: todo a la cara)"); }
+  if (op === "armadura") assert.equal(e.j[s].armadura, 14);
+  if (op === "lanzar") {
+    assert.ok(e.j[s].tablero.some((m) => m.id === "putovc"), "lo lanza");
+    assert.equal(e.j[s].armadura, 4, "con sus efectos");
+    const piezas = e.j[s].mano.filter((c) => c.id === "cuidar_vc" || c.id === "ishowspeed");
+    assert.equal(piezas.length, 2); assert.ok(piezas.every((c) => M.costeCarta(e, s, c, db) === 1), "las piezas cuestan 1");
+  }
+}
+console.log("ok: PutoVC y armadura");

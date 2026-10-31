@@ -473,3 +473,9 @@ img[src^="/arte/unislop-tareas/"] { filter: invert(1) drop-shadow(0 2px 3px #000
 @keyframes guia-pulso { 0%, 100% { filter: drop-shadow(0 0 4px #ffd34f) drop-shadow(0 0 2px #ffd34f); } 50% { filter: drop-shadow(0 0 16px #ffd34f) drop-shadow(0 0 6px #fff3b0) brightness(1.15); } }
 .esbirro .apilado { position: absolute; top: -6px; left: -4px; z-index: 3; padding: 1px 6px; border-radius: 10px; font: 900 clamp(11px, calc(var(--esb) * .15), 17px) var(--f-tit);
   color: #fff; background: #9b0f22; border: 1.5px solid #ffb3bd; box-shadow: 0 2px 4px #000a; }
+.heroe .armadura { position: absolute; left: -12px; bottom: -8px; z-index: 3; display: grid; place-items: center; width: calc(var(--esb) * .42); height: calc(var(--esb) * .46);
+  font: 900 calc(var(--esb) * .22) var(--f-tit); color: #fff; text-shadow: 0 2px 2px #000; clip-path: polygon(50% 0, 100% 15%, 92% 70%, 50% 100%, 8% 70%, 0 15%);
+  background: linear-gradient(160deg, #e6edf5, #8796a8 50%, #4a5566); }
+.putovc > span { background: radial-gradient(circle at 40% 35%, #7a5bd6, #2a1a5c); font-size: calc(var(--esb) * .32); }
+.putovc .vc-stats { position: absolute; left: 50%; bottom: -12px; transform: translateX(-50%); padding: 0 6px; border-radius: 8px; white-space: nowrap;
+  font: 900 12px var(--f-tit); color: #fff; background: #2a1a5c; border: 1.5px solid #b9a2ff; }

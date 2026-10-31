@@ -187,6 +187,16 @@ Diseño de Mario. Arquetipo: paladín molesto — llenar la mesa de Tun, buffear
 | Mascotas de Tun (hechizo) | 2 | — | Roba 2 cartas | hecho |
 | Tun IA | 1 | 1/2 | Grito: descubre un Tun (tribu Tun) | hecho |
 | Mauro Sosa | 2 | 2/3 | Grito: si el rival tiene una mujer en la mano, te la robás | hecho — roba cartas con `"genero": "mujer"` (todavía no hay ninguna) |
+| Cuidar VC (VC) | 3 | 3/4 | Último aliento: obtenés 4 de armadura | hecho — falta imagen (🎧) |
+| Ishowspeed Tocándose ♂ (VC) | 4 | 4/3 | Último aliento: 3 de daño a todos los esbirros | hecho — falta imagen (⚡); coste y stats propuestos |
+| Enojaste Destroyer of VC | 6 | 4/4 | Grito: destruye tu PutoVC y elegís una: gana sus stats y reparte el doble de su ataque entre los enemigos; armadura igual al doble de su ataque; o lo lanzás gratis y obtenés sus piezas a coste 1 | hecho — falta imagen (😤), género; coste y stats propuestos |
+
+### Mecánica: Entrar al VC (como las naves de Hearthstone)
+
+- Las cartas con `"vc": true` entran a la mesa normal y además se suman a tu **PutoVC** (sus stats y su último aliento).
+- El PutoVC aparece como botón al lado del poder de héroe (🎧, con la suma de stats). Tocarlo cuesta `COSTE_VC` (4) de maná: activa los últimos alientos de todas las piezas, en orden, y después invoca un esbirro **PutoVC** con la suma de ataque y vida. Después empezás un VC nuevo.
+- **Armadura** (`armadura` en el jugador, efecto `armadura`): absorbe el daño al héroe antes que la vida. Se ve como un escudo en el retrato.
+- **Elegí una** (efecto `destruir_vc` con `opciones`): usa la pantalla de descubrir, pero la opción elegida se aplica en vez de ir a la mano (cartas ficha `vc_op_*` con efecto `vc_opcion`).
 
 ## Animaciones automáticas
 

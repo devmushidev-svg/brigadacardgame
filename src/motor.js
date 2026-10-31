@@ -13,6 +13,7 @@ export const CONFIG = {
   COPIAS_MAX: 2,
   TIEMPO_TURNO: 75, // segundos
   TIEMPO_MULLIGAN: 40, // segundos para elegir qué cartas cambiar al empezar
+  COSTE_VC: 4, // maná para lanzar el PutoVC
 };
 
 // ---------- azar reproducible (se guarda en el estado) ----------
@@ -58,6 +59,7 @@ export function cabeEsbirro(estado, s, c) {
 const vecesTarea = (estado, s, etiquetas) => (etiquetas || []).includes("tarea") ? 1 + estado.globales.filter((g) => g.disparador === "tareas_dobles" && g.seat === s).length : 1;
 // coste de una carta concreta de la mano: el de la carta menos lo que le rebajaron (ej. Tun Astrónomo)
 export function costeCarta(estado, s, c, db) {
+  if (c?.fijo != null) return c.fijo; // copias que cuestan un número fijo (piezas del PutoVC a coste 1)
   return c ? Math.max(0, costeDe(estado, s, db[c.id]) - (c.rebaja || 0)) : 99;
 }
 // cartas que pueden salir al azar o en un descubrir
@@ -302,8 +304,32 @@ function buscar(estado, ref) {
 
 function danarHeroe(estado, s, n, ev) {
   if (n <= 0) return;
-  estado.j[s].vida -= n;
-  ev.push({ e: "dano", a: "h" + s, n });
+  const p = estado.j[s];
+  // la armadura absorbe el daño antes que la vida
+  const abs = Math.min(p.armadura || 0, n);
+  if (abs) { p.armadura -= abs; ev.push({ e: "armadura_rota", seat: s, n: abs }); }
+  if (n - abs <= 0) return;
+  p.vida -= n - abs;
+  ev.push({ e: "dano", a: "h" + s, n: n - abs });
+}
+
+// ---------- PutoVC: las cartas con "vc" se suman al jugarlas; al lanzarlo se activan sus últimos alientos ----------
+export function puedeLanzarVC(estado, s) {
+  const p = estado.j[s];
+  return !!p.vc?.piezas.length && p.mana >= CONFIG.COSTE_VC && p.tablero.length < CONFIG.MAX_TABLERO;
+}
+function lanzarVC(estado, s, vc, ev, db) {
+  ev.push({ e: "vc_lanza", seat: s, n: vc.piezas.length });
+  for (const id of vc.piezas) {
+    if (estado.fase !== "jugando") return;
+    const c = db[id];
+    if (!c?.aliento) continue;
+    ev.push({ e: "repite", seat: s, carta: id });
+    aplicarEfectos(estado, s, c.aliento, null, ev, db, null);
+    resolverMuertes(estado, ev, db);
+  }
+  const m = estado.fase === "jugando" && invocar(estado, s, "putovc", ev, db);
+  if (m) { m.ataque = vc.ataque; m.vida = m.vidaMax = vc.vida; ev.push({ e: "buff", a: m.uid, ataque: vc.ataque, vida: vc.vida }); }
 }
 
 // extra: { fx, de } para que el cliente sepa cómo dibujar el golpe (ej. una piedra desde Tun Puto)
@@ -514,6 +540,34 @@ function aplicarEfectos(estado, s, efectos, elegido, ev, db, fuente, ctx = {}) {
       const lado = ef.lado === "enemigo" ? otro(s) : s, mazo = estado.j[lado].mazo;
       for (let k = 0; k < n; k++) mazo.splice(Math.floor(azar(estado) * (mazo.length + 1)), 0, ef.carta);
       ev.push({ e: "baraja", seat: lado, carta: ef.carta, n });
+      continue;
+    }
+    if (ef.tipo === "armadura") {
+      estado.j[s].armadura = (estado.j[s].armadura || 0) + n;
+      ev.push({ e: "armadura", seat: s, n });
+      continue;
+    }
+    if (ef.tipo === "destruir_vc") {
+      // Enojaste Destroyer of VC: destruye tu PutoVC y elegís una opción (como el Exodar)
+      const vc = estado.j[s].vc || { piezas: [], ataque: 0, vida: 0 };
+      estado.j[s].vc = null;
+      ev.push({ e: "vc_destruido", seat: s });
+      if (estado.pendiente) aplicarEfectos(estado, s, db[elegir(estado, ef.opciones)]?.efectos, null, ev, db, fuente, { vc });
+      else { estado.pendiente = { seat: s, tipo: "descubrir", elegirUno: true, opciones: ef.opciones.slice(), vc, fuente }; ev.push({ e: "elegir", seat: s, tipo: "descubrir" }); }
+      continue;
+    }
+    if (ef.tipo === "vc_opcion") {
+      const vc = ctx.vc || { piezas: [], ataque: 0, vida: 0 };
+      const f = fuente && buscar(estado, fuente);
+      if (ef.opcion === "stats") { // gana las stats del VC y reparte el doble de ese ataque entre los enemigos
+        if (f) { f.obj.ataque += vc.ataque; f.obj.vida += vc.vida; f.obj.vidaMax += vc.vida; ev.push({ e: "buff", a: fuente, ataque: vc.ataque, vida: vc.vida }); }
+        aplicarEfectos(estado, s, [{ tipo: "repartir", cantidad: vc.ataque * 2, fx: "agua" }], null, ev, db, f ? fuente : null);
+      } else if (ef.opcion === "armadura") {
+        aplicarEfectos(estado, s, [{ tipo: "armadura", cantidad: vc.ataque * 2 }], null, ev, db, fuente);
+      } else if (ef.opcion === "lanzar") { // lo lanza gratis y te da todas sus piezas a coste 1
+        if (vc.piezas.length) lanzarVC(estado, s, vc, ev, db);
+        for (const id of vc.piezas) if (darCarta(estado, s, id, ev)) estado.j[s].mano[estado.j[s].mano.length - 1].fijo = 1;
+      }
       continue;
     }
     if (ef.tipo === "grito_extra") {
@@ -820,6 +874,12 @@ export function opcionesPendiente(estado) {
 }
 function resolverPendiente(estado, eleccion, ev, db) {
   const pe = estado.pendiente;
+  if (pe.tipo === "descubrir" && pe.elegirUno) { // "elegí una": se aplica la opción (no va a la mano)
+    estado.pendiente = null;
+    aplicarEfectos(estado, pe.seat, db[pe.opciones[eleccion]]?.efectos, null, ev, db, pe.fuente && buscar(estado, pe.fuente) ? pe.fuente : null, { vc: pe.vc });
+    resolverMuertes(estado, ev, db);
+    return;
+  }
   if (pe.tipo === "descubrir") {
     estado.pendiente = null;
     const id = pe.opciones[eleccion];
@@ -881,6 +941,16 @@ export function aplicar(estado, s, accion, db, ahora) {
     registrar(estado, `${p.nombre} termino su turno`);
     finTurno(estado, s, ev, db);
     if (estado.fase === "jugando") inicioTurno(estado, otro(s), ev, db, ahora);
+    return { ev };
+  }
+
+  if (accion.t === "vc") {
+    if (!puedeLanzarVC(estado, s)) return { error: !p.vc?.piezas.length ? "todavía no tenés piezas en el VC" : p.mana < CONFIG.COSTE_VC ? "no te alcanza el mana" : "tablero lleno" };
+    p.mana -= CONFIG.COSTE_VC;
+    const vc = p.vc; p.vc = null;
+    registrar(estado, `${p.nombre} lanzó el PutoVC`);
+    lanzarVC(estado, s, vc, ev, db);
+    resolverMuertes(estado, ev, db);
     return { ev };
   }
 
@@ -946,6 +1016,11 @@ export function aplicar(estado, s, accion, db, ahora) {
           aplicarEfectos(estado, s, carta.grito, accion.objetivo, ev, db, m.uid);
           if (extra) resolverMuertes(estado, ev, db);
         }
+      }
+      if (carta.vc) { // entra al PutoVC: suma sus stats y su último aliento
+        const vc = (p.vc ||= { piezas: [], ataque: 0, vida: 0 });
+        vc.piezas.push(carta.id); vc.ataque += carta.ataque; vc.vida += carta.vida;
+        ev.push({ e: "vc_suma", seat: s, carta: carta.id });
       }
       if (carta.tribu) (p.jugadosTribu ||= {})[carta.tribu] = (p.jugadosTribu[carta.tribu] || 0) + 1;
       avanzarMision(estado, s, "jugar_tribu", carta.tribu || null, ev, db);
@@ -1016,6 +1091,7 @@ export function vista(estado, yo, db0 = {}) {
     pendiente: estado.pendiente
       ? { seat: estado.pendiente.seat, tipo: estado.pendiente.tipo,
           opciones: estado.pendiente.seat === yo && estado.pendiente.tipo === "descubrir" ? estado.pendiente.opciones : undefined,
+          elegirUno: !!estado.pendiente.elegirUno,
           tirador: estado.pendiente.tipo === "disparar" ? estado.pendiente.cola[0] : undefined,
           quedan: estado.pendiente.tipo === "disparar" ? estado.pendiente.cola.length : undefined }
       : null,
@@ -1040,6 +1116,8 @@ export function vista(estado, yo, db0 = {}) {
       }) : undefined,
       mejoras: p.mejoras || null,
       gritoExtra: p.gritoExtra || null,
+      armadura: p.armadura || 0,
+      vc: p.vc ? { ...p.vc, coste: CONFIG.COSTE_VC } : null,
       tablero: p.tablero,
     })),
   };
