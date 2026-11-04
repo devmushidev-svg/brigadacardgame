@@ -312,6 +312,7 @@ Habilitado: se puede elegir en Mis mazos, sale en "Al azar" y tiene mazo precarg
 | **Folklore** (hechizo legendario) | 4 | — | Invoca un músico 2/2 con poder de hechizo +1 por cada 3 scrobbles (hasta 4), en orden: Violeta Parra ♀, Víctor Jara ♂, Eduardo Mateo ♂, Chico Buarque ♂ (fichas). Cada músico, cuando se invoca (`al_invocar`), te da un hechizo al azar. Los scrobbles se cuentan aunque la misión no esté en juego | hecho |
 | **Slowcore** (hechizo legendario) | 4 | — | Reparte 5 de daño entre los enemigos. Se repite al final de cada uno de tus turnos por el resto de la partida (global `fin_de_tu_turno`; las repeticiones no suman poder de hechizo) | hecho |
 | Noise (hechizo) | 7 | — | Ganás 10 de armadura. Inflige 10 de daño a todos los esbirros enemigos | hecho |
+| Deathconsciousness (hechizo) | 10 | — | Reparte 8 de daño entre los enemigos, restaura 8 de vida a tu héroe e invoca un Eternal Worm 8/8 (ficha) | hecho |
 | **Contador de Scrobbles** (misión legendaria, serie) | 1 | — | Suma un scrobble por cada hechizo o carta con etiqueta `musica` que jugás (todas las cartas de Tomis la tienen). Nivel 1 (5): robás 3 cartas que cuestan 1 menos. Nivel 2 (10): tus hechizos +2 de daño por el resto de la partida y robás 3 que cuestan 2 menos. Nivel 3 (20): obtenés **Charts** | hecho |
 | Descargar el FLAC (parte 2/3, ficha) | — | — | La misión pasa a esta carta al llegar al nivel 1 | hecho |
 | Winamp (parte 3/3, ficha) | — | — | La misión pasa a esta carta al llegar al nivel 2 | hecho |

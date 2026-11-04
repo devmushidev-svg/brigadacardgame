@@ -1177,3 +1177,16 @@ console.log("ok: Slowcore");
   assert.equal(e.j[r].tablero[0].vida, 2);
 }
 console.log("ok: Noise");
+
+// --- Deathconsciousness: reparte 8, cura 8 e invoca un Eternal Worm 8/8 ---
+{
+  const e = nueva(131); const s = e.turno, r = 1 - s;
+  e.j[s].tablero = []; e.j[r].tablero = [];
+  preparar(e, s, ["deathconsciousness"]);
+  e.j[s].vida = 30;
+  const vr = e.j[r].vida;
+  M.aplicar(e, s, { t: "jugar", uid: "t0" }, db, 0);
+  assert.equal(vr - e.j[r].vida, 8); assert.equal(e.j[s].vida, 38);
+  assert.deepEqual(e.j[s].tablero.map((m) => [m.id, m.ataque, m.vida]), [["eternal_worm", 8, 8]]);
+}
+console.log("ok: Deathconsciousness");

@@ -2012,6 +2012,49 @@
      "cantidad": 10
     }
    ]
+  },
+  {
+   "id": "deathconsciousness",
+   "nombre": "Deathconsciousness",
+   "tipo": "hechizo",
+   "coste": 10,
+   "clase": "tomis",
+   "etiquetas": [
+    "musica"
+   ],
+   "arte": "/arte/deathconsciousness.webp",
+   "texto": "Reparte 8 de daño entre los enemigos. Restaurá 8 de vida a tu héroe. Invoca un Eternal Worm 8/8.",
+   "efectos": [
+    {
+     "tipo": "repartir",
+     "cantidad": 8
+    },
+    {
+     "tipo": "curar",
+     "objetivo": "heroe_propio",
+     "cantidad": 8
+    },
+    {
+     "tipo": "invocar",
+     "carta": "eternal_worm",
+     "cantidad": 1
+    }
+   ]
+  },
+  {
+   "id": "eternal_worm",
+   "nombre": "Eternal Worm",
+   "tipo": "esbirro",
+   "coste": 8,
+   "ataque": 8,
+   "vida": 8,
+   "clase": "tomis",
+   "token": true,
+   "etiquetas": [
+    "musica"
+   ],
+   "arte": "/arte/eternal_worm.webp",
+   "texto": "Volvió por Connecticut."
   }
  ],
  "heroes": [
