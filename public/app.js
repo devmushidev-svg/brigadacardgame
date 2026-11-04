@@ -848,6 +848,7 @@ function pedirNombre() {
 
 async function pantallaPartida(id) {
   PID = id;
+  avisoGirar();
   if (!localStorage.getItem("tok_" + id) && !localStorage.getItem("nombre")) await pedirNombre();
   conectar();
   setInterval(actualizarReloj, 250);
@@ -1740,7 +1741,7 @@ function zoom(idCarta, uid, ref = null) {
   // en pantallas anchas las cartas relacionadas van al costado de la carta grande; en el celular, abajo
   const rel = relacionadasHTML(c, piezas);
   m.innerHTML = `<div class="modal-caja ${rel ? "con-rel" : ""}"><div class="zoom-principal">${cartaHTML(vista, { clase: "grande" })}${V?.tutorial ? statsHTML(c) : ""}${palabrasHTML(c)}
-    ${puede ? '<button class="boton" id="jugar" style="width:min(56vw,260px)">Jugar</button>' : ""}</div>${rel}</div>`;
+    <div class="zoom-botones">${puede ? '<button class="boton" id="jugar">Jugar</button>' : ""}<button class="boton sec" id="salir-zoom">Salir</button></div></div>${rel}</div>`;
   document.body.append(m);
   const abierto = Date.now();
   m.onclick = (e) => {
@@ -1749,9 +1750,53 @@ function zoom(idCarta, uid, ref = null) {
     cerrarModal(m);
   };
   $("#jugar", m) && ($("#jugar", m).onclick = (e) => { e.stopPropagation(); cerrarModal(m); intentarJugar(uid, null, centro(refEl("h" + V.yo))); });
+  $("#salir-zoom", m).onclick = (e) => { e.stopPropagation(); cerrarModal(m); };
   // tocar una carta relacionada la abre en grande
   $$(".relacionadas .carta", m).forEach((el) => (el.onclick = (e) => { e.stopPropagation(); cerrarModal(m); zoom(el.dataset.carta); }));
 }
+// visor de la mano (celular): tus cartas grandes en fila para deslizar y elegir, con "Jugar" en cada una
+function verMano(uidInicial) {
+  if (!V || V.yo < 0) return;
+  const mano = V.j[V.yo].mano || [];
+  if (!mano.length) return;
+  const miTurno = V.turno === V.yo && V.fase === "jugando";
+  const m = document.createElement("div");
+  m.className = "modal visor-mano";
+  m.innerHTML = `<div class="visor-fila">${mano.map((c) => {
+      const card = cartaMano(c) || DB[c.id] || {};
+      const ok = miTurno && jugable(V, card);
+      return `<div class="visor-op" data-uid="${c.uid}">${cartaHTML(card, { clase: ok ? "jugable" : "" })}
+        ${ok ? `<button class="boton visor-jugar" data-uid="${c.uid}">Jugar</button>` : `<div class="visor-nota">${miTurno ? "no alcanza" : "turno del rival"}</div>`}</div>`;
+    }).join("")}</div>
+    <button class="boton sec visor-salir">Salir</button>`;
+  document.body.append(m);
+  const abierto = Date.now();
+  m.querySelector(`.visor-op[data-uid="${uidInicial}"]`)?.scrollIntoView({ inline: "center", block: "nearest" });
+  $(".visor-salir", m).onclick = (e) => { e.stopPropagation(); cerrarModal(m); };
+  $$(".visor-jugar", m).forEach((b) => (b.onclick = (e) => { e.stopPropagation(); cerrarModal(m); intentarJugar(b.dataset.uid, null, centro(refEl("h" + V.yo))); }));
+  $$(".visor-op .carta", m).forEach((el) => (el.onclick = (e) => { e.stopPropagation(); if (Date.now() - abierto < 350) return; cerrarModal(m); zoom(el.dataset.carta, el.closest(".visor-op").dataset.uid); }));
+  m.onclick = (e) => { if ((e.target === m || e.target.classList.contains("visor-fila")) && Date.now() - abierto > 350) cerrarModal(m); };
+}
+
+// celular en vertical: se pide girarlo (y se intenta bloquear la pantalla en horizontal)
+function avisoGirar() {
+  const quiere = !matchMedia("(hover: hover) and (pointer: fine)").matches && innerHeight > innerWidth && ruta.startsWith("/p/") && !sessionStorage.getItem("vertical-ok");
+  let a = $("#girar");
+  if (!quiere) { a?.remove(); return; }
+  if (a) return;
+  a = document.createElement("div");
+  a.id = "girar"; a.className = "girar";
+  a.innerHTML = `<div class="girar-icono">📱↻</div><div class="mull-info">Girá el celular: el juego se ve mejor en horizontal.</div>
+    <button class="boton" id="girar-full">Pantalla completa y horizontal</button><button class="boton sec" id="girar-no">Jugar así igual</button>`;
+  document.body.append(a);
+  $("#girar-full").onclick = async () => {
+    try { await document.documentElement.requestFullscreen(); await screen.orientation?.lock?.("landscape"); } catch {}
+    setTimeout(avisoGirar, 400);
+  };
+  $("#girar-no").onclick = () => { sessionStorage.setItem("vertical-ok", "1"); a.remove(); };
+}
+addEventListener("resize", () => avisoGirar());
+
 // al cerrar algo encima de la mesa, se ignoran los toques un momento (si no, en Android
 // el mismo toque terminaba el turno o jugaba algo que estaba abajo)
 let cerradoEn = 0;
@@ -1898,7 +1943,10 @@ addEventListener("pointerup", (e) => {
   }
 
   // toque simple sobre una carta de la mano = verla grande (con botón jugar)
-  if (g && !g.movio && g.cartaEl && Date.now() - g.t < 450) zoom(g.cartaEl.dataset.carta, g.cartaEl.dataset.uid);
+  if (g && !g.movio && g.cartaEl && Date.now() - g.t < 450) {
+    if (matchMedia("(hover: hover) and (pointer: fine)").matches) zoom(g.cartaEl.dataset.carta, g.cartaEl.dataset.uid);
+    else verMano(g.cartaEl.dataset.uid); // en el celular: el visor de la mano, más fácil para elegir
+  }
   // toque simple sobre un esbirro del rival = verlo grande
   else if (g && !g.movio && g.esbEl?.classList.contains("esbirro") && +g.esbEl.dataset.seat !== V.yo && Date.now() - g.t < 450) zoom(g.esbEl.dataset.carta, null, g.esbEl.dataset.ref);
 });

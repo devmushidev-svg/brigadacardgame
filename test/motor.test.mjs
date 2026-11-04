@@ -248,7 +248,7 @@ for (let k = 0; k < 20; k++) {
   assert.equal(tuns(e, s), 7, "llena la mesa");
   assert.ok(!M.aplicar(e, s, { t: "jugar", uid: "t1" }, db, 0).error);
   assert.ok(e.j[s].tablero.every((m) => m.ataque === 2 && m.vida === 2), "+1/+1 a todos");
-  assert.ok(e.j[s].mano.length === 2 && e.j[s].mano.every((c) => db[c.id].tribu === "tun"), "robó 2 Tun");
+  assert.equal(e.j[s].mano.length, 0, "ya no roba");
 }
 
 // --- Tuna (cura 5 y roba 2) y Tunita (cuenta los Tun invocados o jugados, roba 2 Tun) ---
@@ -269,7 +269,7 @@ for (let k = 0; k < 20; k++) {
   const n = e.j[s].mano.length;
   assert.ok(!M.aplicar(e, s, { t: "jugar", uid: "t3", objetivo: "rv" }, db, 0).error);
   assert.equal(e.j[r].tablero[0].vida, 5);
-  assert.equal(e.j[s].mano.length, n - 1 + 2, "Tunita roba 2 Tun");
+  assert.equal(e.j[s].mano.length, n - 1, "Tunita ya no roba");
 }
 
 // --- Funeral de Tun: zombies por cada Tun muerto; los que no caben buffean ---

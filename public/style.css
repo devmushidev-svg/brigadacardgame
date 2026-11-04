@@ -518,3 +518,29 @@ img[src^="/arte/unislop-tareas/"] { filter: invert(1) drop-shadow(0 2px 3px #000
   .modal-caja.con-rel .relacionadas .carta { --carta-w: min(calc(100vw - 420px), 31vh, 220px); }
   .modal-caja.con-rel .relacionadas.varias .carta { --carta-w: min(calc((100vw - 440px) / 2), 31vh, 220px); }
 }
+
+/* ---------- botones de la carta grande ---------- */
+.zoom-botones { display: flex; gap: 10px; justify-content: center; width: min(86vw, 360px); }
+.zoom-botones .boton { flex: 1; }
+/* ---------- visor de la mano (celular) ---------- */
+.visor-mano { display: flex; flex-direction: column; justify-content: center; gap: 12px; padding: 12px 0; }
+.visor-fila { display: flex; gap: 14px; overflow-x: auto; scroll-snap-type: x mandatory; padding: 18px max(16px, calc(50vw - 110px)); width: 100vw; -webkit-overflow-scrolling: touch; touch-action: pan-x; }
+.visor-op { flex: none; display: grid; justify-items: center; gap: 10px; scroll-snap-align: center; }
+.visor-op .carta { --carta-w: min(56vw, 58vh, 230px); }
+.visor-jugar { width: 100%; padding: 9px; font-size: 17px; }
+.visor-nota { font: 700 13px var(--f-txt); color: var(--pergamino); opacity: .7; height: 40px; display: grid; place-items: center; }
+.visor-salir { align-self: center; width: min(60vw, 260px); }
+@media (orientation: landscape) and (max-height: 500px) {
+  .visor-mano { gap: 6px; padding: 6px 0; }
+  .visor-op { gap: 6px; }
+  .visor-op .carta { --carta-w: min(26vw, 34vh, 200px); }
+  .visor-fila { padding-top: 6px; padding-bottom: 2px; }
+  .visor-salir { padding: 6px; }
+  .visor-jugar { padding: 6px; font-size: 15px; }
+}
+/* ---------- aviso: girá el celular ---------- */
+.girar { position: fixed; inset: 0; z-index: 95; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 14px; padding: 24px;
+  text-align: center; background: radial-gradient(ellipse at 50% 40%, #3a2412f2, #000f 80%); }
+.girar-icono { font-size: 64px; animation: girar-anim 1.6s ease-in-out infinite; }
+@keyframes girar-anim { 50% { transform: rotate(-90deg); } }
+.girar .boton { max-width: 320px; }

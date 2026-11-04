@@ -183,16 +183,16 @@ Diseño de Mario. Arquetipo: paladín molesto — llenar la mesa de Tun, buffear
 | Novia de Tun ♀ | 3 | 4/1 | Acometida. Último aliento: invoca 2 Tun y tus Tun tienen +1 de ataque por el resto de la partida | hecho |
 | Tun Mastermind | 15 | 6/3 | Acometida. 1 menos por cada Tun muerto en la partida. Grito: invoca 3 Tun, tus Tun tienen +1 de ataque por el resto de la partida y robás 2 Tun | hecho |
 | Comida (hechizo) | 3 | — | Llena tu mesa de Tun 1/1 | hecho |
-| Plátano (hechizo) | 1 | — | +1/+1 a tus Tun. Robás 2 Tun | hecho |
+| Plátano (hechizo) | 1 | — | +1/+1 a tus Tun | hecho |
 | Tuna (hechizo) | 2 | — | Restaura 5 de vida a tu héroe. Robás 2 cartas | hecho |
-| Tunita (hechizo) | 2 | — | 1 de daño a un esbirro, +1 por cada Tun que invocaste o jugaste esta partida. Robás 2 Tun | hecho |
+| Tunita (hechizo) | 2 | — | 1 de daño a un esbirro, +1 por cada Tun que invocaste o jugaste esta partida | hecho |
 | **Funeral de Tun** (hechizo legendario) | 10 | — | Un Tun Zombie por cada Tun muerto en la partida; cada uno que no cabe da +1 de ataque o de vida a un Tun al azar | hecho |
 | Tun Zombie (ficha) | — | 1/1 | Lo invoca Funeral de Tun | hecho — **stats provisionales** |
 | **Porque Me Monean** (legendaria) | 6 | 3/5 | Grito: convierte a todos los esbirros del rival en Tun 1/1 | hecho |
 | Tun Amor (sin género) | 4 | 1/8 | Cada vez que uno de tus Tun ataca, gana +1/+1 | hecho |
 | Choza de Monos | 2 | 0/6 | Al final de tu turno, invoca tres Tun | hecho |
 | **Tun Iguana** (legendaria) | 3 | 5/5 | Grito: por el resto de la partida, cada vez que muere uno de tus Tun, invoca un Tun Zombie que ataca a un enemigo al azar | hecho — falta confirmar género |
-| Tun Astrónomo | 1 | 1/5 | Cada vez que ataca, un Tun de tu mano al azar cuesta 2 menos | hecho |
+| Tun Astrónomo | 2 | 1/5 | Cada vez que ataca, un Tun de tu mano al azar cuesta 2 menos | hecho |
 | Tun Satánico | 3 | 1/1 | Grito: destruye a tus otros Tun y gana +2/+2 por cada uno. Último aliento: reparte su ataque como daño entre los enemigos (piedras) | hecho |
 
 ## Neutrales

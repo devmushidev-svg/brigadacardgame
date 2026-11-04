@@ -193,7 +193,7 @@
    "nombre": "Tun Astrónomo",
    "genero": "hombre",
    "tipo": "esbirro",
-   "coste": 1,
+   "coste": 2,
    "ataque": 1,
    "vida": 5,
    "tribu": "tun",
@@ -401,7 +401,7 @@
    "coste": 1,
    "clase": "tun",
    "arte": "/arte/platano.webp",
-   "texto": "Dale +1/+1 a tus Tun. Robá 2 Tun.",
+   "texto": "Dale +1/+1 a tus Tun.",
    "efectos": [
     {
      "tipo": "buff",
@@ -411,13 +411,6 @@
      },
      "ataque": 1,
      "vida": 1
-    },
-    {
-     "tipo": "robar_filtro",
-     "filtro": {
-      "tribu": "tun"
-     },
-     "cantidad": 2
     }
    ]
   },
@@ -515,7 +508,7 @@
    "coste": 2,
    "clase": "tun",
    "arte": "/arte/tunita.webp",
-   "texto": "Inflige 1 de daño a un esbirro, +1 por cada Tun que invocaste o jugaste esta partida. Robá 2 Tun.",
+   "texto": "Inflige 1 de daño a un esbirro, +1 por cada Tun que invocaste o jugaste esta partida.",
    "efectos": [
     {
      "tipo": "dano",
@@ -525,13 +518,6 @@
       "por": "tribu_invocados",
       "tribu": "tun"
      }
-    },
-    {
-     "tipo": "robar_filtro",
-     "filtro": {
-      "tribu": "tun"
-     },
-     "cantidad": 2
     }
    ]
   },
