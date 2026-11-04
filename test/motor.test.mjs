@@ -1220,3 +1220,13 @@ console.log("ok: Shoegaze");
   assert.equal(e.j[s].mazo.length, 3, "salió una del mazo");
 }
 console.log("ok: Review de RYM");
+
+// --- Loop: copia una carta al azar de tu mano ---
+{
+  const e = nueva(134); const s = e.turno;
+  e.j[s].tablero = [];
+  preparar(e, s, ["loop", "post_rock"]);
+  M.aplicar(e, s, { t: "jugar", uid: "t0" }, db, 0);
+  assert.deepEqual(e.j[s].mano.map((c) => c.id), ["post_rock", "post_rock"]);
+}
+console.log("ok: Loop");

@@ -2079,17 +2079,36 @@
    "id": "review_rym",
    "nombre": "Review de RYM",
    "tipo": "hechizo",
-   "coste": 3,
+   "coste": 2,
    "clase": "tomis",
    "etiquetas": [
     "musica"
    ],
-   "arte": "⭐",
+   "arte": "/arte/review_rym.webp",
    "texto": "Descubre una carta de tu mazo. Robala y obtené una copia de ella.",
    "efectos": [
     {
      "tipo": "descubrir_mazo",
      "copias": 1
+    }
+   ]
+  },
+  {
+   "id": "loop",
+   "nombre": "Loop",
+   "tipo": "esbirro",
+   "coste": 1,
+   "ataque": 2,
+   "vida": 2,
+   "clase": "tomis",
+   "etiquetas": [
+    "musica"
+   ],
+   "arte": "/arte/loop.webp",
+   "texto": "Grito de batalla: obtené una copia de una carta al azar de tu mano.",
+   "grito": [
+    {
+     "tipo": "copiar_mano"
     }
    ]
   }

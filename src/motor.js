@@ -575,6 +575,11 @@ function aplicarEfectos(estado, s, efectos, elegido, ev, db, fuente, ctx = {}) {
       }
       continue;
     }
+    if (ef.tipo === "copiar_mano") { // Loop: obtenés una copia de una carta al azar de tu mano
+      const mano = estado.j[s].mano;
+      if (mano.length) darCarta(estado, s, elegir(estado, mano).id, ev);
+      continue;
+    }
     if (ef.tipo === "descubrir_mazo") {
       // Review de RYM: elegís una de 3 cartas distintas de tu mazo; la robás y obtenés una copia más
       const distintas = [...new Set(estado.j[s].mazo)], ops = [];
