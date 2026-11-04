@@ -2055,6 +2055,25 @@
    ],
    "arte": "/arte/eternal_worm.webp",
    "texto": "Volvió por Connecticut."
+  },
+  {
+   "id": "shoegaze",
+   "nombre": "Shoegaze",
+   "tipo": "hechizo",
+   "coste": 6,
+   "clase": "tomis",
+   "etiquetas": [
+    "musica"
+   ],
+   "arte": "/arte/shoegaze.webp",
+   "texto": "Lanza otra vez los 3 últimos hechizos que jugaste (con objetivos al azar).",
+   "efectos": [
+    {
+     "tipo": "repetir_hechizos",
+     "cantidad": 3,
+     "excepto": "shoegaze"
+    }
+   ]
   }
  ],
  "heroes": [

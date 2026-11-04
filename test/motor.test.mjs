@@ -1190,3 +1190,16 @@ console.log("ok: Noise");
   assert.deepEqual(e.j[s].tablero.map((m) => [m.id, m.ataque, m.vida]), [["eternal_worm", 8, 8]]);
 }
 console.log("ok: Deathconsciousness");
+
+// --- Shoegaze: lanza otra vez tus 3 últimos hechizos ---
+{
+  const e = nueva(132); const s = e.turno, r = 1 - s;
+  e.j[s].tablero = []; e.j[r].tablero = [];
+  preparar(e, s, ["shoegaze"]);
+  e.j[s].jugados = ["grindcore", "wey_emo", "tun_brawl", "breakcore", "wey_emo"];
+  const vr = e.j[r].vida;
+  const res = M.aplicar(e, s, { t: "jugar", uid: "t0" }, db, 0);
+  assert.deepEqual(res.ev.filter((x) => x.e === "repite").map((x) => x.carta), ["wey_emo", "breakcore", "wey_emo"]);
+  assert.equal(vr - e.j[r].vida, 5 + 9 + 5, "sin esbirros: todo a la cara");
+}
+console.log("ok: Shoegaze");

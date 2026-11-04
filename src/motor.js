@@ -704,7 +704,10 @@ function aplicarEfectos(estado, s, efectos, elegido, ev, db, fuente, ctx = {}) {
     }
     if (ef.tipo === "repetir_hechizos") {
       // Charts: vuelve a lanzar, en orden, todos los hechizos que lanzaste esta partida (objetivos al azar, con tu poder de hechizo)
-      const ids = (estado.j[s].jugados || []).filter((id) => db[id]?.tipo === "hechizo").slice(0, 40);
+      let ids = (estado.j[s].jugados || []).filter((id) => db[id]?.tipo === "hechizo");
+      // "cantidad": solo los N últimos, sin contar el hechizo que se está lanzando (Shoegaze: 3)
+      if (ef.cantidad != null) { if (ids[ids.length - 1] === ef.excepto) ids.pop(); ids = ids.slice(-n); }
+      ids = ids.slice(0, 40);
       for (const id of ids) {
         if (estado.fase !== "jugando" || estado.pendiente) break;
         lanzarConObjetivoAzar(estado, s, db[id], ev, db, { poderHechizo: poderHechizo(estado, s, db) });
