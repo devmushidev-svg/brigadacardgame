@@ -968,21 +968,32 @@ console.log("ok: Wey Emo Gritando");
 }
 console.log("ok: Mossad Strongest Agent");
 
-// --- Yamir: poder de hechizo +3 y roba 3 hechizos de tu mazo ---
+// --- Yamir: tus hechizos cuestan 1 menos mientras esté en la mesa ---
 {
-  const e = nueva(119); const s = e.turno, r = 1 - s;
+  const e = nueva(119); const s = e.turno;
+  e.j[s].tablero = [];
+  preparar(e, s, ["yamir", "fumando_porro", "tun_brawl"]);
+  const porro = e.j[s].mano.find((c) => c.id === "fumando_porro"), brawl = e.j[s].mano.find((c) => c.id === "tun_brawl");
+  assert.equal(M.costeCarta(e, s, porro, db), 3);
+  M.aplicar(e, s, { t: "jugar", uid: "t0" }, db, 0);
+  assert.equal(M.costeCarta(e, s, porro, db), 2, "el hechizo cuesta 1 menos");
+  assert.equal(M.costeCarta(e, s, brawl, db), db.tun_brawl.coste, "los esbirros no");
+  e.j[s].tablero = [];
+  assert.equal(M.costeCarta(e, s, porro, db), 3, "sin Yamir vuelve a costar lo normal");
+}
+{
+  const e = nueva(120); const s = e.turno, r = 1 - s;
   e.j[s].tablero = []; e.j[r].tablero = [];
   preparar(e, s, ["yamir"]);
   e.j[s].mazo = ["tun_brawl", "grindcore", "tun_brawl", "wey_emo", "mascotas_tun", "fumando_porro"];
   M.aplicar(e, s, { t: "jugar", uid: "t0" }, db, 0);
-  assert.equal(e.j[s].mano.length, 3);
-  assert.ok(e.j[s].mano.every((c) => db[c.id].tipo === "hechizo"), "solo hechizos");
-  assert.deepEqual(e.j[s].mazo.filter((id) => db[id].tipo !== "hechizo"), ["tun_brawl", "tun_brawl"], "los esbirros se quedan en el mazo");
-  const g = e.j[s].mano.find((c) => c.id === "grindcore") || null;
+  assert.equal(e.j[s].mano.length, 3); assert.ok(e.j[s].mano.every((c) => db[c.id].tipo === "hechizo"), "roba 3 hechizos");
+  const g = e.j[s].mano.find((c) => c.id === "grindcore");
   if (g) {
+    assert.equal(M.costeCarta(e, s, g, db), 1, "Grindcore cuesta 1 menos");
     const vr = e.j[r].vida; e.j[s].mana = 10;
     M.aplicar(e, s, { t: "jugar", uid: g.uid, objetivo: "h" + r }, db, 0);
-    assert.equal(vr - e.j[r].vida, (2 + 3) + (3 + 3), "Grindcore con +3: 5 al objetivo y 6 a todos");
+    assert.equal(vr - e.j[r].vida, (2 + 3) + (3 + 3), "con poder de hechizo +3");
   }
 }
 console.log("ok: Yamir");

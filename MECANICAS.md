@@ -300,7 +300,7 @@ Está en `heroes` con `"enConstruccion": true`: aparece en la colección pero no
 | **Ethypostlife** (legendaria) | 3 | 2/3 | Grito: por el resto de la partida, cada hechizo tuyo invoca un esbirro al azar de su mismo coste (si no hay, del más cercano por debajo; usa el coste original del hechizo) | hecho |
 | Wey Emo Gritando (hechizo) | 1 | — | Reparte 5 de daño al azar entre los enemigos; si muere alguno, reparte 3 más (una vez) | hecho |
 | Mossad Strongest Agent | 4 | 1/8 | Cada vez que lanzás un hechizo, robás una carta | hecho — falta género |
-| Yamir | 5 | 4/5 | Poder de hechizo +3. Grito: robás 3 hechizos de tu mazo | hecho — falta género |
+| Yamir | 5 | 3/7 | Poder de hechizo +3. Tus hechizos cuestan 1 menos (mientras esté en la mesa; campo `abarata_hechizos`). Grito: robás 3 hechizos de tu mazo | hecho — falta género |
 
 **Poder de hechizo** (`poder_hechizo: N` en un esbirro): mientras esté en tu mesa, tus hechizos que hacen daño (`dano`, `repartir`, `robar_vida`) pegan N más.
 

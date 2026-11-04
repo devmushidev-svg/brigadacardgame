@@ -60,7 +60,10 @@ const vecesTarea = (estado, s, etiquetas) => (etiquetas || []).includes("tarea")
 // coste de una carta concreta de la mano: el de la carta menos lo que le rebajaron (ej. Tun Astrónomo)
 export function costeCarta(estado, s, c, db) {
   if (c?.fijo != null) return c.fijo; // copias que cuestan un número fijo (piezas del PutoVC a coste 1)
-  return c ? Math.max(0, costeDe(estado, s, db[c.id]) - (c.rebaja || 0)) : 99;
+  if (!c) return 99;
+  // aura "abarata_hechizos" de tus esbirros (Yamir: tus hechizos cuestan 1 menos)
+  const aura = db[c.id]?.tipo === "hechizo" ? estado.j[s].tablero.filter((m) => m.vida > 0).reduce((t, m) => t + cartasDelEsbirro(m, db).reduce((u, x) => u + (x.abarata_hechizos || 0), 0), 0) : 0;
+  return Math.max(0, costeDe(estado, s, db[c.id]) - (c.rebaja || 0) - aura);
 }
 // cartas que pueden salir al azar o en un descubrir
 const pozo = (db, filtro) => Object.values(db).filter((c) => !c.token && c.tipo === "esbirro" && cumpleFiltro(c, filtro));
