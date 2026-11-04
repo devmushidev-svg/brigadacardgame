@@ -1646,7 +1646,7 @@
    "coste": 1,
    "clase": "tomis",
    "rareza": "legendaria",
-   "arte": "/arte/poder_tomis.webp",
+   "arte": "/arte/scrobbles.webp",
    "texto": "Serie de misiones: juega hechizos o cartas de música. 5: robás 3 cartas que cuestan 1 menos. 10: tus hechizos +2 de daño y robás 3 que cuestan 2 menos. 20: Charts.",
    "mision": {
     "contar": "scrobble",
