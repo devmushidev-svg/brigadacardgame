@@ -1465,7 +1465,7 @@
    "id": "grindcore",
    "nombre": "Grindcore",
    "tipo": "hechizo",
-   "coste": 6,
+   "coste": 2,
    "clase": "tomis",
    "arte": "/arte/grindcore.webp",
    "texto": "Inflige 2 de daño. Inflige 3 de daño a todos los enemigos.",

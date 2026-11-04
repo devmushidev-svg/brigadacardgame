@@ -292,7 +292,7 @@ Está en `heroes` con `"enConstruccion": true`: aparece en la colección pero no
 | Carta | Coste | Stats | Efecto | Estado |
 |---|---|---|---|---|
 | La Mejor Música que Jamás Escucharás | 2 | 1/5 | Poder de hechizo +1 | hecho |
-| Grindcore (hechizo) | 6 | — | 2 de daño a lo que elijas y 3 a todos los enemigos (el objetivo enemigo recibe los dos) | hecho — coste propuesto |
+| Grindcore (hechizo) | 2 | — | 2 de daño a lo que elijas y 3 a todos los enemigos (el objetivo enemigo recibe los dos) | hecho |
 | Mi Playlist #67 | 3 | 3/2 | Último aliento: lanza 2 hechizos al azar (con objetivos al azar) | hecho |
 | Fumando Porro (hechizo) | 3 | — | Invoca un Homero 5/5 (ficha). Tus próximos 2 hechizos también invocan un Homero (se ve en la placa) | hecho |
 
