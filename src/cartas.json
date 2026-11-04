@@ -1459,7 +1459,10 @@
    "clase": "tomis",
    "arte": "/arte/mejor_musica.webp",
    "poder_hechizo": 1,
-   "texto": "Poder de hechizo +1."
+   "texto": "Poder de hechizo +1.",
+   "etiquetas": [
+    "musica"
+   ]
   },
   {
    "id": "grindcore",
@@ -1480,6 +1483,9 @@
      "objetivo": "todos_enemigos",
      "cantidad": 3
     }
+   ],
+   "etiquetas": [
+    "musica"
    ]
   },
   {
@@ -1497,6 +1503,9 @@
      "tipo": "hechizos_azar",
      "cantidad": 2
     }
+   ],
+   "etiquetas": [
+    "musica"
    ]
   },
   {
@@ -1525,6 +1534,9 @@
       }
      ]
     }
+   ],
+   "etiquetas": [
+    "musica"
    ]
   },
   {
@@ -1558,6 +1570,9 @@
      "origen": "ethypostlife",
      "efectos": []
     }
+   ],
+   "etiquetas": [
+    "musica"
    ]
   },
   {
@@ -1574,6 +1589,9 @@
      "cantidad": 5,
      "siMuere": 3
     }
+   ],
+   "etiquetas": [
+    "musica"
    ]
   },
   {
@@ -1591,6 +1609,9 @@
      "tipo": "robar",
      "cantidad": 1
     }
+   ],
+   "etiquetas": [
+    "musica"
    ]
   },
   {
@@ -1613,7 +1634,49 @@
      },
      "cantidad": 3
     }
+   ],
+   "etiquetas": [
+    "musica"
    ]
+  },
+  {
+   "id": "scrobbles",
+   "nombre": "Contador de Scrobbles",
+   "tipo": "mision",
+   "coste": 1,
+   "clase": "tomis",
+   "rareza": "legendaria",
+   "arte": "/arte/poder_tomis.webp",
+   "texto": "Serie de misiones: juega hechizos o cartas de música. 5: robás 3 cartas que cuestan 1 menos. 10: tus hechizos +2 de daño y robás 3 que cuestan 2 menos.",
+   "mision": {
+    "contar": "scrobble",
+    "etapas": [
+     {
+      "meta": 5,
+      "recompensa": [
+       {
+        "tipo": "robar_rebajadas",
+        "cantidad": 3,
+        "rebaja": 1
+       }
+      ]
+     },
+     {
+      "meta": 10,
+      "recompensa": [
+       {
+        "tipo": "poder_hechizo_heroe",
+        "cantidad": 2
+       },
+       {
+        "tipo": "robar_rebajadas",
+        "cantidad": 3,
+        "rebaja": 2
+       }
+      ]
+     }
+    ]
+   }
   }
  ],
  "heroes": [

@@ -1131,6 +1131,13 @@ async function animarUno(e, ev, v, nuevos, yo) {
         await esperar(70);
         break;
       }
+      case "mision_nivel": { // serie de misiones: subió de nivel
+        Sonido.logro();
+        const chip = $(`.heroe[data-ref="h${e.seat}"] .mision-chip`), el = chip || refEl("h" + e.seat);
+        if (el) { const c = centro(el); particulas(c.x, c.y, "#ffd34f", 26, 110); onda(c.x, c.y, "#ffd34f"); }
+        await banner(e.seat === yo ? `¡NIVEL ${e.nivel}!` : `${V.j[e.seat].nombre} llegó al nivel ${e.nivel}`, 1200);
+        break;
+      }
       case "mision_completa": {
         const chip = $(`.heroe[data-ref="h${e.seat}"] .mision-chip`), el = chip || refEl("h" + e.seat);
         Sonido.logro();
@@ -1312,6 +1319,7 @@ function esbirroHTML(m, s, v) {
 
 const mejorasHTML = (p) => Object.entries(p.mejoras || {}).filter(([, m]) => m.ataque || m.vida)
   .map(([t, m]) => `<div class="mejora" title="por el resto de la partida">${esc(t[0].toUpperCase() + t.slice(1))} ${m.ataque ? `+${m.ataque}⚔` : ""}${m.vida ? ` +${m.vida}❤` : ""}</div>`).join("")
+  + (p.poderHechizo ? `<div class="mejora" title="tus hechizos pegan más por el resto de la partida">Hechizos +${p.poderHechizo}</div>` : "")
   + (p.gritoExtra ? `<div class="mejora" title="el próximo grito de batalla se activa ${p.gritoExtra.veces} veces">Grito ×${p.gritoExtra.veces}</div>` : "")
   + (p.ecos || []).map((x) => `<div class="mejora" title="tus próximos ${x.quedan} hechizos también lo hacen">${esc(DB[x.origen]?.nombre || "Eco")} ×${x.quedan}</div>`).join("");
 function render(v) {

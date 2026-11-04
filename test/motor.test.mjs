@@ -997,3 +997,38 @@ console.log("ok: Mossad Strongest Agent");
   }
 }
 console.log("ok: Yamir");
+
+// --- Contador de Scrobbles (serie de misiones de Tomis) ---
+{
+  const e = nueva(121); const s = e.turno, r = 1 - s;
+  e.j[s].tablero = []; e.j[r].tablero = [];
+  preparar(e, s, ["scrobbles", "mejor_musica", "tun_brawl", "wey_emo", "wey_emo", "wey_emo", "wey_emo"], 10);
+  e.j[s].mazo = Array(20).fill("tun_brawl");
+  M.aplicar(e, s, { t: "jugar", uid: "t0" }, db, 0);
+  assert.equal(e.j[s].mision.meta, 5);
+  M.aplicar(e, s, { t: "jugar", uid: "t1" }, db, 0); // música: 1
+  M.aplicar(e, s, { t: "jugar", uid: "t2" }, db, 0); // una neutral que no es música no cuenta
+  assert.equal(e.j[s].mision.progreso, 1);
+  for (const u of ["t3", "t4", "t5"]) { e.j[s].mana = 10; M.aplicar(e, s, { t: "jugar", uid: u }, db, 0); }
+  assert.equal(e.j[s].mision.progreso, 4);
+  const antes = new Set(e.j[s].mano.map((c) => c.uid));
+  e.j[s].mana = 10;
+  const res = M.aplicar(e, s, { t: "jugar", uid: "t6" }, db, 0);
+  assert.ok(res.ev.some((x) => x.e === "mision_nivel" && x.nivel === 1), "nivel 1 a los 5");
+  const nuevas = e.j[s].mano.filter((c) => !antes.has(c.uid) && c.id === "tun_brawl");
+  assert.ok(nuevas.length >= 3 && nuevas.every((c) => M.costeCarta(e, s, c, db) === db.tun_brawl.coste - 1), "robó 3 que cuestan 1 menos");
+  assert.equal(e.j[s].mision.meta, 10, "la meta pasa a 10");
+  // nivel 2
+  e.j[s].mision.progreso = 9;
+  e.j[s].mano.push({ uid: "w9", id: "wey_emo" }); e.j[s].mana = 10;
+  const vr = e.j[r].vida;
+  M.aplicar(e, s, { t: "jugar", uid: "w9" }, db, 0);
+  assert.equal(e.j[s].poderHechizoExtra, 2, "nivel 2: +2 de daño de hechizos");
+  assert.equal(e.j[s].mision.nivel, 2); assert.ok(e.j[s].mision.completa, "con dos niveles, termina");
+  e.j[s].mano.push({ uid: "w8", id: "wey_emo" }); e.j[s].mana = 10;
+  const v2 = e.j[r].vida;
+  M.aplicar(e, s, { t: "jugar", uid: "w8" }, db, 0);
+  assert.equal(v2 - e.j[r].vida, 5 + 2 + 1, "Wey Emo con +2 del nivel y +1 de La Mejor Música");
+}
+assert.ok(db.mossad.etiquetas.includes("musica"), "todas las cartas de Tomis son música");
+console.log("ok: Contador de Scrobbles");

@@ -443,6 +443,17 @@ function avanzarMision(estado, s, tipo, tribu, ev, db) {
   if (!mi || mi.completa || mi.contar !== tipo || (mi.tribu && mi.tribu !== tribu)) return;
   mi.progreso++;
   ev.push({ e: "mision_progreso", seat: s, progreso: mi.progreso, meta: mi.meta });
+  // serie de misiones (Tomis): cada etapa tiene su meta y su recompensa; la misión termina con la última
+  if (mi.etapas && mi.progreso >= mi.meta) {
+    const etapa = mi.etapas[mi.nivel || 0];
+    mi.nivel = (mi.nivel || 0) + 1;
+    ev.push({ e: "mision_nivel", seat: s, carta: mi.id, nivel: mi.nivel });
+    registrar(estado, `${estado.j[s].nombre} llegó al nivel ${mi.nivel} de ${mi.nombre}`);
+    aplicarEfectos(estado, s, etapa.recompensa, null, ev, db, null);
+    if (mi.nivel >= mi.etapas.length) { mi.completa = true; ev.push({ e: "mision_completa", seat: s, carta: mi.id }); }
+    else mi.meta = mi.etapas[mi.nivel].meta;
+    return;
+  }
   if (mi.progreso >= mi.meta) {
     mi.completa = true;
     registrar(estado, `${estado.j[s].nombre} completo ${mi.nombre}`);
@@ -508,7 +519,7 @@ export function cantidadDe(estado, s, ef) {
 
 // poder de hechizo: lo que suman tus esbirros con "poder_hechizo" al daño de tus hechizos
 function poderHechizo(estado, s, db) {
-  return estado.j[s].tablero.filter((m) => m.vida > 0).reduce((t, m) => t + cartasDelEsbirro(m, db).reduce((u, c) => u + (c.poder_hechizo || 0), 0), 0);
+  return (estado.j[s].poderHechizoExtra || 0) + estado.j[s].tablero.filter((m) => m.vida > 0).reduce((t, m) => t + cartasDelEsbirro(m, db).reduce((u, c) => u + (c.poder_hechizo || 0), 0), 0);
 }
 
 function aplicarEfectos(estado, s, efectos, elegido, ev, db, fuente, ctx = {}) {
@@ -586,6 +597,18 @@ function aplicarEfectos(estado, s, efectos, elegido, ev, db, fuente, ctx = {}) {
       // se esconde en una carta al azar de la mano del rival; cuando la juegue, vuelve a salir para vos
       const mano = estado.j[otro(s)].mano.filter((c) => !c.escondido);
       if (mano.length) { elegir(estado, mano).escondido = { carta: ef.carta, seat: s }; ev.push({ e: "esconde", seat: s, carta: ef.carta }); }
+      continue;
+    }
+    if (ef.tipo === "robar_rebajadas") {
+      // robás N cartas y cada una cuesta `rebaja` menos
+      const mano = estado.j[s].mano, antes = new Set(mano.map((c) => c.uid));
+      for (let k = 0; k < n; k++) robar(estado, s, ev, db);
+      for (const c of mano) if (!antes.has(c.uid)) c.rebaja = (c.rebaja || 0) + (ef.rebaja || 0);
+      continue;
+    }
+    if (ef.tipo === "poder_hechizo_heroe") { // poder de hechizo para el resto de la partida (no depende de esbirros)
+      estado.j[s].poderHechizoExtra = (estado.j[s].poderHechizoExtra || 0) + n;
+      ev.push({ e: "global", seat: s });
       continue;
     }
     if (ef.tipo === "robar_filtro") {
@@ -1110,11 +1133,14 @@ export function aplicar(estado, s, accion, db, ahora) {
     (p.jugados ||= []).push(carta.id); // historial de cartas jugadas (Coco Supremo)
     registrar(estado, `${p.nombre} jugo ${carta.nombre}`);
     if (carta.tipo === "hechizo") p.hechizosLanzados = (p.hechizosLanzados || 0) + 1; // los cuenta Cruit Breakdown
+    // scrobbles (misión de Tomis): cada hechizo o carta de música que jugás
+    if (carta.tipo === "hechizo" || (carta.etiquetas || []).includes("musica")) avanzarMision(estado, s, "scrobble", null, ev, db);
     if (carta.tipo === "arma") {
       p.arma = { id: carta.id, ataque: carta.ataque, durabilidad: carta.durabilidad };
       ev.push({ e: "arma", seat: s, carta: carta.id });
     } else if (carta.tipo === "mision") {
       p.mision = { id: carta.id, nombre: carta.nombre, ...copia(carta.mision), progreso: 0, completa: false };
+      if (p.mision.etapas) { p.mision.nivel = 0; p.mision.meta = p.mision.etapas[0].meta; }
       ev.push({ e: "mision", seat: s, carta: carta.id });
     } else if (carta.tipo === "hechizo") {
       ev.push({ e: "hechizo", seat: s, carta: carta.id, objetivo: accion.objetivo || null });
@@ -1294,6 +1320,7 @@ export function vista(estado, yo, db0 = {}) {
       gritoExtra: p.gritoExtra || null,
       ecos: (p.ecos || []).map((x) => ({ origen: x.origen, quedan: x.quedan })),
       armadura: p.armadura || 0,
+      poderHechizo: p.poderHechizoExtra || 0,
       arma: p.arma || null,
       heroeAtaco: !!p.heroeAtaco,
       vc: p.vc ? { ...p.vc, coste: CONFIG.COSTE_VC } : null,
