@@ -1559,6 +1559,22 @@
      "efectos": []
     }
    ]
+  },
+  {
+   "id": "wey_emo",
+   "nombre": "Wey Emo Gritando",
+   "tipo": "hechizo",
+   "coste": 1,
+   "clase": "tomis",
+   "arte": "/arte/wey_emo.webp",
+   "texto": "Reparte 5 de daño al azar entre los enemigos. Si muere alguno, reparte 3 más.",
+   "efectos": [
+    {
+     "tipo": "repartir",
+     "cantidad": 5,
+     "siMuere": 3
+    }
+   ]
   }
  ],
  "heroes": [

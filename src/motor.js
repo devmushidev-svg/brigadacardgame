@@ -669,10 +669,16 @@ function aplicarEfectos(estado, s, efectos, elegido, ev, db, fuente, ctx = {}) {
       // daño repartido al azar de a 1 punto entre los enemigos vivos; "cantidad": "ataque" usa el ataque de quien lo lanza (Cruit Baño)
       const total = ef.cantidad === "ataque" ? buscar(estado, fuente)?.obj.ataque || 0 : n;
       const r = otro(s);
+      const golpeados = new Set();
       for (let k = 0; k < total && estado.j[r].vida > 0; k++) {
         const vivos = ["h" + r, ...estado.j[r].tablero.filter((m) => m.vida > 0).map((m) => m.uid)];
-        danar(estado, elegir(estado, vivos), 1, ev, { fx: ef.fx, de: fuente });
+        const ref = elegir(estado, vivos);
+        golpeados.add(ref);
+        danar(estado, ref, 1, ev, { fx: ef.fx, de: fuente });
       }
+      // "siMuere": si murió algún esbirro golpeado, reparte esa cantidad más (una vez) (Wey Emo Gritando)
+      if (ef.siMuere && estado.j[r].tablero.some((m) => golpeados.has(m.uid) && m.vida <= 0))
+        aplicarEfectos(estado, s, [{ tipo: "repartir", cantidad: ef.siMuere, fx: ef.fx }], null, ev, db, fuente, ctx);
       continue;
     }
     if (ef.tipo === "robar_vida") {

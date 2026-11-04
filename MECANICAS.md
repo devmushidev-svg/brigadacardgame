@@ -296,6 +296,7 @@ Está en `heroes` con `"enConstruccion": true`: aparece en la colección pero no
 | Mi Playlist #67 | 3 | 3/2 | Último aliento: lanza 2 hechizos al azar (con objetivos al azar) | hecho |
 | Fumando Porro (hechizo) | 3 | — | Invoca un Homero 5/5 (ficha). Tus próximos 2 hechizos también invocan un Homero (se ve en la placa) | hecho |
 | **Ethypostlife** (legendaria) | 3 | 2/3 | Grito: por el resto de la partida, cada hechizo tuyo invoca un esbirro al azar de su mismo coste (si no hay, del más cercano por debajo; usa el coste original del hechizo) | hecho |
+| Wey Emo Gritando (hechizo) | 1 | — | Reparte 5 de daño al azar entre los enemigos; si muere alguno, reparte 3 más (una vez) | hecho |
 
 **Poder de hechizo** (`poder_hechizo: N` en un esbirro): mientras esté en tu mesa, tus hechizos que hacen daño (`dano`, `repartir`, `robar_vida`) pegan N más.
 

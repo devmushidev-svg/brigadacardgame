@@ -937,3 +937,21 @@ console.log("ok: Fumando Porro");
   assert.ok(e.j[s].tablero.some((m) => db[m.id].coste === 1 && m.id !== "homero"), "un hechizo de 1 invoca uno de 1");
 }
 console.log("ok: Ethypostlife");
+
+// --- Wey Emo Gritando: reparte 5 entre los enemigos; si muere alguno, 3 más ---
+{
+  const e = nueva(116); const s = e.turno, r = 1 - s;
+  e.j[s].tablero = []; e.j[r].tablero = [];
+  preparar(e, s, ["wey_emo"]);
+  const vr = e.j[r].vida;
+  M.aplicar(e, s, { t: "jugar", uid: "t0" }, db, 0);
+  assert.equal(vr - e.j[r].vida, 5, "sin esbirros: los 5 a la cara y nadie muere");
+  const e2 = nueva(117); const s2 = e2.turno, r2 = 1 - s2;
+  e2.j[s2].tablero = []; e2.j[r2].tablero = Array.from({ length: 5 }, (_, k) => ({ uid: "z" + k, id: "x", tribu: null, ataque: 1, vida: 1, vidaMax: 1, ataques: 0 }));
+  preparar(e2, s2, ["wey_emo"]);
+  const v2 = e2.j[r2].vida;
+  M.aplicar(e2, s2, { t: "jugar", uid: "t0" }, db, 0);
+  const muertos = 5 - e2.j[r2].tablero.length;
+  assert.equal(muertos + (v2 - e2.j[r2].vida), 8, "murió alguno: 5 + 3 de daño en total");
+}
+console.log("ok: Wey Emo Gritando");
