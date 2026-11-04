@@ -865,13 +865,8 @@ console.log("ok: Mario, Rafael y El Tipo de la Foto");
 }
 console.log("ok: descubrir hechizo con descuento");
 
-// --- Tomis (en construcción): no sale al azar; poder de hechizo +1 ---
+// --- poder de hechizo +1 ---
 {
-  for (let k = 0; k < 30; k++) {
-    const e = M.crearPartida(db, 200 + k); e.j[0].nombre = "A"; e.j[1].nombre = "B";
-    M.empezar(e, db, 0, heroes, false);
-    assert.ok(e.j.every((p) => p.heroe !== "tomis"), "un héroe en construcción no sale al azar");
-  }
   const e = nueva(111); const s = e.turno, r = 1 - s;
   e.j[s].tablero = []; e.j[r].tablero = [{ uid: "rv", id: "x", tribu: null, ataque: 1, vida: 9, vidaMax: 9, ataques: 0 }];
   preparar(e, s, ["mejor_musica", "tunita"]);

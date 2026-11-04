@@ -2126,7 +2126,6 @@
    "nombre": "Tomis",
    "arte": "/arte/heroe_tomis.webp",
    "clase": "tomis",
-   "enConstruccion": true,
    "marco": "linear-gradient(160deg, #e2505a, #a3121a 40%, #4a0710 80%, #a3121a)",
    "poder": {
     "nombre": "Scrobbling",
@@ -2143,7 +2142,49 @@
       "rebaja": 1
      }
     ]
-   }
+   },
+   "mazoMeta": [
+    "mejor_musica",
+    "mejor_musica",
+    "grindcore",
+    "grindcore",
+    "mi_playlist",
+    "mi_playlist",
+    "fumando_porro",
+    "fumando_porro",
+    "ethypostlife",
+    "wey_emo",
+    "wey_emo",
+    "mossad",
+    "mossad",
+    "yamir",
+    "yamir",
+    "audiophile",
+    "audiophile",
+    "midwest_emo",
+    "midwest_emo",
+    "breakcore",
+    "breakcore",
+    "post_rock",
+    "post_rock",
+    "musica_andina",
+    "musica_andina",
+    "folklore",
+    "folklore",
+    "slowcore",
+    "slowcore",
+    "mascotas_tun",
+    "mascotas_tun",
+    "nullscape",
+    "nullscape",
+    "cruit_breakdown",
+    "cuidar_vc",
+    "cuidar_vc",
+    "ishowspeed",
+    "ishowspeed",
+    "tun_brawl",
+    "tun_brawl"
+   ]
   }
  ]
 }
