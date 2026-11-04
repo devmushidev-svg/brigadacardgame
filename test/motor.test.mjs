@@ -1024,7 +1024,7 @@ console.log("ok: Yamir");
   const vr = e.j[r].vida;
   M.aplicar(e, s, { t: "jugar", uid: "w9" }, db, 0);
   assert.equal(e.j[s].poderHechizoExtra, 2, "nivel 2: +2 de daño de hechizos");
-  assert.equal(e.j[s].mision.nivel, 2); assert.ok(e.j[s].mision.completa, "con dos niveles, termina");
+  assert.equal(e.j[s].mision.nivel, 2); assert.equal(e.j[s].mision.meta, 20, "falta el nivel 3");
   e.j[s].mano.push({ uid: "w8", id: "wey_emo" }); e.j[s].mana = 10;
   const v2 = e.j[r].vida;
   M.aplicar(e, s, { t: "jugar", uid: "w8" }, db, 0);
@@ -1032,3 +1032,23 @@ console.log("ok: Yamir");
 }
 assert.ok(db.mossad.etiquetas.includes("musica"), "todas las cartas de Tomis son música");
 console.log("ok: Contador de Scrobbles");
+
+// --- Nivel 3 del Contador de Scrobbles: Charts, que repite todos tus hechizos de la partida ---
+{
+  const e = nueva(122); const s = e.turno, r = 1 - s;
+  e.j[s].tablero = []; e.j[r].tablero = [];
+  preparar(e, s, ["scrobbles", "wey_emo", "wey_emo"], 10);
+  M.aplicar(e, s, { t: "jugar", uid: "t0" }, db, 0);
+  e.j[s].mision.progreso = 18; e.j[s].mision.nivel = 2; e.j[s].mision.meta = 20;
+  M.aplicar(e, s, { t: "jugar", uid: "t1" }, db, 0);
+  e.j[s].mana = 10;
+  const res = M.aplicar(e, s, { t: "jugar", uid: "t2" }, db, 0);
+  assert.ok(e.j[s].mision.completa && e.j[s].mano.some((c) => c.id === "charts"), "nivel 3: Charts a la mano");
+  const ch = e.j[s].mano.find((c) => c.id === "charts");
+  e.j[s].mana = 10;
+  const vr = e.j[r].vida;
+  const res2 = M.aplicar(e, s, { t: "jugar", uid: ch.uid }, db, 0);
+  assert.equal(res2.ev.filter((x) => x.e === "repite" && x.carta === "wey_emo").length, 2, "repite los 2 Wey Emo");
+  assert.equal(vr - e.j[r].vida, 10, "5 + 5 al héroe (sin esbirros)");
+}
+console.log("ok: Charts");

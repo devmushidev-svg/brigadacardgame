@@ -1647,7 +1647,7 @@
    "clase": "tomis",
    "rareza": "legendaria",
    "arte": "/arte/poder_tomis.webp",
-   "texto": "Serie de misiones: juega hechizos o cartas de música. 5: robás 3 cartas que cuestan 1 menos. 10: tus hechizos +2 de daño y robás 3 que cuestan 2 menos.",
+   "texto": "Serie de misiones: juega hechizos o cartas de música. 5: robás 3 cartas que cuestan 1 menos. 10: tus hechizos +2 de daño y robás 3 que cuestan 2 menos. 20: Charts.",
    "mision": {
     "contar": "scrobble",
     "etapas": [
@@ -1674,9 +1674,39 @@
         "rebaja": 2
        }
       ]
+     },
+     {
+      "meta": 20,
+      "recompensa": [
+       {
+        "tipo": "dar_carta",
+        "carta": "charts"
+       }
+      ]
      }
     ]
    }
+  },
+  {
+   "id": "charts",
+   "nombre": "Charts",
+   "tipo": "esbirro",
+   "coste": 5,
+   "ataque": 8,
+   "vida": 8,
+   "clase": "tomis",
+   "rareza": "legendaria",
+   "token": true,
+   "etiquetas": [
+    "musica"
+   ],
+   "arte": "/arte/charts.webp",
+   "texto": "Grito de batalla: repite todos los hechizos que lanzaste esta partida.",
+   "grito": [
+    {
+     "tipo": "repetir_hechizos"
+    }
+   ]
   }
  ],
  "heroes": [

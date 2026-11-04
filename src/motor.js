@@ -517,6 +517,19 @@ export function cantidadDe(estado, s, ef) {
   return n;
 }
 
+// lanza un hechizo eligiendo un objetivo válido al azar (si necesita y no hay, no se lanza)
+function lanzarConObjetivoAzar(estado, s, c, ev, db, ctx = {}) {
+  let obj = null;
+  if (necesitaObjetivo(c)) {
+    const refs = ["h0", "h1", ...estado.j[0].tablero.map((m) => m.uid), ...estado.j[1].tablero.map((m) => m.uid)].filter((r) => objetivoValido(estado, s, c, r));
+    if (!refs.length) return;
+    obj = elegir(estado, refs);
+  }
+  ev.push({ e: "repite", seat: s, carta: c.id });
+  aplicarEfectos(estado, s, c.efectos, obj, ev, db, null, ctx);
+  resolverMuertes(estado, ev, db);
+}
+
 // poder de hechizo: lo que suman tus esbirros con "poder_hechizo" al daño de tus hechizos
 function poderHechizo(estado, s, db) {
   return (estado.j[s].poderHechizoExtra || 0) + estado.j[s].tablero.filter((m) => m.vida > 0).reduce((t, m) => t + cartasDelEsbirro(m, db).reduce((u, c) => u + (c.poder_hechizo || 0), 0), 0);
@@ -640,16 +653,16 @@ function aplicarEfectos(estado, s, efectos, elegido, ev, db, fuente, ctx = {}) {
       const pool = Object.values(db).filter((c) => c.tipo === "hechizo" && c.id !== "moneda" && !c.al_robarse && !(c.efectos || []).some((x) => x.tipo === "vc_opcion"));
       for (let k = 0; k < total && pool.length; k++) {
         if (estado.fase !== "jugando" || (fuente && !buscar(estado, fuente)) || estado.pendiente) break;
-        const c = elegir(estado, pool);
-        let obj = null;
-        if (necesitaObjetivo(c)) {
-          const refs = ["h0", "h1", ...estado.j[0].tablero.map((m) => m.uid), ...estado.j[1].tablero.map((m) => m.uid)].filter((r) => objetivoValido(estado, s, c, r));
-          if (!refs.length) continue;
-          obj = elegir(estado, refs);
-        }
-        ev.push({ e: "repite", seat: s, carta: c.id });
-        aplicarEfectos(estado, s, c.efectos, obj, ev, db, null);
-        resolverMuertes(estado, ev, db);
+        lanzarConObjetivoAzar(estado, s, elegir(estado, pool), ev, db);
+      }
+      continue;
+    }
+    if (ef.tipo === "repetir_hechizos") {
+      // Charts: vuelve a lanzar, en orden, todos los hechizos que lanzaste esta partida (objetivos al azar, con tu poder de hechizo)
+      const ids = (estado.j[s].jugados || []).filter((id) => db[id]?.tipo === "hechizo").slice(0, 40);
+      for (const id of ids) {
+        if (estado.fase !== "jugando" || estado.pendiente) break;
+        lanzarConObjetivoAzar(estado, s, db[id], ev, db, { poderHechizo: poderHechizo(estado, s, db) });
       }
       continue;
     }
