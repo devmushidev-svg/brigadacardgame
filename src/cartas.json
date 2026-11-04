@@ -1865,7 +1865,8 @@
       "chico_buarque"
      ]
     }
-   ]
+   ],
+   "rareza": "legendaria"
   },
   {
    "id": "violeta_parra",
@@ -2170,7 +2171,6 @@
     "musica_andina",
     "musica_andina",
     "folklore",
-    "folklore",
     "slowcore",
     "slowcore",
     "mascotas_tun",
@@ -2183,7 +2183,8 @@
     "ishowspeed",
     "ishowspeed",
     "tun_brawl",
-    "tun_brawl"
+    "tun_brawl",
+    "tun_ia"
    ]
   }
  ]
