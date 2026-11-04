@@ -1506,7 +1506,7 @@
    "tipo": "esbirro",
    "coste": 2,
    "ataque": 1,
-   "vida": 5,
+   "vida": 2,
    "clase": "tomis",
    "arte": "/arte/mejor_musica.webp",
    "poder_hechizo": 1,
@@ -1527,12 +1527,14 @@
     {
      "tipo": "dano",
      "objetivo": "elegido",
-     "cantidad": 1
+     "cantidad": 1,
+     "fx": "grind"
     },
     {
      "tipo": "dano",
      "objetivo": "todos_enemigos",
-     "cantidad": 2
+     "cantidad": 2,
+     "fx": "grind"
     }
    ],
    "etiquetas": [
@@ -1638,7 +1640,8 @@
     {
      "tipo": "repartir",
      "cantidad": 4,
-     "siMuere": 2
+     "siMuere": 2,
+     "fx": "lagrima"
     }
    ],
    "etiquetas": [
@@ -1674,7 +1677,7 @@
    "vida": 7,
    "clase": "tomis",
    "arte": "/arte/yamir.webp",
-   "texto": "Poder de hechizo +1. Tus hechizos cuestan 1 menos. Grito de batalla: robá 3 hechizos.",
+   "texto": "Poder de hechizo +1. Tus hechizos cuestan 1 menos. Grito de batalla: robá un hechizo.",
    "abarata_hechizos": 1,
    "poder_hechizo": 1,
    "grito": [
@@ -1683,7 +1686,7 @@
      "filtro": {
       "tipo": "hechizo"
      },
-     "cantidad": 3
+     "cantidad": 1
     }
    ],
    "etiquetas": [
@@ -1725,10 +1728,6 @@
         "tipo": "robar_rebajadas",
         "cantidad": 2,
         "rebaja": 0
-       },
-       {
-        "tipo": "rebaja_proxima",
-        "cantidad": 2
        }
       ]
      },
@@ -1775,7 +1774,7 @@
    "rareza": "legendaria",
    "token": true,
    "arte": "/arte/descargar_flac.webp",
-   "texto": "Serie de misiones: jugá 5 más. Recompensa: tus hechizos tienen +1 de daño esta partida. Robá 2 cartas. La próxima carta que juegues cuesta 2 menos."
+   "texto": "Serie de misiones: jugá 5 más. Recompensa: tus hechizos tienen +1 de daño esta partida. Robá 2 cartas."
   },
   {
    "id": "winamp",
@@ -1843,15 +1842,18 @@
    "efectos": [
     {
      "tipo": "repartir",
-     "cantidad": 2
+     "cantidad": 2,
+     "fx": "amen"
     },
     {
      "tipo": "repartir",
-     "cantidad": 2
+     "cantidad": 2,
+     "fx": "amen"
     },
     {
      "tipo": "repartir",
-     "cantidad": 2
+     "cantidad": 2,
+     "fx": "amen"
     }
    ]
   },
@@ -1872,7 +1874,8 @@
    "efectos": [
     {
      "tipo": "repartir",
-     "cantidad": 10
+     "cantidad": 10,
+     "fx": "crescendo"
     }
    ]
   },
@@ -1895,7 +1898,8 @@
     },
     {
      "tipo": "repartir",
-     "cantidad": 6
+     "cantidad": 6,
+     "fx": "quena"
     }
    ]
   },
@@ -1909,7 +1913,7 @@
     "musica"
    ],
    "arte": "/arte/folklore.webp",
-   "texto": "Invoca un músico 2/2 por cada 3 scrobbles que tengas (hasta 4). Cada uno tiene poder de hechizo +1 y te da un hechizo al azar.",
+   "texto": "Invoca un músico 2/3 por cada 3 scrobbles que tengas (hasta 4). Cada uno tiene poder de hechizo +1.",
    "efectos": [
     {
      "tipo": "invocar_por_scrobbles",
@@ -1931,7 +1935,7 @@
    "tipo": "esbirro",
    "coste": 2,
    "ataque": 2,
-   "vida": 2,
+   "vida": 3,
    "clase": "tomis",
    "token": true,
    "etiquetas": [
@@ -1939,13 +1943,7 @@
    ],
    "poder_hechizo": 1,
    "arte": "/arte/violeta_parra.webp",
-   "texto": "Poder de hechizo +1. Cuando se invoca, obtenés un hechizo al azar.",
-   "al_invocar": [
-    {
-     "tipo": "hechizo_azar_mano",
-     "cantidad": 1
-    }
-   ]
+   "texto": "Poder de hechizo +1."
   },
   {
    "id": "victor_jara",
@@ -1954,7 +1952,7 @@
    "tipo": "esbirro",
    "coste": 2,
    "ataque": 2,
-   "vida": 2,
+   "vida": 3,
    "clase": "tomis",
    "token": true,
    "etiquetas": [
@@ -1962,13 +1960,7 @@
    ],
    "poder_hechizo": 1,
    "arte": "/arte/victor_jara.webp",
-   "texto": "Poder de hechizo +1. Cuando se invoca, obtenés un hechizo al azar.",
-   "al_invocar": [
-    {
-     "tipo": "hechizo_azar_mano",
-     "cantidad": 1
-    }
-   ]
+   "texto": "Poder de hechizo +1."
   },
   {
    "id": "eduardo_mateo",
@@ -1977,7 +1969,7 @@
    "tipo": "esbirro",
    "coste": 2,
    "ataque": 2,
-   "vida": 2,
+   "vida": 3,
    "clase": "tomis",
    "token": true,
    "etiquetas": [
@@ -1985,13 +1977,7 @@
    ],
    "poder_hechizo": 1,
    "arte": "/arte/eduardo_mateo.webp",
-   "texto": "Poder de hechizo +1. Cuando se invoca, obtenés un hechizo al azar.",
-   "al_invocar": [
-    {
-     "tipo": "hechizo_azar_mano",
-     "cantidad": 1
-    }
-   ]
+   "texto": "Poder de hechizo +1."
   },
   {
    "id": "chico_buarque",
@@ -2000,7 +1986,7 @@
    "tipo": "esbirro",
    "coste": 2,
    "ataque": 2,
-   "vida": 2,
+   "vida": 3,
    "clase": "tomis",
    "token": true,
    "etiquetas": [
@@ -2008,13 +1994,7 @@
    ],
    "poder_hechizo": 1,
    "arte": "/arte/chico_buarque.webp",
-   "texto": "Poder de hechizo +1. Cuando se invoca, obtenés un hechizo al azar.",
-   "al_invocar": [
-    {
-     "tipo": "hechizo_azar_mano",
-     "cantidad": 1
-    }
-   ]
+   "texto": "Poder de hechizo +1."
   },
   {
    "id": "slowcore",
@@ -2030,7 +2010,8 @@
    "efectos": [
     {
      "tipo": "repartir",
-     "cantidad": 5
+     "cantidad": 5,
+     "fx": "caracol"
     },
     {
      "tipo": "global",
@@ -2039,7 +2020,8 @@
      "efectos": [
       {
        "tipo": "repartir",
-       "cantidad": 5
+       "cantidad": 5,
+       "fx": "caracol"
       }
      ]
     }
@@ -2065,7 +2047,8 @@
     {
      "tipo": "dano",
      "objetivo": "esbirros_enemigos",
-     "cantidad": 10
+     "cantidad": 10,
+     "fx": "estatica"
     }
    ]
   },
@@ -2083,7 +2066,8 @@
    "efectos": [
     {
      "tipo": "repartir",
-     "cantidad": 8
+     "cantidad": 8,
+     "fx": "gusano"
     },
     {
      "tipo": "curar",

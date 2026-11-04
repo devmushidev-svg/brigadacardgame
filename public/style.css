@@ -555,3 +555,4 @@ img[src^="/arte/unislop-tareas/"] { filter: invert(1) drop-shadow(0 2px 3px #000
   .campo { margin: 2px calc(var(--esb) * 1.2); min-height: 0; }
   .mano .carta:hover { transform: none; }
 }
+.carta .texto b.sube { color: #0f7a2a; font-size: 1.15em; text-shadow: 0 0 6px #6fff8a88; }

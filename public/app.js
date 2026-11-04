@@ -234,7 +234,7 @@ const PALABRAS = [
 ];
 const RE_PALABRAS = new RegExp(`(?<![\\p{L}])(${PALABRAS.map((p) => p.re).join("|")})(?![\\p{L}])`, "giu");
 const palabraDe = (txt) => PALABRAS.find((p) => new RegExp(`^(?:${p.re})$`, "iu").test(txt));
-const textoHTML = (t) => esc(t).replace(RE_PALABRAS, "<b>$1</b>");
+const textoHTML = (t) => esc(t).replace(RE_PALABRAS, "<b>$1</b>").replace(/⟦(\d+)⟧/g, '<b class="sube">$1</b>'); // ⟦n⟧ = daño subido por poder de hechizo
 // las palabras clave que tiene una carta (por su texto o sus claves), con su explicación
 function palabrasDe(c) {
   const vistas = new Set();
@@ -392,6 +392,43 @@ async function lanzarCosa(desdeEl, aEl, html, tam = 34, dur = 600, gira = true) 
   x.remove();
   particulas(d.x, d.y, "#ffb347", 14, 50);
 }
+// ---------- animaciones de daño de las cartas de Tomis: cada hechizo tira lo suyo ----------
+const FX_MUSICA = {
+  grind: { html: "🤘", tam: 38, dur: 260, color: "#ff2a2a", arco: 0.1, glitch: false, temblor: true }, // Grindcore: blast beat, rápido y rojo
+  lagrima: { html: "😭", tam: 34, dur: 380, color: "#5ab0ff", arco: 0.6 },                         // Wey Emo Gritando
+  amen: { html: "⚡", tam: 32, dur: 170, color: "#ffe14a", arco: 0, glitch: true },                  // Breakcore: cortes rapidísimos
+  crescendo: { html: "🎸", tam: 42, dur: 360, color: "#ffd34f", arco: 0.7, gira: true },            // Post-rock: subida épica
+  quena: { html: "🦙", tam: 36, dur: 360, color: "#e8c48a", arco: 0.5 },                           // Música Andina
+  caracol: { html: "🐌", tam: 32, dur: 480, color: "#9ad07a", arco: 0.25 },                        // Slowcore: lento
+  estatica: { html: "📢", tam: 30, dur: 220, color: "#d8d8d8", arco: 0, glitch: true },            // Noise: estática
+  gusano: { html: "🪱", tam: 40, dur: 380, color: "#d06a8a", arco: 0.45, gira: true },             // Deathconsciousness
+};
+let fxSonido = 0;
+async function fxMusica(f, desdeEl, aEl) {
+  if (!aEl) return;
+  const o = centro(desdeEl || aEl), d = centro(aEl), x = document.createElement("div");
+  x.style.cssText = `position:fixed;left:0;top:0;font-size:${f.tam}px;line-height:1;z-index:67;pointer-events:none;filter:drop-shadow(0 0 10px ${f.color}) drop-shadow(0 3px 2px #000a)`;
+  x.textContent = f.html;
+  $("#fx").append(x);
+  setTimeout(() => x.remove(), f.dur + 1000); // nunca queda trabado
+  if (Date.now() - fxSonido > 140) { fxSonido = Date.now(); Sonido.lanzar(); }
+  // sale del que lo lanza con un destello, así se ve de dónde viene
+  particulas(o.x, o.y, f.color, 6, 30);
+  const alto = (Math.abs(d.x - o.x) * 0.3 + 70) * (f.arco || 0), kf = [];
+  for (let i = 0; i <= 16; i++) {
+    const t = i / 16;
+    kf.push({ transform: `translate(${o.x + (d.x - o.x) * t - f.tam / 2}px, ${o.y + (d.y - o.y) * t - Math.sin(Math.PI * t) * alto - f.tam / 2}px) rotate(${f.gira ? t * 540 : 0}deg) scale(${0.7 + t * 0.6})`, offset: t });
+  }
+  const estela = setInterval(() => { const r = x.getBoundingClientRect(); particulas(r.left + r.width / 2, r.top + r.height / 2, f.color, 2, 14); }, 45);
+  await x.animate(kf, { duration: f.dur, easing: "ease-in" }).finished.catch(() => {});
+  clearInterval(estela); x.remove();
+  onda(d.x, d.y, f.color, 120);
+  particulas(d.x, d.y, f.color, 16, 60);
+  if (f.glitch) aEl.animate([{ filter: "none" }, { filter: "hue-rotate(90deg) contrast(3) saturate(3)", transform: "translateX(-5px) skewX(10deg)" },
+    { filter: "invert(1)", transform: "translateX(5px) skewX(-10deg)" }, { filter: "none", transform: "none" }], { duration: 220 });
+  if (f.temblor) temblar($(".mesa"), false);
+}
+
 // disparo del trabuco de Chance: fogonazo, trazo de la bala y chispazo
 async function disparar(desdeEl, aEl) {
   if (!aEl) return;
@@ -1042,6 +1079,8 @@ async function animarUno(e, ev, v, nuevos, yo) {
       }
       case "dispara_global": { // un efecto "por el resto de la partida" se activa: su ícono brilla
         const g = $(`.global[data-carta="${e.carta}"]`);
+        // un hechizo que se repite solo (Slowcore): se muestra la carta, así se sabe qué pegó
+        if (DB[e.carta]?.tipo === "hechizo" && e.carta !== "panama") await mostrarCarta(e.carta, 800);
         if (g) { g.animate([{ transform: "scale(1)" }, { transform: "scale(1.6)", filter: "brightness(1.8) drop-shadow(0 0 10px #ffd34f)" }, { transform: "scale(1)" }], 450); const c = centro(g); particulas(c.x, c.y, "#ffd34f", 10, 40); }
         await esperar(200);
         break;
@@ -1115,6 +1154,7 @@ async function animarUno(e, ev, v, nuevos, yo) {
         if (e.fx === "bala") await disparar(refEl(e.de) || $(`.tablero[data-seat="${V.j[0].tablero.some((m) => m.uid === e.de) ? 0 : 1}"]`) || $(".campo"), refEl(e.a));
         if (e.fx === "vomito") await vomitar(refEl(e.de) || $(`.tablero[data-seat="${e.seat}"]`), (e.a || []).map(refEl).filter(Boolean));
         if (e.fx === "tun") await lanzarCosa(refEl(e.de) || $(".campo"), refEl(e.a), artHTML(DB.tun?.arte || "🐒"), 40, 520, true);
+        if (FX_MUSICA[e.fx]) await fxMusica(FX_MUSICA[e.fx], refEl(e.de) || $(".campo"), refEl(e.a));
         if (e.fx === "piedra") await tirarPiedra(refEl(e.de) || $(`.tablero[data-seat="${V.j[0].tablero.some((m) => m.uid === e.de) ? 0 : 1}"]`), refEl(e.a));
         break;
       }
@@ -1309,8 +1349,14 @@ function objetivosAtaque(v, s, atacante = null) {
 }
 const puedeAtacar = (m) => !m.noAtaca && m.ataque > 0 && !m.dormido && m.ataques < (m.doble ? 2 : 1);
 // la carta de la mano con su coste real (ej. Tun Cool baja según la mesa)
+// tus hechizos muestran el daño real: si tenés poder de hechizo, el número sube (en verde)
+function potenciar(d, t) {
+  const p = (V && V.yo >= 0 && V.j[V.yo]?.poderTotal) || 0;
+  if (!p || d.tipo !== "hechizo") return t;
+  return t.replace(/(\d+)(?= de daño)/g, (n) => `⟦${+n + p}⟧`).replace(/(reparte )(\d+)( más)/gi, (m, a, n, b) => `${a}⟦${+n + p}⟧${b}`);
+}
 const cartaMano = (c) => (DB[c.id] ? { ...DB[c.id], coste: c.coste ?? DB[c.id].coste, ataque: c.ataque ?? DB[c.id].ataque, vida: c.vida ?? DB[c.id].vida,
-  texto: DB[c.id].texto + (c.cantidad != null ? ` (ahora: ${c.cantidad})` : "") + (c.veces != null ? ` (llevás ${c.veces})` : ""), contador: contadorMuertos(DB[c.id]) } : null);
+  texto: potenciar(DB[c.id], DB[c.id].texto) + (c.cantidad != null ? ` (ahora: ${c.cantidad})` : "") + (c.veces != null ? ` (llevás ${c.veces})` : ""), contador: contadorMuertos(DB[c.id]) } : null);
 // cartas que dependen de los Tun muertos llevan un contador en la carta
 function contadorMuertos(c) {
   const t = c.descuento?.por === "tribu_muertos" ? c.descuento.tribu : (c.efectos || []).find((e) => e.tipo === "invocar_por_muertos")?.tribu;

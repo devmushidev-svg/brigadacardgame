@@ -296,27 +296,27 @@ Habilitado: se puede elegir en Mis mazos, sale en "Al azar" y tiene mazo precarg
 
 | Carta | Coste | Stats | Efecto | Estado |
 |---|---|---|---|---|
-| La Mejor Música que Jamás Escucharás | 2 | 1/5 | Poder de hechizo +1 | hecho |
+| La Mejor Música que Jamás Escucharás | 2 | 1/2 | Poder de hechizo +1 | hecho |
 | Grindcore (hechizo) | 2 | — | 1 de daño a lo que elijas y 2 a todos los enemigos (el objetivo enemigo recibe los dos) | hecho |
 | Mi Playlist #67 | 3 | 3/2 | Último aliento: lanza 2 hechizos al azar (con objetivos al azar) | hecho |
 | Fumando Porro (hechizo) | 3 | — | Invoca un Homero 5/5 (ficha). Tus próximos 2 hechizos también invocan un Homero (se ve en la placa) | hecho |
 | **Ethypostlife** (legendaria) | 3 | 2/3 | Grito: por el resto de la partida, cada hechizo tuyo invoca un esbirro al azar de su mismo coste (si no hay, del más cercano por debajo; usa el coste original del hechizo) | hecho |
 | Wey Emo Gritando (hechizo) | 1 | — | Reparte 4 de daño al azar entre los enemigos; si muere alguno, reparte 2 más (una vez) | hecho |
 | Mossad Strongest Agent | 4 | 1/8 | Cada vez que lanzás un hechizo, robás una carta | hecho — falta género |
-| Yamir | 5 | 3/7 | Poder de hechizo +1. Tus hechizos cuestan 1 menos (mientras esté en la mesa; campo `abarata_hechizos`). Grito: robás 3 hechizos de tu mazo | hecho — falta género |
+| Yamir | 5 | 3/7 | Poder de hechizo +1. Tus hechizos cuestan 1 menos (mientras esté en la mesa; campo `abarata_hechizos`). Grito: robás 1 hechizo de tu mazo | hecho — falta género |
 | Audiophile | 2 | 2/3 | Tus hechizos cuestan 1 menos. Grito: robás una carta | hecho |
 | Midwest Emo (hechizo) | 7 | — | Vuelven a tu mano los 5 últimos hechizos que lanzaste; cuestan 1 menos (efecto `recuperar_hechizos`; no cuenta a sí mismo) | hecho |
 | Breakcore (hechizo) | 3 | — | Reparte 2 de daño entre los enemigos, 3 veces (cada reparto suma el poder de hechizo) | hecho |
 | Post-rock (hechizo) | 15 | — | Cuesta 1 menos por cada hechizo que lanzaste esta partida (`descuento: { por: "hechizos_lanzados" }`). Reparte 10 de daño entre los enemigos | hecho (foto de Hesse Kassel) |
 | Música Andina (hechizo) | 5 | — | Restaura 6 de vida a tu héroe y reparte 6 de daño entre los enemigos | hecho |
-| **Folklore** (hechizo legendario) | 4 | — | Invoca un músico 2/2 con poder de hechizo +1 por cada 3 scrobbles (hasta 4), en orden: Violeta Parra ♀, Víctor Jara ♂, Eduardo Mateo ♂, Chico Buarque ♂ (fichas). Cada músico, cuando se invoca (`al_invocar`), te da un hechizo al azar. Los scrobbles se cuentan aunque la misión no esté en juego | hecho |
+| **Folklore** (hechizo legendario) | 4 | — | Invoca un músico 2/3 con poder de hechizo +1 por cada 3 scrobbles (hasta 4), en orden: Violeta Parra ♀, Víctor Jara ♂, Eduardo Mateo ♂, Chico Buarque ♂ (fichas). Los scrobbles se cuentan aunque la misión no esté en juego | hecho |
 | **Slowcore** (hechizo legendario) | 4 | — | Reparte 5 de daño entre los enemigos. Se repite al final de cada uno de tus turnos por el resto de la partida (global `fin_de_tu_turno`; las repeticiones no suman poder de hechizo) | hecho |
 | Noise (hechizo) | 7 | — | Ganás 5 de armadura. Inflige 10 de daño a todos los esbirros enemigos | hecho |
 | Deathconsciousness (hechizo) | 10 | — | Reparte 8 de daño entre los enemigos, restaura 8 de vida a tu héroe e invoca un Eternal Worm 8/8 (ficha) | hecho |
 | Shoegaze (hechizo) | 6 | — | Lanza otra vez los 3 últimos hechizos que jugaste, con objetivos al azar (sin contarse a sí mismo) | hecho |
 | Review de RYM (hechizo) | 2 | — | Descubre una carta de tu mazo: la robás y obtenés una copia (efecto `descubrir_mazo`) | hecho |
 | Loop | 1 | 2/2 | Grito: obtenés una copia de una carta al azar de tu mano (efecto `copiar_mano`) | hecho |
-| **Contador de Scrobbles** (misión legendaria, serie) | 1 | — | Suma un scrobble por cada hechizo o carta con etiqueta `musica` que jugás (todas las cartas de Tomis la tienen). Nivel 1 (5): robás 2 cartas que cuestan 1 menos. Nivel 2 (10): tus hechizos +1 de daño por el resto de la partida, robás 2 y la próxima carta que juegues cuesta 2 menos (`rebaja_proxima`). Nivel 3 (20): obtenés **Charts** | hecho |
+| **Contador de Scrobbles** (misión legendaria, serie) | 1 | — | Suma un scrobble por cada hechizo o carta con etiqueta `musica` que jugás (todas las cartas de Tomis la tienen). Nivel 1 (5): robás 2 cartas que cuestan 1 menos. Nivel 2 (10): tus hechizos +1 de daño por el resto de la partida, robás 2 (el efecto `rebaja_proxima` existe pero ya no se usa). Nivel 3 (20): obtenés **Charts** | hecho |
 | Descargar el FLAC (parte 2/3, ficha) | — | — | La misión pasa a esta carta al llegar al nivel 1 | hecho |
 | Winamp (parte 3/3, ficha) | — | — | La misión pasa a esta carta al llegar al nivel 2 | hecho |
 | **Charts** (legendaria, recompensa) | 5 | 5/5 | Grito: repite, en orden, todos los hechizos que lanzaste esta partida (objetivos al azar, con tu poder de hechizo) | hecho |
@@ -331,3 +331,7 @@ Balance con los mazos precargados de Mario (50 de vida, bot contra bot, 300 part
 Tras el rework de Tun (Plátano, Tuna, Tunita, Novia, Astrónomo, Amor, Satánico, Cool, Mastermind) y Música Andina/Noise: Tun 90% vs Cruit, Tun 84% vs Tomis, Tomis 73% vs Cruit. Lo que más pesa: Tuna (+1/+1 permanente) junto con Tun Puto (su daño sube con el ataque del Tun).
 Tras Panamá solo al inicio, Caca 1 a todos, tareas a 1 y Tun Puto de vuelta a 1: Tun 88% vs Cruit, Tun 82% vs Tomis, Cruit 37% vs Tomis.
 Tras Tuna (cura 5, roba 2): Tun 85% vs Cruit, Tun 74% vs Tomis, Cruit 37% vs Tomis.
+
+**Animaciones de daño de Tomis:** cada hechizo que hace daño tiene su `fx` y tira algo propio desde tu héroe: Grindcore 🤘 (rápido, hace temblar la mesa), Wey Emo 😭, Breakcore ⚡ (con glitch), Post-rock 🎸, Música Andina 🦙, Slowcore 🐌 (lento; cuando se repite al final del turno también se muestra la carta), Noise 📢 (con estática), Deathconsciousness 🪱. Con poder de hechizo, el daño de tus hechizos en la mano se ve subido, en verde.
+
+Balance tras el nerf a Tomis (misión roba 2, músicos 2/3 sin hechizo, Mejor Música 1/2, Yamir roba 1) y Tun Iguana 8/8 (bot contra bot, 300 partidas): Tun 60% vs Cruit, Tun 55% vs Tomis, Tomis 56% vs Cruit.

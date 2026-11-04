@@ -1008,7 +1008,7 @@ console.log("ok: Mossad Strongest Agent");
   preparar(e, s, ["yamir"]);
   e.j[s].mazo = ["tun_brawl", "grindcore", "tun_brawl", "wey_emo", "mascotas_tun", "fumando_porro"];
   M.aplicar(e, s, { t: "jugar", uid: "t0" }, db, 0);
-  assert.equal(e.j[s].mano.length, 3); assert.ok(e.j[s].mano.every((c) => db[c.id].tipo === "hechizo"), "roba 3 hechizos");
+  assert.equal(e.j[s].mano.length, 1); assert.ok(e.j[s].mano.every((c) => db[c.id].tipo === "hechizo"), "roba 1 hechizo");
   const g = e.j[s].mano.find((c) => c.id === "grindcore");
   if (g) {
     assert.equal(M.costeCarta(e, s, g, db), 1, "Grindcore cuesta 1 menos");
@@ -1048,12 +1048,7 @@ console.log("ok: Yamir");
   assert.equal(e.j[s].poderHechizoExtra, 1, "nivel 2: +1 de daño de hechizos");
   assert.equal(e.j[s].mision.nivel, 2); assert.equal(e.j[s].mision.meta, 20, "falta el nivel 3");
   assert.equal(e.j[s].mision.id, "winamp", "y a la parte 3");
-  assert.equal(e.j[s].rebajaProxima, 2, "nivel 2: la próxima carta cuesta 2 menos");
-  e.j[s].mano.push({ uid: "b9", id: "tun_brawl" }, { uid: "b8", id: "tun_brawl" });
-  assert.equal(M.costeCarta(e, s, { uid: "b9", id: "tun_brawl" }, db), Math.max(0, db.tun_brawl.coste - 2));
-  e.j[s].tablero = e.j[s].tablero.filter((m) => m.id === "mejor_musica"); e.j[s].mana = 10; const rb = M.aplicar(e, s, { t: "jugar", uid: "b9" }, db, 0); assert.ok(!rb.error, rb.error);
-  assert.equal(e.j[s].rebajaProxima, 0, "solo la primera carta");
-  assert.equal(M.costeCarta(e, s, { uid: "b8", id: "tun_brawl" }, db), M.costeDe(e, s, db.tun_brawl), "la segunda cuesta lo normal");
+  assert.ok(!e.j[s].rebajaProxima, "nivel 2: ya no rebaja la próxima carta");
   e.j[s].mano.push({ uid: "w8", id: "wey_emo" }); e.j[s].mana = 10;
   const v2 = e.j[r].vida;
   M.aplicar(e, s, { t: "jugar", uid: "w8" }, db, 0);
@@ -1154,7 +1149,7 @@ console.log("ok: Post-rock");
 }
 console.log("ok: Música Andina");
 
-// --- Folklore: un músico por cada 3 scrobbles (hasta 4); cada uno da un hechizo al azar al invocarse ---
+// --- Folklore: un músico por cada 3 scrobbles (hasta 4); son 2/3 con poder de hechizo +1 ---
 {
   const e = nueva(128); const s = e.turno, r = 1 - s;
   e.j[s].tablero = []; e.j[r].tablero = [];
@@ -1162,8 +1157,8 @@ console.log("ok: Música Andina");
   e.j[s].scrobbles = 5;
   M.aplicar(e, s, { t: "jugar", uid: "t0" }, db, 0);
   assert.deepEqual(e.j[s].tablero.map((m) => m.id), ["violeta_parra", "victor_jara"], "5 (+1 = 6) scrobbles: dos músicos");
-  assert.equal(e.j[s].mano.filter((c) => c.uid !== "t1").length, 2, "cada músico dio un hechizo");
-  assert.ok(e.j[s].mano.filter((c) => c.uid !== "t1").every((c) => db[c.id].tipo === "hechizo"));
+  assert.equal(e.j[s].mano.filter((c) => c.uid !== "t1").length, 0, "los músicos ya no dan hechizos");
+  assert.deepEqual(e.j[s].tablero.map((m) => `${m.ataque}/${m.vida}`), ["2/3", "2/3"], "son 2/3");
   e.j[s].tablero = []; e.j[s].scrobbles = 40; e.j[s].mana = 10; e.j[s].mano = e.j[s].mano.filter((c) => c.uid === "t1");
   M.aplicar(e, s, { t: "jugar", uid: "t1" }, db, 0);
   assert.equal(e.j[s].tablero.length, 4, "hasta 4");

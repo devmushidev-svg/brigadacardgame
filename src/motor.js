@@ -809,7 +809,7 @@ function aplicarEfectos(estado, s, efectos, elegido, ev, db, fuente, ctx = {}) {
         const vivos = ["h" + r, ...estado.j[r].tablero.filter((m) => m.vida > 0).map((m) => m.uid)];
         const ref = elegir(estado, vivos);
         golpeados.add(ref);
-        danar(estado, ref, 1, ev, { fx: ef.fx, de: fuente });
+        danar(estado, ref, 1, ev, { fx: ef.fx, de: fuente || "h" + s });
       }
       // "siMuere": si murió algún esbirro golpeado, reparte esa cantidad más (una vez) (Wey Emo Gritando)
       if (ef.siMuere && estado.j[r].tablero.some((m) => golpeados.has(m.uid) && m.vida <= 0))
@@ -982,7 +982,7 @@ function aplicarEfectos(estado, s, efectos, elegido, ev, db, fuente, ctx = {}) {
     for (const ref of refs) {
       const t = buscar(estado, ref);
       if (!t) continue;
-      if (ef.tipo === "dano") danar(estado, ref, n, ev, { fx: fxGrupo ? null : ef.fx, de: fuente });
+      if (ef.tipo === "dano") danar(estado, ref, n, ev, { fx: fxGrupo ? null : ef.fx, de: fuente || "h" + s }); // un hechizo sale de tu héroe
       else if (ef.tipo === "curar") { if (ef.fx) ev.push({ e: "fx", fx: ef.fx, de: fuente, a: ref }); curar(estado, ref, n, ev); }
       else if (ef.tipo === "destruir" && t.tipo === "esbirro") { t.obj.vida = 0; ev.push({ e: "destruido", a: ref }); }
       else if (ef.tipo === "buff" && t.tipo === "esbirro") {
@@ -1436,6 +1436,7 @@ export function vista(estado, yo, db0 = {}) {
       ecos: (p.ecos || []).map((x) => ({ origen: x.origen, quedan: x.quedan })),
       armadura: p.armadura || 0,
       poderHechizo: p.poderHechizoExtra || 0,
+      poderTotal: poderHechizo(estado, s, db0), // todo lo que suman tus hechizos ahora (para mostrar el daño real en las cartas)
       scrobbles: p.scrobbles || 0,
       arma: p.arma || null,
       heroeAtaco: !!p.heroeAtaco,
