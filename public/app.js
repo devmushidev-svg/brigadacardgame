@@ -605,6 +605,7 @@ function pantallaMazos() {
         <div class="mazo-heroe">${artHTML(HEROES[m.heroe]?.arte)}</div>
         <div class="mazo-info"><b>${esc(m.nombre)}</b><span>${esc(HEROES[m.heroe]?.nombre || "?")} · ${m.cartas.length}/${TAM_MAZO}${m.fijo ? " · precargado" : mazoValido(m) ? "" : " · incompleto"}</span></div>
         <div class="mazo-acc">${mazoValido(m) ? `<button class="mini-btn usar">${m.id === act ? "✔ en uso" : "Usar"}</button>` : ""}
+          <button class="mini-btn ver">Ver</button>
           ${m.fijo ? '<button class="mini-btn copiar" title="copiar para editarlo">Copiar</button>' : '<button class="mini-btn editar">Editar</button><button class="mini-btn borrar">🗑</button>'}</div></div>`).join("")
       }</div>
     <div class="ayuda">Los mazos precargados no se borran: copialos para cambiarlos. "Al azar" en el lobby te da un héroe al azar con su mazo precargado.</div>
@@ -614,6 +615,7 @@ function pantallaMazos() {
   $$(".mazo-tile").forEach((t) => {
     const id = t.dataset.id;
     const fijo = mazosFijos().find((m) => m.id === id);
+    $(".ver", t).onclick = () => verMazo(todosMazos().find((m) => m.id === id));
     if (fijo) $(".copiar", t).onclick = () => editorMazo({ ...fijo, id: "m" + Date.now(), nombre: "Mi mazo de " + HEROES[fijo.heroe].nombre, fijo: undefined });
     else {
       $(".editar", t).onclick = () => editorMazo(misMazos().find((m) => m.id === id));
@@ -621,6 +623,21 @@ function pantallaMazos() {
     }
     $(".usar", t) && ($(".usar", t).onclick = () => { guardarLS("mazoActivo", id); toast("este mazo se usa en tus partidas"); pantallaMazos(); });
   });
+}
+
+// ver un mazo (precargado o tuyo) sin editarlo: sus cartas por coste, con cuántas copias lleva
+function verMazo(mazo) {
+  if (!mazo) return;
+  const h = HEROES[mazo.heroe];
+  const n = (id) => mazo.cartas.filter((x) => x === id).length;
+  const cartas = [...new Set(mazo.cartas)].map((id) => DB[id]).filter(Boolean)
+    .sort((a, b) => (!!a.clase === !!b.clase ? 0 : a.clase ? -1 : 1) || a.coste - b.coste || a.nombre.localeCompare(b.nombre));
+  app.innerHTML = `<div class="coleccion"><h2>${esc(mazo.nombre)}</h2>
+    <div class="ayuda" style="text-align:center;margin-top:-6px">${esc(h?.nombre || "?")} · ${mazo.cartas.length} cartas${mazo.fijo ? " · precargado" : ""}</div>
+    <div class="rejilla">${cartas.map((c) => `<div class="ed-op" data-id="${esc(c.id)}">${cartaHTML(c)}${n(c.id) > 1 ? `<span class="ed-n">×${n(c.id)}</span>` : ""}</div>`).join("")}</div>
+    <div class="botones-mazos"><button class="boton sec" id="volver-mazos">Volver</button></div></div>`;
+  $$(".rejilla .carta").forEach((el) => (el.onclick = () => zoom(el.dataset.carta)));
+  $("#volver-mazos").onclick = pantallaMazos;
 }
 
 function elegirHeroe() {
