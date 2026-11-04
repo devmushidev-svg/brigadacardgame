@@ -1592,6 +1592,27 @@
      "cantidad": 1
     }
    ]
+  },
+  {
+   "id": "yamir",
+   "nombre": "Yamir",
+   "tipo": "esbirro",
+   "coste": 5,
+   "ataque": 4,
+   "vida": 5,
+   "clase": "tomis",
+   "arte": "/arte/yamir.webp",
+   "poder_hechizo": 3,
+   "texto": "Poder de hechizo +3. Grito de batalla: robás 3 hechizos de tu mazo.",
+   "grito": [
+    {
+     "tipo": "robar_filtro",
+     "filtro": {
+      "tipo": "hechizo"
+     },
+     "cantidad": 3
+    }
+   ]
   }
  ],
  "heroes": [

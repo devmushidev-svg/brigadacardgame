@@ -585,6 +585,17 @@ function aplicarEfectos(estado, s, efectos, elegido, ev, db, fuente, ctx = {}) {
       if (mano.length) { elegir(estado, mano).escondido = { carta: ef.carta, seat: s }; ev.push({ e: "esconde", seat: s, carta: ef.carta }); }
       continue;
     }
+    if (ef.tipo === "robar_filtro") {
+      // robás de tu mazo cartas que cumplan el filtro, al azar entre las que queden (Yamir: 3 hechizos)
+      const p = estado.j[s];
+      for (let k = 0; k < n; k++) {
+        const idx = p.mazo.map((id, i) => (cumpleFiltro(db[id], ef.filtro) ? i : -1)).filter((i) => i >= 0);
+        if (!idx.length) break;
+        const [id] = p.mazo.splice(elegir(estado, idx), 1);
+        darCarta(estado, s, id, ev);
+      }
+      continue;
+    }
     if (ef.tipo === "robar_legendaria") {
       // Doxeo: robás una legendaria de tu mazo (si queda alguna)
       const p = estado.j[s];

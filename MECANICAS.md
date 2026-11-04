@@ -119,6 +119,7 @@ En el texto de las cartas, las palabras clave salen en **negrita** y al ver la c
 | `barajar` | mete N copias de `carta` en lugares al azar del mazo (`lado: "enemigo"` = del rival) |
 | `grito_extra` | el próximo grito de batalla de un esbirro del `filtro` que juegues se activa `cantidad` veces (Cruit Rage; se ve en la placa) |
 | `rebajar` | una carta de tu mano del `filtro` al azar cuesta `cantidad` menos (se ve en verde en la mano) |
+| `robar_filtro` | robás de tu mazo N cartas que cumplan el `filtro` (ej. `{ "tipo": "hechizo" }`), al azar entre las que queden |
 | `repartir` | daño de a 1 punto a enemigos vivos al azar (héroe o esbirros), `cantidad` veces; `"cantidad": "ataque"` usa el ataque actual de quien lo lanza (Cruit Baño; con Leche pega más, y si lo repite Coco Supremo usa el ataque de Coco) |
 | `robar_vida` | daño que se **suma** a la vida de tu héroe (puede pasar de la vida máxima y la sube); cada esbirro tuyo con `duplica_robo_de` igual a la carta que roba lo duplica (Cruit Vampiro: tus Cruit Sangre roban el doble; dos Vampiros, el cuádruple) |
 | `dar_azar` | te da N cartas distintas al azar de las que cumplen el `filtro` (Unislop) |
@@ -299,6 +300,7 @@ Está en `heroes` con `"enConstruccion": true`: aparece en la colección pero no
 | **Ethypostlife** (legendaria) | 3 | 2/3 | Grito: por el resto de la partida, cada hechizo tuyo invoca un esbirro al azar de su mismo coste (si no hay, del más cercano por debajo; usa el coste original del hechizo) | hecho |
 | Wey Emo Gritando (hechizo) | 1 | — | Reparte 5 de daño al azar entre los enemigos; si muere alguno, reparte 3 más (una vez) | hecho |
 | Mossad Strongest Agent | 4 | 1/8 | Cada vez que lanzás un hechizo, robás una carta | hecho — falta género |
+| Yamir | 5 | 4/5 | Poder de hechizo +3. Grito: robás 3 hechizos de tu mazo | hecho — falta género |
 
 **Poder de hechizo** (`poder_hechizo: N` en un esbirro): mientras esté en tu mesa, tus hechizos que hacen daño (`dano`, `repartir`, `robar_vida`) pegan N más.
 

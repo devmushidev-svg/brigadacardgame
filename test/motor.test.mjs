@@ -967,3 +967,22 @@ console.log("ok: Wey Emo Gritando");
   assert.equal(e.j[s].mano.length, n - 1 + 1, "lanzó un hechizo y robó una");
 }
 console.log("ok: Mossad Strongest Agent");
+
+// --- Yamir: poder de hechizo +3 y roba 3 hechizos de tu mazo ---
+{
+  const e = nueva(119); const s = e.turno, r = 1 - s;
+  e.j[s].tablero = []; e.j[r].tablero = [];
+  preparar(e, s, ["yamir"]);
+  e.j[s].mazo = ["tun_brawl", "grindcore", "tun_brawl", "wey_emo", "mascotas_tun", "fumando_porro"];
+  M.aplicar(e, s, { t: "jugar", uid: "t0" }, db, 0);
+  assert.equal(e.j[s].mano.length, 3);
+  assert.ok(e.j[s].mano.every((c) => db[c.id].tipo === "hechizo"), "solo hechizos");
+  assert.deepEqual(e.j[s].mazo.filter((id) => db[id].tipo !== "hechizo"), ["tun_brawl", "tun_brawl"], "los esbirros se quedan en el mazo");
+  const g = e.j[s].mano.find((c) => c.id === "grindcore") || null;
+  if (g) {
+    const vr = e.j[r].vida; e.j[s].mana = 10;
+    M.aplicar(e, s, { t: "jugar", uid: g.uid, objetivo: "h" + r }, db, 0);
+    assert.equal(vr - e.j[r].vida, (2 + 3) + (3 + 3), "Grindcore con +3: 5 al objetivo y 6 a todos");
+  }
+}
+console.log("ok: Yamir");
