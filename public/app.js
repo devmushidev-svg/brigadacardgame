@@ -1306,7 +1306,8 @@ function esbirroHTML(m, s, v) {
 
 const mejorasHTML = (p) => Object.entries(p.mejoras || {}).filter(([, m]) => m.ataque || m.vida)
   .map(([t, m]) => `<div class="mejora" title="por el resto de la partida">${esc(t[0].toUpperCase() + t.slice(1))} ${m.ataque ? `+${m.ataque}⚔` : ""}${m.vida ? ` +${m.vida}❤` : ""}</div>`).join("")
-  + (p.gritoExtra ? `<div class="mejora" title="el próximo grito de batalla se activa ${p.gritoExtra.veces} veces">Grito ×${p.gritoExtra.veces}</div>` : "");
+  + (p.gritoExtra ? `<div class="mejora" title="el próximo grito de batalla se activa ${p.gritoExtra.veces} veces">Grito ×${p.gritoExtra.veces}</div>` : "")
+  + (p.ecos || []).map((x) => `<div class="mejora" title="tus próximos ${x.quedan} hechizos también lo hacen">${esc(DB[x.origen]?.nombre || "Eco")} ×${x.quedan}</div>`).join("");
 function render(v) {
   V = v;
   if (preview) preview.style.display = "none";

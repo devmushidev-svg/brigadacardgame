@@ -906,3 +906,18 @@ console.log("ok: Grindcore");
   assert.ok(n >= 1 && n <= 2, "hasta 2 hechizos al azar (alguno puede no tener objetivo)");
 }
 console.log("ok: Mi Playlist #67");
+
+// --- Fumando Porro: invoca un Homero y tus próximos 2 hechizos también ---
+{
+  const e = nueva(114); const s = e.turno;
+  e.j[s].tablero = [];
+  preparar(e, s, ["fumando_porro", "mascotas_tun", "mascotas_tun", "mascotas_tun"]);
+  const homeros = () => e.j[s].tablero.filter((m) => m.id === "homero").length;
+  M.aplicar(e, s, { t: "jugar", uid: "t0" }, db, 0);
+  assert.equal(homeros(), 1);
+  assert.deepEqual(M.vista(e, s, db).j[s].ecos, [{ origen: "fumando_porro", quedan: 2 }]);
+  M.aplicar(e, s, { t: "jugar", uid: "t1" }, db, 0); assert.equal(homeros(), 2, "el siguiente hechizo también");
+  M.aplicar(e, s, { t: "jugar", uid: "t2" }, db, 0); assert.equal(homeros(), 3, "y el siguiente");
+  M.aplicar(e, s, { t: "jugar", uid: "t3" }, db, 0); assert.equal(homeros(), 3, "el tercero ya no");
+}
+console.log("ok: Fumando Porro");

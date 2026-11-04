@@ -1498,6 +1498,47 @@
      "cantidad": 2
     }
    ]
+  },
+  {
+   "id": "fumando_porro",
+   "nombre": "Fumando Porro",
+   "tipo": "hechizo",
+   "coste": 3,
+   "clase": "tomis",
+   "arte": "/arte/fumando_porro.webp",
+   "texto": "Invoca un Homero 5/5. Tus próximos 2 hechizos también invocan un Homero.",
+   "efectos": [
+    {
+     "tipo": "invocar",
+     "carta": "homero",
+     "cantidad": 1
+    },
+    {
+     "tipo": "eco_hechizos",
+     "cantidad": 2,
+     "origen": "fumando_porro",
+     "efectos": [
+      {
+       "tipo": "invocar",
+       "carta": "homero",
+       "cantidad": 1
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "homero",
+   "nombre": "Homero",
+   "genero": "hombre",
+   "tipo": "esbirro",
+   "coste": 5,
+   "ataque": 5,
+   "vida": 5,
+   "clase": "tomis",
+   "token": true,
+   "arte": "/arte/homero.webp",
+   "texto": "Otra producción de Marko."
   }
  ],
  "heroes": [

@@ -644,6 +644,12 @@ function aplicarEfectos(estado, s, efectos, elegido, ev, db, fuente, ctx = {}) {
       }
       continue;
     }
+    if (ef.tipo === "eco_hechizos") {
+      // Fumando Porro: tus próximos N hechizos también hacen estos efectos
+      (estado.j[s].ecos ||= []).push({ efectos: ef.efectos, quedan: n, origen: ef.origen || null });
+      ev.push({ e: "global", seat: s });
+      continue;
+    }
     if (ef.tipo === "grito_extra") {
       // Cruit Rage: el próximo grito de batalla de un esbirro del filtro que juegues se activa N veces
       estado.j[s].gritoExtra = { tribu: ef.filtro?.tribu || null, veces: n };
@@ -1092,6 +1098,10 @@ export function aplicar(estado, s, accion, db, ahora) {
       ev.push({ e: "mision", seat: s, carta: carta.id });
     } else if (carta.tipo === "hechizo") {
       ev.push({ e: "hechizo", seat: s, carta: carta.id, objetivo: accion.objetivo || null });
+      // ecos pendientes de hechizos anteriores (Fumando Porro): este hechizo también los hace
+      const ecos = (p.ecos || []).filter((x) => x.quedan > 0);
+      for (const eco of ecos) { eco.quedan--; if (eco.origen) ev.push({ e: "repite", seat: s, carta: eco.origen }); aplicarEfectos(estado, s, eco.efectos, null, ev, db, null); }
+      p.ecos = (p.ecos || []).filter((x) => x.quedan > 0);
       // Unislop: por el resto de la partida tus Tareas se lanzan dos veces (una vez más por cada efecto así)
       const veces = vecesTarea(estado, s, carta.etiquetas);
       for (let k = 0; k < veces && estado.fase === "jugando"; k++) {
@@ -1247,6 +1257,7 @@ export function vista(estado, yo, db0 = {}) {
       }) : undefined,
       mejoras: p.mejoras || null,
       gritoExtra: p.gritoExtra || null,
+      ecos: (p.ecos || []).map((x) => ({ origen: x.origen, quedan: x.quedan })),
       armadura: p.armadura || 0,
       arma: p.arma || null,
       heroeAtaco: !!p.heroeAtaco,
