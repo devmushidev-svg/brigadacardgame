@@ -175,8 +175,8 @@ Diseño de Mario. Arquetipo: paladín molesto — llenar la mesa de Tun, buffear
 | Tun (ficha) | 1 | 1/1 | tribu Tun | hecho |
 | **Tun the Awarded** (misión, legendaria) | 1 | — | Invoca 20 Tun (cuenta todo, incluido el poder) → Tun Maestro del Universo | hecho |
 | **Tun Maestro del Universo** (legendaria, recompensa) | 5 | 8/8 | Grito: llena tu mesa de Tun al azar (cualquier Tun del juego) y elegís contra quién se lanza cada uno | hecho |
-| **Panamá** (legendaria) | 1 | 1/1 | Grito: por el resto de la partida, cada vez que un jugador robe, invoca un Tun para él | hecho |
-| Tun Puto | 3 | 1/5 | Cada vez que muere un Tun (de cualquier lado), 1 de daño a un enemigo al azar | hecho |
+| **Panamá** (legendaria) | 1 | 1/1 | Al inicio de la partida (si está en tu mazo, `inicio_partida`) y grito: por el resto de la partida, cada vez que un jugador robe, invoca un Tun para él | hecho |
+| Tun Puto | 3 | 1/5 | Cada vez que muere cualquier esbirro, arroja un Tun a un enemigo al azar: daño igual al ataque de tu Tun básico (`cantidad: "ataque_tun"`) | hecho |
 | Tun Tung Sahur | 1 | 1/1 | Grito: invoca un Tun 1/1 | hecho |
 | Tun Mujer ♀ | 5 | 2/8 | Grito: transforma a tus otros esbirros en Tun Puto | hecho |
 | Tun Cool | 10 | 6/7 | Cuesta 1 menos por cada otro Tun en el campo (los dos lados). Cada vez que recibe daño, invoca un Tun 1/1 | hecho |
@@ -190,8 +190,8 @@ Diseño de Mario. Arquetipo: paladín molesto — llenar la mesa de Tun, buffear
 | Tun Zombie (ficha) | — | 1/1 | Lo invoca Funeral de Tun | hecho — **stats provisionales** |
 | **Porque Me Monean** (legendaria) | 6 | 3/5 | Grito: convierte a todos los esbirros del rival en Tun 1/1 | hecho |
 | Tun Amor (sin género) | 5 | 3/5 | Cada vez que uno de tus Tun ataca, gana +1/+1 | hecho |
-| Choza de Monos | 3 | 0/6 | Al final de tu turno, invoca dos Tun | hecho |
-| **Tun Iguana** (legendaria) | 5 | 5/5 | Grito: por el resto de la partida, cada vez que muere uno de tus Tun, invoca un Tun Zombie que ataca a un enemigo al azar | hecho — falta confirmar género |
+| Choza de Monos | 2 | 0/6 | Al final de tu turno, invoca tres Tun | hecho |
+| **Tun Iguana** (legendaria) | 3 | 5/5 | Grito: por el resto de la partida, cada vez que muere uno de tus Tun, invoca un Tun Zombie que ataca a un enemigo al azar | hecho — falta confirmar género |
 | Tun Astrónomo | 3 | 2/4 | Cada vez que ataca, un Tun de tu mano al azar cuesta 2 menos | hecho — falta imagen (🔭); coste y stats propuestos, falta confirmar género |
 | Tun Satánico | **5** | **3/3** | Grito: destruye a tus otros Tun y gana +2/+2 por cada uno | hecho — **coste y stats provisionales**, falta que Mario los defina |
 
@@ -327,4 +327,4 @@ Efecto `eco_hechizos` (`cantidad`, `efectos`, `origen`): tus próximos N hechizo
 
 **Pool de hechizos al azar y de descubrir hechizos** (`hechizosAzar`): los hechizos del juego que van en mazos, más las tareas universitarias de Cruit (menos las que dan Leche, como Laboratorio). Lo usan Cruit Breakdown, Mi Playlist #67, el poder de Tomis, Charts no (repite los tuyos), y los músicos de Folklore.
 
-Balance con los mazos precargados de Mario (50 de vida, bot contra bot, 300 partidas): tras bajar el daño de Tomis, Tomis 78% vs Tun y 79% vs Cruit; Cruit 74% vs Tun. Con 30 o 40 de vida casi no cambia.
+Balance con los mazos precargados de Mario (50 de vida, bot contra bot, 300 partidas): tras bajar el daño de Tomis, Tomis 78% vs Tun y 79% vs Cruit; Cruit 74% vs Tun. Con 30 o 40 de vida casi no cambia. Tras los buffs a Tun (Panamá al inicio, Tun Puto, Choza, Iguana): Tun 51% vs Cruit, Tun 36% vs Tomis, Cruit 20% vs Tomis.

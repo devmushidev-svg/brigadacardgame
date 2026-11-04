@@ -226,6 +226,7 @@ const PALABRAS = [
   { n: "Arma", re: "arma", d: "Se le equipa a tu héroe: puede atacar una vez por turno con el ataque del arma. Cada ataque gasta un uso; si ataca a un esbirro, ese esbirro le pega de vuelta a tu héroe." },
   { n: "VC", re: "vc", d: "Al jugarla entra a tu PutoVC (una ubicación en tu mesa que no se puede destruir). Al lanzarlo sale la unión de todo lo que entró: la suma de sus stats y todos sus efectos (últimos alientos, auras). Después el VC vuelve a 0." },
   { n: "Armadura", re: "armadura", d: "Absorbe el daño que recibe tu héroe antes que su vida." },
+  { n: "Al inicio de la partida", re: "al inicio de la partida", d: "Si esta carta está en tu mazo, su efecto se activa solo cuando empieza la partida (después del mulligan). Igual la podés jugar después." },
   { n: "Se fusiona", re: "se fusiona", d: "Si ya tenés uno igual en la mesa, se une a ese: le suma su ataque y su vida, y su efecto cuenta una vez más." },
   { n: "Activar", re: "activan?|activar", d: "Repite el grito de batalla y el último aliento del esbirro." },
   { n: "Tarea", re: "tareas?", d: "Hechizo universitario. Algunas cartas (como Cruit Excel) se hacen más fuertes por cada Tarea que lanzaste." },
@@ -1043,6 +1044,14 @@ async function animarUno(e, ev, v, nuevos, yo) {
         await esperar(200);
         break;
       }
+      case "inicio_partida": { // como en Hearthstone: la carta sale de tu mazo, se muestra y activa su efecto
+        const mazo = $(`.zona.${e.seat === yo ? "yo" : "rival"} .mazo`) || refEl("h" + e.seat);
+        Sonido.legendaria(false);
+        await banner(e.seat === yo ? "AL INICIO DE LA PARTIDA" : `${V.j[e.seat].nombre}: al inicio de la partida`, 900);
+        if (mazo) { const c = centro(mazo); particulas(c.x, c.y, "#ffd34f", 26, 110); onda(c.x, c.y, "#ffd34f"); }
+        await mostrarCarta(e.carta, 1500);
+        break;
+      }
       case "esconde": toast(e.seat === yo ? `${DB[e.carta]?.nombre || "Tu esbirro"} se escondió en la mano del rival...` : "algo se escondió en una carta de tu mano...", 2000); await esperar(300); break;
       case "sale_escondido": Sonido.hechizo(); await banner(`¡${DB[e.carta]?.nombre || "algo"} estaba escondido!`, 1100); break;
       case "arma": { if (!sonidoCarta(e.carta, "jugar")) Sonido.escudo(); const h = refEl("h" + e.seat); if (h) { const c = centro(h); particulas(c.x, c.y, "#d0d6e0", 16, 60); } if (e.seat !== yo) await mostrarCarta(e.carta, 900); break; }
@@ -1103,6 +1112,7 @@ async function animarUno(e, ev, v, nuevos, yo) {
         if (e.fx === "agua") await lanzarCosa(refEl(e.de) || $(".campo"), refEl(e.a), "💧", 30, 420, false);
         if (e.fx === "bala") await disparar(refEl(e.de) || $(`.tablero[data-seat="${V.j[0].tablero.some((m) => m.uid === e.de) ? 0 : 1}"]`) || $(".campo"), refEl(e.a));
         if (e.fx === "vomito") await vomitar(refEl(e.de) || $(`.tablero[data-seat="${e.seat}"]`), (e.a || []).map(refEl).filter(Boolean));
+        if (e.fx === "tun") await lanzarCosa(refEl(e.de) || $(".campo"), refEl(e.a), artHTML(DB.tun?.arte || "🐒"), 40, 520, true);
         if (e.fx === "piedra") await tirarPiedra(refEl(e.de) || $(`.tablero[data-seat="${V.j[0].tablero.some((m) => m.uid === e.de) ? 0 : 1}"]`), refEl(e.a));
         break;
       }

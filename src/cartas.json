@@ -87,8 +87,23 @@
    "clase": "tun",
    "rareza": "legendaria",
    "arte": "🇵🇦",
-   "texto": "Grito de batalla: por el resto de la partida, cada vez que un jugador robe una carta, invoca un Tun 1/1 para él.",
+   "texto": "Al inicio de la partida y Grito de batalla: por el resto de la partida, cada vez que un jugador robe una carta, invoca un Tun 1/1 para él.",
    "grito": [
+    {
+     "tipo": "global",
+     "disparador": "al_robar",
+     "origen": "panama",
+     "efectos": [
+      {
+       "tipo": "invocar",
+       "carta": "tun",
+       "cantidad": 1,
+       "lado": "quien_roba"
+      }
+     ]
+    }
+   ],
+   "inicio_partida": [
     {
      "tipo": "global",
      "disparador": "al_robar",
@@ -115,15 +130,14 @@
    "tribu": "tun",
    "clase": "tun",
    "arte": "/arte/tun_puto.webp",
-   "texto": "Cada vez que muere un Tun, inflige 1 de daño a un enemigo al azar.",
+   "texto": "Cada vez que muere un esbirro, arroja un Tun a un enemigo al azar: le hace daño igual al ataque de tu Tun básico.",
    "cuando_muere": {
-    "tribu": "tun",
     "efectos": [
      {
       "tipo": "dano",
       "objetivo": "enemigo_azar",
-      "cantidad": 1,
-      "fx": "piedra"
+      "cantidad": "ataque_tun",
+      "fx": "tun"
      }
     ]
    }
@@ -145,17 +159,17 @@
    "genero": "hombre",
    "nombre": "Choza de Monos",
    "tipo": "esbirro",
-   "coste": 3,
+   "coste": 2,
    "ataque": 0,
    "vida": 6,
    "clase": "tun",
    "arte": "/arte/choza_monos.webp",
-   "texto": "Al final de tu turno, invoca dos Tun.",
+   "texto": "Al final de tu turno, invoca tres Tun.",
    "fin_turno": [
     {
      "tipo": "invocar",
      "carta": "tun",
-     "cantidad": 2
+     "cantidad": 3
     }
    ]
   },
@@ -164,7 +178,7 @@
    "nombre": "Tun Iguana",
    "genero": "hombre",
    "tipo": "esbirro",
-   "coste": 5,
+   "coste": 3,
    "ataque": 5,
    "vida": 5,
    "tribu": "tun",

@@ -73,7 +73,7 @@ for (let k = 0; k < 50; k++) {
 // --- Panamá: cada robo invoca un Tun para quien roba, aunque Panamá muera ---
 {
   const e = nueva(8); const s = e.turno, r = 1 - s;
-  e.j[s].tablero = []; e.j[r].tablero = [];
+  e.j[s].tablero = []; e.j[r].tablero = []; e.globales = []; // sin el Panamá del inicio de la partida
   preparar(e, s, ["panama"]);
   M.aplicar(e, s, { t: "jugar", uid: "t0" }, db, 0);
   e.j[s].tablero = []; // Panamá muere: el efecto sigue
@@ -115,7 +115,7 @@ for (let k = 0; k < 20; k++) {
   const res = M.aplicar(e, s, { t: "atacar", de: tun.uid, a: "rv" }, db, 0);
   assert.ok(!res.error, res.error);
   assert.ok(res.ev.some((x) => x.e === "dispara"), "Tun Puto se activa");
-  assert.ok(res.ev.some((x) => x.e === "fx" && x.fx === "piedra"), "Tun Puto tira piedra");
+  assert.ok(res.ev.some((x) => x.e === "fx" && x.fx === "tun"), "Tun Puto arroja un Tun");
   assert.equal(e.j[r].vida + (e.j[r].tablero[0]?.vida ?? 0), antes - 2, "1 del golpe del Tun + 1 de Tun Puto");
 }
 // --- Tun Satánico: se come a los otros Tun y gana +2/+2 por cada uno ---
@@ -131,14 +131,14 @@ for (let k = 0; k < 20; k++) {
   assert.equal(e.j[s].tablero.length, 1, "solo queda Tun Satanico");
   assert.equal(sat.ataque, 3 + 6); assert.equal(sat.vida, 3 + 6);
 }
-// --- Choza de Monos: 2 Tun al final del turno ---
+// --- Choza de Monos: 3 Tun al final del turno ---
 {
   const e = nueva(11); const s = e.turno;
   e.j[s].tablero = [];
   preparar(e, s, ["choza_monos"]);
   M.aplicar(e, s, { t: "jugar", uid: "t0" }, db, 0);
   M.aplicar(e, s, { t: "fin" }, db, 0);
-  assert.equal(tuns(e, s), 2);
+  assert.equal(tuns(e, s), 3);
 }
 
 // --- Tun IA: descubrir (3 opciones distintas, solo el que elige las ve) ---
@@ -1230,3 +1230,30 @@ console.log("ok: Review de RYM");
   assert.deepEqual(e.j[s].mano.map((c) => c.id), ["post_rock", "post_rock"]);
 }
 console.log("ok: Loop");
+
+// --- Panamá al inicio de la partida: si está en tu mazo, su efecto queda activo al empezar ---
+{
+  const e = M.crearPartida(db, 9); e.j[0].nombre = "A"; e.j[1].nombre = "B";
+  e.j[0].mazoElegido = { heroe: "tun", cartas: heroes.tun.mazoMeta }; e.j[0].heroe = "tun"; e.j[1].heroe = "cruit";
+  const ev = M.empezar(e, db, 0, heroes, false);
+  const conPanama = e.j[0].mazo.includes("panama") || e.j[0].mano.some((c) => c.id === "panama");
+  assert.ok(conPanama, "el mazo de Tun lleva Panamá");
+  assert.ok(ev.some((x) => x.e === "inicio_partida" && x.carta === "panama") || e.j[0].mano.some((c) => c.id === "panama"), "se activa si está en el mazo");
+}
+// --- Tun Puto: cada vez que muere cualquier esbirro, arroja un Tun con el ataque de tu Tun básico ---
+{
+  const e = nueva(135); const s = e.turno, r = 1 - s;
+  e.globales = [];
+  e.j[s].tablero = [{ uid: "tp", id: "tun_puto", tribu: "tun", ataque: 1, vida: 5, vidaMax: 5, ataques: 0 }];
+  e.j[r].tablero = [{ uid: "x1", id: "x", tribu: null, ataque: 1, vida: 0, vidaMax: 1, ataques: 0 }];
+  preparar(e, s, []);
+  const vr = e.j[r].vida;
+  M.aplicar(e, s, { t: "fin" }, db, 0); // muere el esbirro del rival (sin tribu)
+  assert.equal(vr - e.j[r].vida, 1, "1 de daño por un esbirro sin tribu");
+  e.j[s].mejoras = { tun: { ataque: 2, vida: 0 } };
+  e.j[r].tablero = [{ uid: "x2", id: "x", tribu: null, ataque: 1, vida: 0, vidaMax: 1, ataques: 0 }];
+  const v2 = e.j[r].vida;
+  M.aplicar(e, r, { t: "fin" }, db, 0);
+  assert.equal(v2 - e.j[r].vida, 3, "con +2 de ataque a tus Tun, pega 3");
+}
+console.log("ok: buffs de Tun");

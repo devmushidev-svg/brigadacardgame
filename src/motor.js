@@ -196,6 +196,15 @@ function comenzarJuego(estado, db, ahora, ev) {
   estado.mulligan = null;
   const primero = estado.turno;
   if (db.moneda) darCarta(estado, otro(primero), "moneda", ev);
+  // "al inicio de la partida": cartas que, estando en tu mazo, activan su efecto ahora (Panamá)
+  for (const s of [primero, otro(primero)]) {
+    for (const id of new Set(estado.j[s].mazo)) {
+      const c = db[id];
+      if (!c?.inicio_partida) continue;
+      ev.push({ e: "inicio_partida", seat: s, carta: id });
+      aplicarEfectos(estado, s, c.inicio_partida, null, ev, db, null);
+    }
+  }
   inicioTurno(estado, primero, ev, db, ahora);
 }
 
@@ -526,6 +535,8 @@ export function contarPorCada(estado, s, pc) {
   return 1;
 }
 export function cantidadDe(estado, s, ef) {
+  // "ataque_tun": el ataque que tendría tu Tun básico (1 + lo que sumaron las mejoras de Tun)
+  if (ef.cantidad === "ataque_tun") return 1 + (estado.j[s].mejoras?.tun?.ataque || 0);
   let n = ef.cantidad ?? 1;
   if (ef.bonus?.por === "tribu_jugados") n += estado.j[s].jugadosTribu?.[ef.bonus.tribu] || 0;
   return n;
@@ -1005,16 +1016,16 @@ function resolverMuertes(estado, ev, db) {
     }
     // "cada vez que muere un <tribu>": se activa en los esbirros vivos de los dos lados
     for (const { s, m } of muertos) {
-      if (!m.tribu) continue;
       // efectos por el resto de la partida: "cada vez que muere uno de tus <tribu>" (Tun Iguana)
       for (const g of estado.globales) {
-        if (g.disparador === "muere_tribu" && g.seat === s && g.tribu === m.tribu && estado.fase === "jugando") aplicarEfectos(estado, s, g.efectos, null, ev, db, null);
+        if (m.tribu && g.disparador === "muere_tribu" && g.seat === s && g.tribu === m.tribu && estado.fase === "jugando") aplicarEfectos(estado, s, g.efectos, null, ev, db, null);
       }
       for (const s2 of [0, 1]) {
         for (const v of [...estado.j[s2].tablero]) {
           for (const cv of cartasDelEsbirro(v, db)) {
             const cm = cv.cuando_muere;
-            if (v.vida > 0 && cm && cm.tribu === m.tribu) {
+            // sin "tribu": cada vez que muere cualquier esbirro (Tun Puto)
+            if (v.vida > 0 && cm && (!cm.tribu || cm.tribu === m.tribu)) {
               ev.push({ e: "dispara", uid: v.uid, por: "muere" });
               aplicarEfectos(estado, s2, cm.efectos, null, ev, db, v.uid);
             }
