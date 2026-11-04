@@ -1796,6 +1796,27 @@
      "cantidad": 3
     }
    ]
+  },
+  {
+   "id": "post_rock",
+   "nombre": "Post-rock",
+   "tipo": "hechizo",
+   "coste": 15,
+   "clase": "tomis",
+   "etiquetas": [
+    "musica"
+   ],
+   "arte": "🌅",
+   "descuento": {
+    "por": "hechizos_lanzados"
+   },
+   "texto": "Cuesta 1 menos por cada hechizo que lanzaste esta partida. Reparte 20 de daño entre los enemigos.",
+   "efectos": [
+    {
+     "tipo": "repartir",
+     "cantidad": 20
+    }
+   ]
   }
  ],
  "heroes": [

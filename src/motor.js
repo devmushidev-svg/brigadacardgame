@@ -48,6 +48,7 @@ export function costeDe(estado, s, c) {
     for (const k of lados) coste -= estado.j[k].tablero.filter((m) => m.tribu === d.tribu && m.vida > 0).length;
   }
   if (d?.por === "tribu_muertos") coste -= estado.muertosTribu?.[d.tribu] || 0;
+  if (d?.por === "hechizos_lanzados") coste -= estado.j[s].hechizosLanzados || 0; // Post-rock: 1 menos por cada hechizo de la partida
   return Math.max(0, coste);
 }
 // si un esbirro entra en la mesa: hay lugar, o se fusiona con uno igual (Cruit Sangre)

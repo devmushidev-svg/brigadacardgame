@@ -1100,3 +1100,18 @@ console.log("ok: Midwest Emo");
   assert.equal(v2 - e.j[r].vida, 12, "con poder de hechizo +1: 4 + 4 + 4");
 }
 console.log("ok: Breakcore");
+
+// --- Post-rock: cuesta 1 menos por cada hechizo lanzado; reparte 20 entre los enemigos ---
+{
+  const e = nueva(126); const s = e.turno, r = 1 - s;
+  e.j[s].tablero = []; e.j[r].tablero = [];
+  preparar(e, s, ["post_rock"]);
+  assert.equal(M.costeDe(e, s, db.post_rock), 15);
+  e.j[s].hechizosLanzados = 9;
+  assert.equal(M.costeDe(e, s, db.post_rock), 6);
+  e.j[s].mana = 6;
+  const vr = e.j[r].vida;
+  assert.ok(!M.aplicar(e, s, { t: "jugar", uid: "t0" }, db, 0).error);
+  assert.equal(vr - e.j[r].vida, 20);
+}
+console.log("ok: Post-rock");
