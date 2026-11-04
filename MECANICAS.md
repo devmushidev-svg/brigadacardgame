@@ -175,8 +175,8 @@ Diseño de Mario. Arquetipo: paladín molesto — llenar la mesa de Tun, buffear
 | Tun (ficha) | 1 | 1/1 | tribu Tun | hecho |
 | **Tun the Awarded** (misión, legendaria) | 1 | — | Invoca 20 Tun (cuenta todo, incluido el poder) → Tun Maestro del Universo | hecho |
 | **Tun Maestro del Universo** (legendaria, recompensa) | 5 | 8/8 | Grito: llena tu mesa de Tun al azar (cualquier Tun del juego) y elegís contra quién se lanza cada uno | hecho |
-| **Panamá** (legendaria) | 1 | 1/1 | Al inicio de la partida (si está en tu mazo, `inicio_partida`) y grito: por el resto de la partida, cada vez que un jugador robe, invoca un Tun para él | hecho |
-| Tun Puto | 3 | 1/5 | Cada vez que muere cualquier esbirro, arroja un Tun a un enemigo al azar: daño igual al ataque de tu Tun básico (`cantidad: "ataque_tun"`) | hecho |
+| **Panamá** (legendaria) | 1 | 1/1 | Al inicio de la partida (si está en tu mazo): por el resto de la partida, cada vez que un jugador robe, invoca un Tun para él. Sin grito | hecho |
+| Tun Puto | 3 | 1/5 | Cada vez que muere cualquier esbirro, tira una piedra de 1 de daño a un enemigo al azar | hecho |
 | Tun Tung Sahur | 1 | 1/1 | Grito: invoca un Tun 1/1 | hecho |
 | Tun Mujer ♀ | 5 | 2/8 | Grito: transforma a tus otros esbirros en Tun Puto | hecho |
 | Tun Cool | 10 | 6/7 | Acometida. Robo de vida. 1 menos por cada otro Tun en el campo. Al recibir daño, invoca un Tun. Grito: invoca una copia sin habilidades (ficha) y robás 2 Tun | hecho |
@@ -244,7 +244,7 @@ Diseño de Mario. Marco azul (provisional). Cruit es no binario: toda carta con 
 | Estreñido Cruit | 1 | 1/2 | Grito y último aliento: mete 2 Cacas en el mazo del rival (al robarlas: 2 de daño y roba otra) | hecho |
 | Cruit Sangre | 2 | 2/2 | Se fusiona con tus otros Cruit Sangre (suma stats, ×N en la carta). Al final de tu turno, roba 1 de vida por cada Sangre fusionada al enemigo con menos vida | hecho |
 | Cruit Vampiro | 5 | 3/3 | Tus Cruit Sangre roban el doble de vida. Grito: invoca 2 Cruit Sangre (se fusionan en una, con animación) | hecho |
-| Caca (ficha) | 0 | — | Se lanza al robarla: 2 de daño a quien la roba y roba otra | hecho |
+| Caca (ficha) | 0 | — | Se lanza al robarla: 1 de daño a quien la roba y a sus esbirros, y roba otra | hecho |
 | Cruit Tostadora | 1 | 1/2 | Grito: robás una carta | hecho |
 | Cruit Baño | 2 | 4/2 | Grito: inflige daño igual a su ataque, repartido al azar entre todos los enemigos (chorros de agua) | hecho |
 | **Cruit Vaca** (legendaria, tribu Vaca: no cuenta como Cruit) | 4 | 3/4 | Grito: una Leche a cada uno de tus otros esbirros (+1/+1 y activa a los Cruit) | hecho |
@@ -266,7 +266,7 @@ Sin mazo armado, el héroe sale al azar.
 
 Con los mazos de 20, bot contra bot, Cruit le ganaba a Tun ~68% (era ~95% antes de los nerfs a Estreñido, Cruit Baño y Cruit Sangre y el buff a Novia de Tun). Con los mazos de 30 y mulligan (Lechero 1/1, Cruit Vaca fuera de la tribu, Cruit Verity 3 de maná con Verity 5/5, Cruit Baño 4/2 de 2 de maná que reparte su ataque, Novia de Tun 3 de maná 2/1 que al morir invoca 2 Tun, Intolerante y Estreñido también al morir), Cruit gana ~46%. Con 50 de vida y los cambios a Tun (Tun Mujer, Mastermind, Porque Me Monean, Choza, misión de 20), ~41%.
 
-### Tareas universitarias (fichas de Unislop, etiqueta Tarea: cuentan para Cruit Excel)
+### Tareas universitarias (fichas de Unislop, etiqueta Tarea: cuentan para Cruit Excel). Todas cuestan 1 salvo Desvelada (0)
 
 | Tarea | Coste | Efecto |
 |---|---|---|
@@ -275,7 +275,7 @@ Con los mazos de 20, bot contra bot, Cruit le ganaba a Tun ~68% (era ~95% antes 
 | Examen Sorpresa ❗ | 1 | Destruye un esbirro |
 | Proyecto Grupal 👥 | 2 | +2/+2 a tus esbirros |
 | Laboratorio 🧪 | 2 | Obtenés 2 Leches |
-| Tesis 📚 | 3 | 2 de daño a tu héroe y 6 de daño a un enemigo |
+| Tesis 📚 | 1 | 3 de daño a todos los enemigos |
 | Hoja de Cálculo 📊 | 2 | +3/+3 a un esbirro |
 | Desvelada ☕ | 0 | +2 de maná este turno |
 
@@ -329,3 +329,4 @@ Efecto `eco_hechizos` (`cantidad`, `efectos`, `origen`): tus próximos N hechizo
 
 Balance con los mazos precargados de Mario (50 de vida, bot contra bot, 300 partidas): tras bajar el daño de Tomis, Tomis 78% vs Tun y 79% vs Cruit; Cruit 74% vs Tun. Con 30 o 40 de vida casi no cambia. Tras los buffs a Tun (Panamá al inicio, Tun Puto, Choza, Iguana): Tun 51% vs Cruit, Tun 36% vs Tomis, Cruit 20% vs Tomis.
 Tras el rework de Tun (Plátano, Tuna, Tunita, Novia, Astrónomo, Amor, Satánico, Cool, Mastermind) y Música Andina/Noise: Tun 90% vs Cruit, Tun 84% vs Tomis, Tomis 73% vs Cruit. Lo que más pesa: Tuna (+1/+1 permanente) junto con Tun Puto (su daño sube con el ataque del Tun).
+Tras Panamá solo al inicio, Caca 1 a todos, tareas a 1 y Tun Puto de vuelta a 1: Tun 88% vs Cruit, Tun 82% vs Tomis, Cruit 37% vs Tomis.

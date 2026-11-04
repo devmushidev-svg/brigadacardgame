@@ -70,17 +70,20 @@ for (let k = 0; k < 50; k++) {
   e.j[s].tablero = Array.from({ length: 7 }, (_, k) => ({ uid: "z" + k, id: "mae", tribu: null, ataque: 1, vida: 2, vidaMax: 2, ataques: 0 }));
   assert.equal(M.puedeUsarPoder(e, s), false, "sin espacio no se puede usar el poder");
 }
-// --- Panamá: cada robo invoca un Tun para quien roba, aunque Panamá muera ---
+// --- Panamá (al inicio de la partida): cada robo invoca un Tun para quien roba ---
 {
-  const e = nueva(8); const s = e.turno, r = 1 - s;
-  e.j[s].tablero = []; e.j[r].tablero = []; e.globales = []; // sin el Panamá del inicio de la partida
-  preparar(e, s, ["panama"]);
-  M.aplicar(e, s, { t: "jugar", uid: "t0" }, db, 0);
-  e.j[s].tablero = []; // Panamá muere: el efecto sigue
-  M.aplicar(e, s, { t: "fin" }, db, 0); // el rival roba al empezar
-  assert.equal(tuns(e, r), 1, "el rival recibe su Tun");
-  M.aplicar(e, r, { t: "fin" }, db, 0);
-  assert.equal(tuns(e, s), 1, "y yo el mio");
+  const e = M.crearPartida(db, 8); e.j[0].nombre = "A"; e.j[1].nombre = "B";
+  e.j[0].heroe = "tun"; e.j[1].heroe = "cruit";
+  e.j[0].mazoElegido = { heroe: "tun", cartas: Array(40).fill("tun_brawl").map((x, k) => (k === 39 ? "panama" : x)), fijo: true };
+  e.j[0].mazoElegido.cartas[0] = "panama"; // que quede en el mazo (no en la mano inicial)
+  e.j[0].mazoElegido.cartas[39] = "tun_brawl";
+  e.j[0].mazoElegido.cartas.reverse();
+  M.empezar(e, db, 0, heroes, false);
+  assert.ok(e.globales.some((g) => g.disparador === "al_robar"), "Panamá activó su efecto al inicio de la partida");
+  const s = e.turno, r = 1 - s;
+  e.j[0].tablero = []; e.j[1].tablero = [];
+  M.aplicar(e, s, { t: "fin" }, db, 0); // el otro roba al empezar
+  assert.equal(tuns(e, r), 1, "quien roba recibe su Tun");
 }
 // --- mazo completo aunque haya pocas cartas diseñadas ---
 for (let k = 0; k < 20; k++) {
@@ -115,7 +118,7 @@ for (let k = 0; k < 20; k++) {
   const res = M.aplicar(e, s, { t: "atacar", de: tun.uid, a: "rv" }, db, 0);
   assert.ok(!res.error, res.error);
   assert.ok(res.ev.some((x) => x.e === "dispara"), "Tun Puto se activa");
-  assert.ok(res.ev.some((x) => x.e === "fx" && x.fx === "tun"), "Tun Puto arroja un Tun");
+  assert.ok(res.ev.some((x) => x.e === "fx" && x.fx === "piedra"), "Tun Puto tira una piedra");
   assert.equal(e.j[r].vida + (e.j[r].tablero[0]?.vida ?? 0), antes - 2, "1 del golpe del Tun + 1 de Tun Puto");
 }
 // --- Tun Satánico: se come a los otros Tun y gana +2/+2 por cada uno ---
@@ -471,7 +474,7 @@ for (let k = 0; k < 20; k++) {
   // Sangre fusionada (×2) con un Vampiro: roba 1×2, doble por el Vampiro = 4, al enemigo con menos vida (el héroe rival, sin esbirros)
   assert.equal(e.j[s].vida, 24, "+4 de vida");
   assert.ok(res.ev.some((x) => x.e === "se_lanza"), "el rival robó una caca al empezar su turno");
-  assert.equal(e.j[r].vida, vr - 4 - 2, "4 robados + 2 de la caca");
+  assert.equal(e.j[r].vida, vr - 4 - 1, "4 robados + 1 de la caca");
   assert.equal(e.j[r].mano.length, mr + 1, "la caca no va a la mano, roba otra");
   e.j[s].vida = M.CONFIG.VIDA_HEROE - 1; e.turno = s; M.aplicar(e, s, { t: "fin" }, db, 0);
   assert.ok(e.j[s].vida > M.CONFIG.VIDA_HEROE && e.j[s].vidaMax === e.j[s].vida, "robar vida suma, pasa del máximo");
@@ -1252,7 +1255,7 @@ console.log("ok: Loop");
   assert.ok(conPanama, "el mazo de Tun lleva Panamá");
   assert.ok(ev.some((x) => x.e === "inicio_partida" && x.carta === "panama") || e.j[0].mano.some((c) => c.id === "panama"), "se activa si está en el mazo");
 }
-// --- Tun Puto: cada vez que muere cualquier esbirro, arroja un Tun con el ataque de tu Tun básico ---
+// --- Tun Puto: cada vez que muere cualquier esbirro, tira una piedra de 1 de daño (siempre 1) ---
 {
   const e = nueva(135); const s = e.turno, r = 1 - s;
   e.globales = [];
@@ -1266,7 +1269,7 @@ console.log("ok: Loop");
   e.j[r].tablero = [{ uid: "x2", id: "x", tribu: null, ataque: 1, vida: 0, vidaMax: 1, ataques: 0 }];
   const v2 = e.j[r].vida;
   M.aplicar(e, r, { t: "fin" }, db, 0);
-  assert.equal(v2 - e.j[r].vida, 3, "con +2 de ataque a tus Tun, pega 3");
+  assert.equal(v2 - e.j[r].vida, 1, "aunque tus Tun tengan más ataque, sigue siendo 1");
 }
 console.log("ok: buffs de Tun");
 

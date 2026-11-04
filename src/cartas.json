@@ -87,22 +87,7 @@
    "clase": "tun",
    "rareza": "legendaria",
    "arte": "🇵🇦",
-   "texto": "Al inicio de la partida y Grito de batalla: por el resto de la partida, cada vez que un jugador robe una carta, invoca un Tun 1/1 para él.",
-   "grito": [
-    {
-     "tipo": "global",
-     "disparador": "al_robar",
-     "origen": "panama",
-     "efectos": [
-      {
-       "tipo": "invocar",
-       "carta": "tun",
-       "cantidad": 1,
-       "lado": "quien_roba"
-      }
-     ]
-    }
-   ],
+   "texto": "Al inicio de la partida: por el resto de la partida, cada vez que un jugador robe una carta, invoca un Tun 1/1 para él.",
    "inicio_partida": [
     {
      "tipo": "global",
@@ -130,14 +115,14 @@
    "tribu": "tun",
    "clase": "tun",
    "arte": "/arte/tun_puto.webp",
-   "texto": "Cada vez que muere un esbirro, arroja un Tun a un enemigo al azar: le hace daño igual al ataque de tu Tun básico.",
+   "texto": "Cada vez que muere un esbirro, le tira una piedra a un enemigo al azar: 1 de daño.",
    "cuando_muere": {
     "efectos": [
      {
       "tipo": "dano",
       "objetivo": "enemigo_azar",
-      "cantidad": "ataque_tun",
-      "fx": "tun"
+      "cantidad": 1,
+      "fx": "piedra"
      }
     ]
    }
@@ -1091,13 +1076,18 @@
    "coste": 0,
    "token": true,
    "arte": "💩",
-   "texto": "Se lanza al robarla: te hace 2 de daño y robas otra carta.",
+   "texto": "Se lanza al robarla: 1 de daño a vos y a tus esbirros, y robás otra carta.",
    "al_robarse": [
     {
      "tipo": "dano",
      "objetivo": "heroe_propio",
-     "cantidad": 2,
+     "cantidad": 1,
      "fx": "caca"
+    },
+    {
+     "tipo": "dano",
+     "objetivo": "aliados",
+     "cantidad": 1
     }
    ]
   },
@@ -1112,7 +1102,7 @@
    "tribu": "cruit",
    "clase": "cruit",
    "arte": "/arte/cruit_estrenido.webp",
-   "texto": "Grito de batalla y último aliento: mete 2 Cacas en el mazo del rival. Al robarlas, recibe 2 de daño.",
+   "texto": "Grito de batalla y último aliento: mete 2 Cacas en el mazo del rival. Al robarlas, le hacen 1 de daño a él y a sus esbirros.",
    "grito": [
     {
      "tipo": "barajar",
@@ -1371,7 +1361,7 @@
    "id": "t_exposicion",
    "nombre": "Exposición",
    "tipo": "hechizo",
-   "coste": 2,
+   "coste": 1,
    "clase": "cruit",
    "token": true,
    "etiquetas": [
@@ -1414,7 +1404,7 @@
    "id": "t_proyecto",
    "nombre": "Proyecto Grupal",
    "tipo": "hechizo",
-   "coste": 2,
+   "coste": 1,
    "clase": "cruit",
    "token": true,
    "etiquetas": [
@@ -1436,7 +1426,7 @@
    "id": "t_laboratorio",
    "nombre": "Laboratorio",
    "tipo": "hechizo",
-   "coste": 2,
+   "coste": 1,
    "clase": "cruit",
    "token": true,
    "etiquetas": [
@@ -1457,7 +1447,7 @@
    "id": "t_tesis",
    "nombre": "Tesis",
    "tipo": "hechizo",
-   "coste": 3,
+   "coste": 1,
    "clase": "cruit",
    "token": true,
    "etiquetas": [
@@ -1465,17 +1455,12 @@
     "tarea_util"
    ],
    "arte": "/arte/unislop-tareas/t_tesis.svg",
-   "texto": "Tarea. Inflige 2 de daño a tu héroe y 6 de daño a un enemigo.",
+   "texto": "Tarea. Inflige 3 de daño a todos los enemigos.",
    "efectos": [
     {
      "tipo": "dano",
-     "objetivo": "heroe_propio",
-     "cantidad": 2
-    },
-    {
-     "tipo": "dano",
-     "objetivo": "elegido_enemigo",
-     "cantidad": 6
+     "objetivo": "todos_enemigos",
+     "cantidad": 3
     }
    ]
   },
@@ -1483,7 +1468,7 @@
    "id": "t_excel",
    "nombre": "Hoja de Cálculo",
    "tipo": "hechizo",
-   "coste": 2,
+   "coste": 1,
    "clase": "cruit",
    "token": true,
    "etiquetas": [
