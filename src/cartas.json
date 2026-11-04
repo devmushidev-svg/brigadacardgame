@@ -2000,7 +2000,7 @@
     "musica"
    ],
    "arte": "/arte/noise.webp",
-   "texto": "Ganás 10 de armadura. Inflige 10 de daño a todos los esbirros.",
+   "texto": "Ganás 10 de armadura. Inflige 10 de daño a todos los esbirros enemigos.",
    "efectos": [
     {
      "tipo": "armadura",
@@ -2008,7 +2008,7 @@
     },
     {
      "tipo": "dano",
-     "objetivo": "todos_esbirros",
+     "objetivo": "esbirros_enemigos",
      "cantidad": 10
     }
    ]
