@@ -801,7 +801,7 @@ console.log("ok: PutoVC y armadura");
   const res = M.aplicar(e, s, { t: "jugar", uid: "t3" }, db, 0);
   assert.ok(!res.error, res.error);
   const n = res.ev.filter((x) => x.e === "repite").length;
-  assert.ok(n >= 1 && n <= 3, "hasta 3 hechizos al azar");
+  assert.ok(n <= 40, "lanza hechizos al azar (si sale una Leche sobre él mismo, repite su grito y lanza más)");
   assert.ok(res.ev.length < 600, "termina");
 }
 console.log("ok: armas y Cruit Breakdown");
