@@ -160,7 +160,7 @@ Cualquiera de los tres es opcional; si falta, suena el sintetizado. `"sonido"` s
             "recompensa": [{ "tipo": "dar_carta", "carta": "tun_maestro" }] }
 ```
 
-Serie de misiones: en vez de `meta` y `recompensa`, `etapas: [{ meta, recompensa }, ...]`; cada etapa da su recompensa y la meta pasa a la siguiente (el medallón muestra el nivel actual). `contar: "scrobble"` cuenta los hechizos y las cartas con etiqueta `musica` jugadas.
+Serie de misiones: en vez de `meta` y `recompensa`, `etapas: [{ meta, recompensa }, ...]`; cada etapa da su recompensa y la meta pasa a la siguiente; con `carta` en la etapa, la misión cambia a esa carta (como las partes de las series de Hearthstone: imagen y texto propios). `contar: "scrobble"` cuenta los hechizos y las cartas con etiqueta `musica` jugadas.
 
 `contar`: `invocar_tribu` (cualquier invocación cuenta, incluido el poder de héroe) o `jugar_tribu` (solo cartas jugadas desde la mano).
 
@@ -304,6 +304,8 @@ Está en `heroes` con `"enConstruccion": true`: aparece en la colección pero no
 | Mossad Strongest Agent | 4 | 1/8 | Cada vez que lanzás un hechizo, robás una carta | hecho — falta género |
 | Yamir | 5 | 3/7 | Poder de hechizo +3. Tus hechizos cuestan 1 menos (mientras esté en la mesa; campo `abarata_hechizos`). Grito: robás 3 hechizos de tu mazo | hecho — falta género |
 | **Contador de Scrobbles** (misión legendaria, serie) | 1 | — | Suma un scrobble por cada hechizo o carta con etiqueta `musica` que jugás (todas las cartas de Tomis la tienen). Nivel 1 (5): robás 3 cartas que cuestan 1 menos. Nivel 2 (10): tus hechizos +2 de daño por el resto de la partida y robás 3 que cuestan 2 menos. Nivel 3 (20): obtenés **Charts** | hecho |
+| Descargar el FLAC (parte 2/3, ficha) | — | — | La misión pasa a esta carta al llegar al nivel 1 | hecho |
+| Winamp (parte 3/3, ficha) | — | — | La misión pasa a esta carta al llegar al nivel 2 | hecho |
 | **Charts** (legendaria, recompensa) | 5 | 8/8 | Grito: repite, en orden, todos los hechizos que lanzaste esta partida (objetivos al azar, con tu poder de hechizo) | hecho |
 
 **Poder de hechizo** (`poder_hechizo: N` en un esbirro): mientras esté en tu mesa, tus hechizos que hacen daño (`dano`, `repartir`, `robar_vida`) pegan N más.

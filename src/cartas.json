@@ -1647,12 +1647,13 @@
    "clase": "tomis",
    "rareza": "legendaria",
    "arte": "/arte/scrobbles.webp",
-   "texto": "Serie de misiones: juega hechizos o cartas de música. 5: robás 3 cartas que cuestan 1 menos. 10: tus hechizos +2 de daño y robás 3 que cuestan 2 menos. 20: Charts.",
+   "texto": "Serie de misiones (1/3): juega 5 hechizos o cartas de música. Recompensa: robás 3 cartas que cuestan 1 menos.",
    "mision": {
     "contar": "scrobble",
     "etapas": [
      {
       "meta": 5,
+      "carta": "scrobbles",
       "recompensa": [
        {
         "tipo": "robar_rebajadas",
@@ -1663,6 +1664,7 @@
      },
      {
       "meta": 10,
+      "carta": "descargar_flac",
       "recompensa": [
        {
         "tipo": "poder_hechizo_heroe",
@@ -1677,6 +1679,7 @@
      },
      {
       "meta": 20,
+      "carta": "winamp",
       "recompensa": [
        {
         "tipo": "dar_carta",
@@ -1707,6 +1710,28 @@
      "tipo": "repetir_hechizos"
     }
    ]
+  },
+  {
+   "id": "descargar_flac",
+   "nombre": "Descargar el FLAC",
+   "tipo": "mision",
+   "coste": 1,
+   "clase": "tomis",
+   "rareza": "legendaria",
+   "token": true,
+   "arte": "/arte/descargar_flac.webp",
+   "texto": "Serie de misiones (2/3): llegá a 10 scrobbles. Recompensa: tus hechizos +2 de daño y robás 3 cartas que cuestan 2 menos."
+  },
+  {
+   "id": "winamp",
+   "nombre": "Winamp",
+   "tipo": "mision",
+   "coste": 1,
+   "clase": "tomis",
+   "rareza": "legendaria",
+   "token": true,
+   "arte": "/arte/winamp.webp",
+   "texto": "Serie de misiones (3/3): llegá a 20 scrobbles. Recompensa: Charts."
   }
  ],
  "heroes": [

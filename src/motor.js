@@ -154,7 +154,7 @@ export function empezar(estado, db, ahora, heroes = {}, mulligan = true) {
   estado.turno = primero;
   // la misión de la clase siempre empieza en la mano (en el tutorial no, para que sea corto)
   for (const s of estado.tutorial ? [] : [primero, otro(primero)]) {
-    const mision = Object.values(db).find((c) => c.tipo === "mision" && c.clase && c.clase === estado.j[s].heroe);
+    const mision = Object.values(db).find((c) => c.tipo === "mision" && !c.token && c.clase && c.clase === estado.j[s].heroe);
     if (mision) darCarta(estado, s, mision.id, ev);
   }
   for (let k = 0; k < 3; k++) robar(estado, primero, ev, db);
@@ -450,8 +450,11 @@ function avanzarMision(estado, s, tipo, tribu, ev, db) {
     ev.push({ e: "mision_nivel", seat: s, carta: mi.id, nivel: mi.nivel });
     registrar(estado, `${estado.j[s].nombre} llegó al nivel ${mi.nivel} de ${mi.nombre}`);
     aplicarEfectos(estado, s, etapa.recompensa, null, ev, db, null);
-    if (mi.nivel >= mi.etapas.length) { mi.completa = true; ev.push({ e: "mision_completa", seat: s, carta: mi.id }); }
-    else mi.meta = mi.etapas[mi.nivel].meta;
+    if (mi.nivel >= mi.etapas.length) { mi.completa = true; ev.push({ e: "mision_completa", seat: s, carta: mi.id }); return; }
+    mi.meta = mi.etapas[mi.nivel].meta;
+    // como en Hearthstone: la carta de la misión pasa a ser la de la siguiente parte
+    const sig = db[mi.etapas[mi.nivel].carta];
+    if (sig) { mi.id = sig.id; mi.nombre = sig.nombre; }
     return;
   }
   if (mi.progreso >= mi.meta) {

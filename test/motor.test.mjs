@@ -1018,6 +1018,7 @@ console.log("ok: Yamir");
   const nuevas = e.j[s].mano.filter((c) => !antes.has(c.uid) && c.id === "tun_brawl");
   assert.ok(nuevas.length >= 3 && nuevas.every((c) => M.costeCarta(e, s, c, db) === db.tun_brawl.coste - 1), "robó 3 que cuestan 1 menos");
   assert.equal(e.j[s].mision.meta, 10, "la meta pasa a 10");
+  assert.equal(e.j[s].mision.id, "descargar_flac", "la misión pasa a la parte 2");
   // nivel 2
   e.j[s].mision.progreso = 9;
   e.j[s].mano.push({ uid: "w9", id: "wey_emo" }); e.j[s].mana = 10;
@@ -1025,6 +1026,7 @@ console.log("ok: Yamir");
   M.aplicar(e, s, { t: "jugar", uid: "w9" }, db, 0);
   assert.equal(e.j[s].poderHechizoExtra, 2, "nivel 2: +2 de daño de hechizos");
   assert.equal(e.j[s].mision.nivel, 2); assert.equal(e.j[s].mision.meta, 20, "falta el nivel 3");
+  assert.equal(e.j[s].mision.id, "winamp", "y a la parte 3");
   e.j[s].mano.push({ uid: "w8", id: "wey_emo" }); e.j[s].mana = 10;
   const v2 = e.j[r].vida;
   M.aplicar(e, s, { t: "jugar", uid: "w8" }, db, 0);
@@ -1050,5 +1052,11 @@ console.log("ok: Contador de Scrobbles");
   const res2 = M.aplicar(e, s, { t: "jugar", uid: ch.uid }, db, 0);
   assert.equal(res2.ev.filter((x) => x.e === "repite" && x.carta === "wey_emo").length, 2, "repite los 2 Wey Emo");
   assert.equal(vr - e.j[r].vida, 10, "5 + 5 al héroe (sin esbirros)");
+}
+// la misión que empieza en la mano es la primera parte, no las otras
+{
+  const e = M.crearPartida(db, 5); e.j[0].nombre = "A"; e.j[1].nombre = "B"; e.j[0].heroe = "tomis"; e.j[1].heroe = "tun";
+  M.empezar(e, db, 0, heroes, false);
+  assert.ok(e.j[0].mano.some((c) => c.id === "scrobbles") && !e.j[0].mano.some((c) => c.id === "winamp" || c.id === "descargar_flac"));
 }
 console.log("ok: Charts");
