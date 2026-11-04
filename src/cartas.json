@@ -1987,7 +1987,8 @@
       }
      ]
     }
-   ]
+   ],
+   "rareza": "legendaria"
   }
  ],
  "heroes": [
@@ -2172,7 +2173,6 @@
     "musica_andina",
     "folklore",
     "slowcore",
-    "slowcore",
     "mascotas_tun",
     "mascotas_tun",
     "nullscape",
@@ -2184,6 +2184,7 @@
     "ishowspeed",
     "tun_brawl",
     "tun_brawl",
+    "tun_ia",
     "tun_ia"
    ]
   }
