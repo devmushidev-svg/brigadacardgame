@@ -495,13 +495,16 @@
    "coste": 2,
    "clase": "tun",
    "arte": "/arte/tuna.webp",
-   "texto": "Por el resto de la partida, tus Tun tienen +1/+1.",
+   "texto": "Restaurá 5 de vida a tu héroe. Robá 2 cartas.",
    "efectos": [
     {
-     "tipo": "mejora_tribu",
-     "tribu": "tun",
-     "ataque": 1,
-     "vida": 1
+     "tipo": "curar",
+     "objetivo": "heroe_propio",
+     "cantidad": 5
+    },
+    {
+     "tipo": "robar",
+     "cantidad": 2
     }
    ]
   },

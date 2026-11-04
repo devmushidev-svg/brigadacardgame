@@ -251,24 +251,25 @@ for (let k = 0; k < 20; k++) {
   assert.ok(e.j[s].mano.length === 2 && e.j[s].mano.every((c) => db[c.id].tribu === "tun"), "robó 2 Tun");
 }
 
-// --- Tuna (+1/+1 a tus Tun el resto de la partida) y Tunita (cuenta los Tun invocados o jugados) ---
+// --- Tuna (cura 5 y roba 2) y Tunita (cuenta los Tun invocados o jugados, roba 2 Tun) ---
 {
   const e = nueva(34); const s = e.turno, r = 1 - s;
   e.j[s].tablero = []; e.j[r].tablero = [];
   preparar(e, s, ["tun_brawl", "tun_puto", "tuna", "tunita"]);
-  e.j[s].invocadosTribu = {};
+  e.j[s].invocadosTribu = {}; e.globales = []; // sin el Panamá del inicio (invocaría Tun al robar)
   M.aplicar(e, s, { t: "jugar", uid: "t0" }, db, 0);
   M.aplicar(e, s, { t: "jugar", uid: "t1" }, db, 0);
+  e.j[s].vida = 30; e.j[s].mazo = ["tun_brawl", "tun_brawl", "tun_brawl", "tun_brawl", "tun_brawl"];
   M.aplicar(e, s, { t: "jugar", uid: "t2" }, db, 0);
-  assert.deepEqual(e.j[s].tablero.map((m) => [m.ataque, m.vida]), [[3, 4], [2, 6]], "Tuna: +1/+1 a tus Tun");
+  assert.equal(e.j[s].vida, 35, "Tuna cura 5");
+  assert.equal(e.j[s].mano.length, 1 + 2, "y roba 2");
   e.j[s].poderUsado = false; e.j[s].mana = 10; M.aplicar(e, s, { t: "poder" }, db, 0);
-  assert.equal(e.j[s].tablero[2].ataque, 2, "los nuevos también");
   assert.equal(M.vista(e, s, db).j[s].mano.find((c) => c.id === "tunita").cantidad, 4, "1 + 3 Tun (2 jugados + 1 invocado)");
   e.j[r].tablero = [{ uid: "rv", id: "x", tribu: null, ataque: 1, vida: 9, vidaMax: 9, ataques: 0 }];
-  e.j[s].mazo = ["tun_brawl", "tun_brawl"];
+  const n = e.j[s].mano.length;
   assert.ok(!M.aplicar(e, s, { t: "jugar", uid: "t3", objetivo: "rv" }, db, 0).error);
   assert.equal(e.j[r].tablero[0].vida, 5);
-  assert.equal(e.j[s].mano.length, 2, "Tunita roba 2 Tun");
+  assert.equal(e.j[s].mano.length, n - 1 + 2, "Tunita roba 2 Tun");
 }
 
 // --- Funeral de Tun: zombies por cada Tun muerto; los que no caben buffean ---

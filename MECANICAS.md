@@ -184,7 +184,7 @@ Diseño de Mario. Arquetipo: paladín molesto — llenar la mesa de Tun, buffear
 | Tun Mastermind | 15 | 6/3 | Acometida. 1 menos por cada Tun muerto en la partida. Grito: invoca 3 Tun, tus Tun tienen +1 de ataque por el resto de la partida y robás 2 Tun | hecho |
 | Comida (hechizo) | 3 | — | Llena tu mesa de Tun 1/1 | hecho |
 | Plátano (hechizo) | 1 | — | +1/+1 a tus Tun. Robás 2 Tun | hecho |
-| Tuna (hechizo) | 2 | — | Por el resto de la partida, tus Tun tienen +1/+1 | hecho |
+| Tuna (hechizo) | 2 | — | Restaura 5 de vida a tu héroe. Robás 2 cartas | hecho |
 | Tunita (hechizo) | 2 | — | 1 de daño a un esbirro, +1 por cada Tun que invocaste o jugaste esta partida. Robás 2 Tun | hecho |
 | **Funeral de Tun** (hechizo legendario) | 10 | — | Un Tun Zombie por cada Tun muerto en la partida; cada uno que no cabe da +1 de ataque o de vida a un Tun al azar | hecho |
 | Tun Zombie (ficha) | — | 1/1 | Lo invoca Funeral de Tun | hecho — **stats provisionales** |
@@ -330,3 +330,4 @@ Efecto `eco_hechizos` (`cantidad`, `efectos`, `origen`): tus próximos N hechizo
 Balance con los mazos precargados de Mario (50 de vida, bot contra bot, 300 partidas): tras bajar el daño de Tomis, Tomis 78% vs Tun y 79% vs Cruit; Cruit 74% vs Tun. Con 30 o 40 de vida casi no cambia. Tras los buffs a Tun (Panamá al inicio, Tun Puto, Choza, Iguana): Tun 51% vs Cruit, Tun 36% vs Tomis, Cruit 20% vs Tomis.
 Tras el rework de Tun (Plátano, Tuna, Tunita, Novia, Astrónomo, Amor, Satánico, Cool, Mastermind) y Música Andina/Noise: Tun 90% vs Cruit, Tun 84% vs Tomis, Tomis 73% vs Cruit. Lo que más pesa: Tuna (+1/+1 permanente) junto con Tun Puto (su daño sube con el ataque del Tun).
 Tras Panamá solo al inicio, Caca 1 a todos, tareas a 1 y Tun Puto de vuelta a 1: Tun 88% vs Cruit, Tun 82% vs Tomis, Cruit 37% vs Tomis.
+Tras Tuna (cura 5, roba 2): Tun 85% vs Cruit, Tun 74% vs Tomis, Cruit 37% vs Tomis.
