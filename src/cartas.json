@@ -1731,6 +1731,27 @@
    "token": true,
    "arte": "/arte/winamp.webp",
    "texto": "Serie de misiones: jugá 10 más. Recompensa: Charts."
+  },
+  {
+   "id": "audiophile",
+   "nombre": "Audiophile",
+   "tipo": "esbirro",
+   "coste": 2,
+   "ataque": 2,
+   "vida": 3,
+   "clase": "tomis",
+   "etiquetas": [
+    "musica"
+   ],
+   "arte": "/arte/audiophile.webp",
+   "abarata_hechizos": 1,
+   "texto": "Tus hechizos cuestan 1 menos. Grito de batalla: robá una carta.",
+   "grito": [
+    {
+     "tipo": "robar",
+     "cantidad": 1
+    }
+   ]
   }
  ],
  "heroes": [

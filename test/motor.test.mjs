@@ -1060,3 +1060,15 @@ console.log("ok: Contador de Scrobbles");
   assert.ok(e.j[0].mano.some((c) => c.id === "scrobbles") && !e.j[0].mano.some((c) => c.id === "winamp" || c.id === "descargar_flac"));
 }
 console.log("ok: Charts");
+
+// --- Audiophile: tus hechizos cuestan 1 menos; grito: roba una carta ---
+{
+  const e = nueva(123); const s = e.turno;
+  e.j[s].tablero = [];
+  preparar(e, s, ["audiophile", "fumando_porro"]);
+  const n = e.j[s].mano.length;
+  M.aplicar(e, s, { t: "jugar", uid: "t0" }, db, 0);
+  assert.equal(e.j[s].mano.length, n - 1 + 1, "robó una");
+  assert.equal(M.costeCarta(e, s, e.j[s].mano.find((c) => c.id === "fumando_porro"), db), 2);
+}
+console.log("ok: Audiophile");
