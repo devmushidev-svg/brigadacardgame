@@ -147,6 +147,16 @@ const Sonido = (() => {
   };
 })();
 addEventListener("pointerdown", () => Sonido.despertar(), { once: true });
+// sonidos propios por carta, como en Hearthstone: "sonidos": { "jugar", "ataque", "muere" } (archivos en public/sonidos/).
+// "sonido" suelto es el de jugarla. Devuelve true si la carta tenía su propio sonido para ese momento.
+function sonidoCarta(id, momento) {
+  const c = DB[id];
+  const url = c?.sonidos?.[momento] || (momento === "jugar" ? c?.sonido : null);
+  if (url) Sonido.archivo(url);
+  return !!url;
+}
+// la carta de un esbirro que está (o estaba) en la mesa
+const cartaDeRef = (ref) => V && [0, 1].map((s) => V.j[s].tablero.find((m) => m.uid === ref)).find(Boolean)?.id;
 
 // ================= utilidades visuales =================
 function colorDe(t) {
@@ -818,7 +828,7 @@ async function animarUno(e, ev, v, nuevos, yo) {
   {
     switch (e.e) {
       case "hechizo":
-        Sonido.hechizo();
+        if (!sonidoCarta(e.carta, "jugar")) Sonido.hechizo();
         if (e.seat !== yo) await mostrarCarta(e.carta, 1000); else await esperar(150);
         break;
       case "invoca": {
@@ -884,14 +894,14 @@ async function animarUno(e, ev, v, nuevos, yo) {
           bala.className = "proyectil"; bala.innerHTML = artHTML(DB[ev.find((x) => x.uid === e.de)?.carta]?.arte || "🧍");
           bala.style.left = desde.x + "px"; bala.style.top = desde.y + "px";
           $("#fx").append(bala);
-          Sonido.ataque();
+          if (!sonidoCarta(cartaDeRef(e.de), "ataque")) Sonido.ataque();
           await bala.animate([{ transform: "translate(-50%,-50%) scale(.6) rotate(0)" }, { transform: `translate(calc(-50% + ${hasta.x - desde.x}px), calc(-50% + ${hasta.y - desde.y}px)) scale(1.3) rotate(540deg)` }],
             { duration: 330, easing: "cubic-bezier(.5,0,.9,.6)" }).finished;
           bala.remove(); Sonido.golpe(1); particulas(hasta.x, hasta.y, "#ffd27a", 10, 50);
         }
         if (de && (a || ev.some((x) => x.e === "invoca" && x.uid === e.a))) {
           // si el objetivo recién entró (Tun Mujer), van hacia donde va a aparecer
-          Sonido.ataque();
+          if (!sonidoCarta(cartaDeRef(e.de), "ataque")) Sonido.ataque();
           const p1 = centro(de), p2 = a ? centro(a) : centro(de.closest(".tablero") || de);
           const dx = (p2.x - p1.x) * 0.82, dy = (p2.y - p1.y) * 0.82;
           de.style.zIndex = 30;
@@ -950,7 +960,7 @@ async function animarUno(e, ev, v, nuevos, yo) {
       }
       case "esconde": toast(e.seat === yo ? `${DB[e.carta]?.nombre || "Tu esbirro"} se escondió en la mano del rival...` : "algo se escondió en una carta de tu mano...", 2000); await esperar(300); break;
       case "sale_escondido": Sonido.hechizo(); await banner(`¡${DB[e.carta]?.nombre || "algo"} estaba escondido!`, 1100); break;
-      case "arma": { Sonido.escudo(); const h = refEl("h" + e.seat); if (h) { const c = centro(h); particulas(c.x, c.y, "#d0d6e0", 16, 60); } if (e.seat !== yo) await mostrarCarta(e.carta, 900); break; }
+      case "arma": { if (!sonidoCarta(e.carta, "jugar")) Sonido.escudo(); const h = refEl("h" + e.seat); if (h) { const c = centro(h); particulas(c.x, c.y, "#d0d6e0", 16, 60); } if (e.seat !== yo) await mostrarCarta(e.carta, 900); break; }
       case "arma_rota": { const h = refEl("h" + e.seat); if (h) { const c = centro(h); particulas(c.x, c.y, "#9aa3b0", 20, 70); } toast(`se rompió ${DB[e.carta]?.nombre || "el arma"}`, 1300); break; }
       case "vc_suma": { // la carta se suma al PutoVC
         const b = $(`[data-vc="${e.seat}"]`) || refEl("h" + e.seat);
@@ -1040,7 +1050,7 @@ async function animarUno(e, ev, v, nuevos, yo) {
         const el = refEl(e.uid);
         if (el) {
           await esperar(250);
-          Sonido.muere();
+          if (!sonidoCarta(cartaDeRef(e.uid), "muere")) Sonido.muere();
           const c = centro(el);
           particulas(c.x, c.y, "#8a6a45", 16, 55);
           await el.animate([{ transform: "scale(1)", filter: "grayscale(0)", opacity: 1 },
@@ -1131,9 +1141,9 @@ async function despues(ev, v, antes, nuevos) {
     if (!el) continue;
     const inv = ev.find((x) => (x.e === "invoca" || x.e === "transforma") && x.uid === uid);
     const c = DB[inv?.carta] || {};
-    if (c.sonido) Sonido.archivo(c.sonido);
-    else if (c.tribu === "tun" && !c.token) Sonido.mono();
-    else if (c.tribu === "tun" && monitos++ < 2) setTimeout(() => Sonido.monito(), monitos * 90);
+    const propio = sonidoCarta(inv?.carta, "jugar");
+    if (!propio && c.tribu === "tun" && !c.token) Sonido.mono();
+    else if (!propio && c.tribu === "tun" && monitos++ < 2) setTimeout(() => Sonido.monito(), monitos * 90);
     if (nuevos.especial?.has(uid)) { // ya hizo su entrada grande: solo brilla en su lugar
       el.animate([{ filter: "brightness(2.2) drop-shadow(0 0 20px #ffd34f)" }, { filter: "none" }], 700);
       continue;

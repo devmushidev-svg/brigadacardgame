@@ -134,7 +134,13 @@ En el texto de las cartas, las palabras clave salen en **negrita** y al ver la c
 - `"vomito"`: un chorro verde que sale del esbirro y salpica a todos los objetivos (Cruit Intolerante)
 - `"devorar"`: los esbirros devorados vuelan girando hacia la carta, con gruñido demoníaco (Tun Satánico)
 
-**Sonidos:** las cartas de Tun suenan a mono al jugarse; los Tun invocados hacen un "uh" corto. Una carta puede llevar `"sonido": "/sonidos/x.mp3"` (archivo en `public/sonidos/`) para usar un audio propio en vez del sintetizado.
+**Sonidos:** las cartas de Tun suenan a mono al jugarse; los Tun invocados hacen un "uh" corto. Como en Hearthstone, cada carta puede tener audios propios para tres momentos (archivos en `public/sonidos/`):
+
+```json
+"sonidos": { "jugar": "/sonidos/tun_puto_jugar.mp3", "ataque": "/sonidos/tun_puto_ataque.mp3", "muere": "/sonidos/tun_puto_muere.mp3" }
+```
+
+Cualquiera de los tres es opcional; si falta, suena el sintetizado. `"sonido"` suelto sigue valiendo para el de jugarla. Sirve para esbirros, hechizos y armas.
 
 **Por cada (`porCada`):** en un `buff`, multiplica los stats: `{ "por": "etiqueta_jugados", "etiqueta": "tarea" }` cuenta las cartas con esa etiqueta que jugaste esta partida (Cruit Excel). En la mano se ve "(llevás N)".
 
