@@ -695,13 +695,24 @@
    "coste": 0,
    "token": true,
    "arte": "🔁",
-   "texto": "Activa el PutoVC gratis y obtenés todas sus piezas a coste 1.",
+   "texto": "Lanza el PutoVC gratis (sale la unión) y obtenés todas sus piezas a coste 1.",
    "efectos": [
     {
      "tipo": "vc_opcion",
      "opcion": "lanzar"
     }
    ]
+  },
+  {
+   "id": "putovc",
+   "nombre": "PutoVC",
+   "tipo": "esbirro",
+   "coste": 0,
+   "ataque": 0,
+   "vida": 0,
+   "token": true,
+   "arte": "🎧",
+   "texto": "La unión de tus cartas de VC: tiene la suma de sus stats y todos sus efectos."
   },
   {
    "id": "porque_me_monean",

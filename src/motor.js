@@ -282,10 +282,10 @@ function inicioTurno(estado, s, ev, db, ahora) {
 function finTurno(estado, s, ev, db) {
   // efectos "al final de tu turno"
   for (const m of [...estado.j[s].tablero]) {
-    const c = db[m.id];
-    if (c?.fin_turno && m.vida > 0) {
+    const efs = efectosDe(m, "fin_turno", db);
+    if (efs.length && m.vida > 0) {
       ev.push({ e: "dispara", uid: m.uid, por: "fin_turno" });
-      aplicarEfectos(estado, s, c.fin_turno, null, ev, db, m.uid);
+      aplicarEfectos(estado, s, efs, null, ev, db, m.uid);
       resolverMuertes(estado, ev, db);
       if (estado.fase !== "jugando") return;
     }
@@ -319,18 +319,25 @@ function danarHeroe(estado, s, n, ev) {
 const vcVacio = () => ({ piezas: [], ataque: 0, vida: 0 });
 export function puedeLanzarVC(estado, s) {
   const p = estado.j[s];
-  return !!p.vc?.piezas.length && p.mana >= CONFIG.COSTE_VC;
+  return !!p.vc?.piezas.length && p.mana >= CONFIG.COSTE_VC && p.tablero.length < CONFIG.MAX_TABLERO;
 }
+// las cartas de un esbirro: la suya y, si es la unión del PutoVC, las de cada pieza (sus efectos pasan a ser de la unión)
+const cartasDelEsbirro = (m, db) => [db[m.id], ...(m.piezas || []).map((id) => db[id])].filter(Boolean);
+const efectosDe = (m, campo, db) => cartasDelEsbirro(m, db).flatMap((c) => c[campo] || []);
+// lanzar: sale la unión de todas las piezas, con la suma de stats, sus claves y sus efectos (últimos alientos, auras...)
 function lanzarVC(estado, s, vc, ev, db) {
   ev.push({ e: "vc_lanza", seat: s, n: vc.piezas.length });
-  for (const id of vc.piezas) {
-    if (estado.fase !== "jugando") return;
-    const c = db[id];
-    if (!c?.aliento) continue;
-    ev.push({ e: "repite", seat: s, carta: id });
-    aplicarEfectos(estado, s, c.aliento, null, ev, db, null);
-    resolverMuertes(estado, ev, db);
-  }
+  const m = invocar(estado, s, "putovc", ev, db);
+  if (!m) return;
+  m.ataque = vc.ataque; m.vida = m.vidaMax = vc.vida; m.piezas = vc.piezas.slice();
+  const claves = new Set(vc.piezas.flatMap((id) => db[id]?.claves || []));
+  if (claves.has("provocar")) m.provocar = true;
+  if (claves.has("escudo")) m.escudo = true;
+  if (claves.has("doble")) m.doble = true;
+  if (claves.has("robo_vida")) m.roboVida = true;
+  if (claves.has("carga") || claves.has("acometida")) { m.dormido = false; m.soloEsbirros = !claves.has("carga"); }
+  m.alRecibirDano = vc.piezas.some((id) => db[id]?.al_recibir_dano);
+  ev.push({ e: "buff", a: m.uid, ataque: vc.ataque, vida: vc.vida });
 }
 
 // extra: { fx, de } para que el cliente sepa cómo dibujar el golpe (ej. una piedra desde Tun Puto)
@@ -346,7 +353,7 @@ function danar(estado, ref, n, ev, extra = {}) {
   }
   t.obj.vida -= n;
   ev.push({ e: "dano", a: ref, n });
-  if (t.obj.alRecibirDano) (estado.golpes ||= []).push({ uid: ref, id: t.obj.id, seat: t.seat });
+  if (t.obj.alRecibirDano) (estado.golpes ||= []).push({ uid: ref, id: t.obj.id, seat: t.seat, piezas: t.obj.piezas });
 }
 
 function curar(estado, ref, n, ev) {
@@ -648,7 +655,7 @@ function aplicarEfectos(estado, s, efectos, elegido, ev, db, fuente, ctx = {}) {
       // daño que se suma a la vida de tu héroe; cada esbirro tuyo con "duplica_robo_de" igual a quien roba lo duplica
       // (Cruit Vampiro: tus Cruit Sangre roban el doble; con dos Vampiros, el cuádruple)
       const quien = fuente && buscar(estado, fuente)?.obj.id;
-      const mult = 2 ** estado.j[s].tablero.filter((m) => m.vida > 0 && quien && db[m.id]?.duplica_robo_de === quien).length;
+      const mult = 2 ** estado.j[s].tablero.filter((m) => m.vida > 0 && quien).reduce((n, m) => n + cartasDelEsbirro(m, db).filter((c) => c.duplica_robo_de === quien).length, 0);
       for (const ref of objetivos(estado, s, ef, elegido, fuente)) {
         const t = buscar(estado, ref);
         if (!t) continue;
@@ -828,10 +835,10 @@ function resolverMuertes(estado, ev, db) {
     const golpes = estado.golpes || [];
     estado.golpes = [];
     for (const g of golpes) {
-      const c = db[g.id];
-      if (!c?.al_recibir_dano || estado.fase !== "jugando") continue;
+      const efs = efectosDe(g, "al_recibir_dano", db);
+      if (!efs.length || estado.fase !== "jugando") continue;
       ev.push({ e: "dispara", uid: g.uid, por: "dano" });
-      aplicarEfectos(estado, g.seat, c.al_recibir_dano, null, ev, db, g.uid);
+      aplicarEfectos(estado, g.seat, efs, null, ev, db, g.uid);
     }
     const muertos = [];
     for (const s of [0, 1]) {
@@ -845,7 +852,8 @@ function resolverMuertes(estado, ev, db) {
       ev.push({ e: "muere", uid: m.uid, seat: s });
       if (m.tribu) (estado.muertosTribu ||= {})[m.tribu] = (estado.muertosTribu[m.tribu] || 0) + 1;
       const c = db[m.id];
-      if (c && c.aliento) aplicarEfectos(estado, s, c.aliento, null, ev, db, null);
+      const alientos = efectosDe(m, "aliento", db);
+      if (alientos.length) aplicarEfectos(estado, s, alientos, null, ev, db, null);
       // apéndices que se reemplazan (Rafael Fernando: Colosal +99) mientras quede reserva
       const res = estado.j[s].reservas;
       if (c?.reemplazo && res?.[m.id] > 0 && estado.fase === "jugando") { res[m.id]--; invocar(estado, s, m.id, ev, db, pos); }
@@ -859,10 +867,12 @@ function resolverMuertes(estado, ev, db) {
       }
       for (const s2 of [0, 1]) {
         for (const v of [...estado.j[s2].tablero]) {
-          const cm = db[v.id]?.cuando_muere;
-          if (v.vida > 0 && cm && cm.tribu === m.tribu) {
-            ev.push({ e: "dispara", uid: v.uid, por: "muere" });
-            aplicarEfectos(estado, s2, cm.efectos, null, ev, db, v.uid);
+          for (const cv of cartasDelEsbirro(v, db)) {
+            const cm = cv.cuando_muere;
+            if (v.vida > 0 && cm && cm.tribu === m.tribu) {
+              ev.push({ e: "dispara", uid: v.uid, por: "muere" });
+              aplicarEfectos(estado, s2, cm.efectos, null, ev, db, v.uid);
+            }
           }
         }
       }
@@ -1004,7 +1014,7 @@ export function aplicar(estado, s, accion, db, ahora) {
   }
 
   if (accion.t === "vc") {
-    if (!puedeLanzarVC(estado, s)) return { error: !p.vc?.piezas.length ? "todavía no tenés piezas en el VC" : "no te alcanza el mana" };
+    if (!puedeLanzarVC(estado, s)) return { error: !p.vc?.piezas.length ? "todavía no tenés piezas en el VC" : p.mana < CONFIG.COSTE_VC ? "no te alcanza el mana" : "tablero lleno" };
     p.mana -= CONFIG.COSTE_VC;
     const vc = p.vc; p.vc = vcVacio();
     registrar(estado, `${p.nombre} lanzó el PutoVC`);
@@ -1133,18 +1143,20 @@ export function aplicar(estado, s, accion, db, ahora) {
     if (!objetivosAtaque(estado, s, m).includes(accion.a)) return { error: m.soloEsbirros && accion.a[0] === "h" ? "con acometida solo puede atacar esbirros este turno" : "tenes que atacar a los de provocar" };
     m.ataques++;
     // "cada vez que ataca" (Tun Astrónomo)
-    const alAtacar = db[m.id]?.al_atacar;
-    if (alAtacar) {
+    const alAtacar = efectosDe(m, "al_atacar", db);
+    if (alAtacar.length) {
       ev.push({ e: "dispara", uid: m.uid, por: "ataque" });
       aplicarEfectos(estado, s, alAtacar, null, ev, db, m.uid);
     }
     // "cuando uno de tus <tribu> ataca": se buffea antes del golpe (ej. Tun Amor)
     for (const v of [...p.tablero]) {
-      const ca = db[v.id]?.cuando_ataca_aliado;
-      if (!ca || v.vida <= 0 || (ca.tribu && m.tribu !== ca.tribu)) continue;
-      ev.push({ e: "dispara", uid: v.uid, por: "ataque" });
-      m.ataque += ca.ataque || 0; m.vida += ca.vida || 0; m.vidaMax += ca.vida || 0;
-      ev.push({ e: "buff", a: m.uid, ataque: ca.ataque || 0, vida: ca.vida || 0 });
+      for (const cv of cartasDelEsbirro(v, db)) {
+        const ca = cv.cuando_ataca_aliado;
+        if (!ca || v.vida <= 0 || (ca.tribu && m.tribu !== ca.tribu)) continue;
+        ev.push({ e: "dispara", uid: v.uid, por: "ataque" });
+        m.ataque += ca.ataque || 0; m.vida += ca.vida || 0; m.vidaMax += ca.vida || 0;
+        ev.push({ e: "buff", a: m.uid, ataque: ca.ataque || 0, vida: ca.vida || 0 });
+      }
     }
     chocar(estado, m.uid, accion.a, ev);
     resolverMuertes(estado, ev, db);

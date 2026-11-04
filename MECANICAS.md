@@ -53,6 +53,8 @@ Recomendado: PNG o WEBP cuadrado de 512×512, con el personaje centrado, porque 
 | `mision` | queda activa con un contador; al cumplirse aplica su `recompensa` |
 | `arma` | se le equipa al héroe (`ataque`, `durabilidad`): ataca una vez por turno, cada ataque gasta un uso, recibe el golpe de vuelta de los esbirros; `al_atacar` en el arma = "cada vez que tu héroe ataca" |
 
+**Cartas relacionadas:** al ver una carta en grande (o en la vista previa de PC) salen al lado las cartas a las que hace referencia: lo que invoca, da, mete en el mazo o transforma, la recompensa de una misión, los apéndices de un colosal, las opciones de "elegí una", y las piezas de la unión del PutoVC. Se calcula solo, mirando los campos `carta` de sus efectos.
+
 Más campos: `colosal: { carta, cantidad }` (entra con apéndices a los costados; si el apéndice tiene `reemplazo: true`, lo que no entra queda de reserva y cada uno que muere es reemplazado), clave `robo_vida` (el daño que hace al pelear se suma a la vida del héroe), efecto `esconder` (se esconde en una carta al azar de la mano del rival; al jugarla sale para su dueño).
 
 Otros campos: `fusionar: true` (si ya hay uno igual en tu mesa se suma a ese; `porApilado` en un efecto lo multiplica por las fusionadas), `excluir: { "etiqueta": "programa" }` en un efecto (no puede elegir esos esbirros: a Cruit Excel no se le da Leche). Global `tareas_dobles` (Unislop): tus Tareas se lanzan una vez más.
@@ -202,7 +204,7 @@ Diseño de Mario. Arquetipo: paladín molesto — llenar la mesa de Tun, buffear
 ### Mecánica: Entrar al VC (como las naves de Hearthstone)
 
 - Las cartas con `"vc": true` entran a la mesa normal y además se suman a tu **PutoVC** (su último aliento y sus stats).
-- El PutoVC es una **ubicación** fija en el borde izquierdo de tu mesa (aparece con la primera pieza): no ocupa lugar de esbirro, no se puede atacar ni destruir. Tocarlo cuesta `COSTE_VC` (4) de maná: activa los últimos alientos de todas las piezas, en orden, y vuelve a 0 (no invoca nada). Igual guarda la suma de ataque y vida de las piezas, que usa Enojaste Destroyer of VC.
+- El PutoVC es una **ubicación** fija en el borde izquierdo de tu mesa (aparece con la primera pieza): no ocupa lugar de esbirro, no se puede atacar ni destruir. Al tocarlo se ven sus piezas y la unión que saldría; lanzarlo cuesta `COSTE_VC` (4) de maná y necesita lugar en la mesa: sale la **unión** (`putovc`), un esbirro con la suma de ataque y vida de las piezas, sus claves y todos sus efectos (últimos alientos, al final de tu turno, al recibir daño, al atacar, auras); no se activa nada al lanzarlo. Después el VC vuelve a 0.
 - **Armadura** (`armadura` en el jugador, efecto `armadura`): absorbe el daño al héroe antes que la vida. Se ve como un escudo en el retrato.
 - **Elegí una** (efecto `destruir_vc` con `opciones`): usa la pantalla de descubrir, pero la opción elegida se aplica en vez de ir a la mano (cartas ficha `vc_op_*` con efecto `vc_opcion`).
 

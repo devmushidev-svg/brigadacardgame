@@ -717,7 +717,7 @@ console.log("ok: cartas nuevas de Tun");
 }
 console.log("ok: cambios de Cruit");
 
-// --- PutoVC (ubicación): las piezas se suman; al lanzarlo se activan sus últimos alientos y vuelve a 0 ---
+// --- PutoVC (ubicación): las piezas se suman; al lanzarlo sale la unión con la suma de stats y los efectos de las piezas ---
 {
   const e = nueva(90); const s = e.turno, r = 1 - s;
   e.j[s].tablero = []; e.j[r].tablero = [];
@@ -725,23 +725,26 @@ console.log("ok: cambios de Cruit");
   M.aplicar(e, s, { t: "jugar", uid: "t0" }, db, 0);
   M.aplicar(e, s, { t: "jugar", uid: "t1" }, db, 0);
   assert.deepEqual(e.j[s].vc, { piezas: ["cuidar_vc", "ishowspeed"], ataque: 7, vida: 7 });
+  e.j[s].tablero = []; // las piezas ya no están en la mesa
   e.j[r].tablero = [{ uid: "rv", id: "x", tribu: null, ataque: 1, vida: 9, vidaMax: 9, ataques: 0 }];
   e.j[s].mana = M.CONFIG.COSTE_VC - 1;
   assert.ok(M.aplicar(e, s, { t: "vc" }, db, 0).error, "sin maná no se lanza");
   e.j[s].mana = M.CONFIG.COSTE_VC;
   const res = M.aplicar(e, s, { t: "vc" }, db, 0);
   assert.ok(!res.error, res.error);
-  // el 3 a todos de Ishowspeed mata a las dos piezas de la mesa, y sus últimos alientos se activan de nuevo
-  assert.ok(!e.j[s].tablero.some((m) => m.id === "cuidar_vc" || m.id === "ishowspeed"), "las piezas murieron en la cadena");
-  assert.equal(e.j[s].armadura, 8, "Cuidar VC: 4 al lanzar y 4 al morir");
-  assert.equal(e.j[r].tablero[0].vida, 3, "Ishowspeed: 3 al lanzar y 3 al morir");
-  assert.ok(!e.j[s].tablero.some((m) => m.id === "putovc"), "no invoca nada: es una ubicación");
-  assert.deepEqual(e.j[s].vc, { piezas: [], ataque: 0, vida: 0 }, "vuelve a 0 (la ubicación queda)");
+  assert.ok(!e.j[s].armadura && e.j[r].tablero[0].vida === 9, "al lanzar no se activa nada");
+  const u = e.j[s].tablero.find((m) => m.id === "putovc");
+  assert.deepEqual([u.ataque, u.vida, u.piezas], [7, 7, ["cuidar_vc", "ishowspeed"]], "la unión: suma de stats y sus piezas");
+  assert.deepEqual(e.j[s].vc, { piezas: [], ataque: 0, vida: 0 }, "el VC vuelve a 0 (la ubicación queda)");
+  // al morir la unión se activan los últimos alientos de todas sus piezas
+  u.vida = 0; M.aplicar(e, s, { t: "fin" }, db, 0);
+  assert.equal(e.j[s].armadura, 4, "último aliento de Cuidar VC");
+  assert.equal(e.j[r].tablero[0].vida, 6, "último aliento de Ishowspeed: 3 a todos los esbirros");
   // la armadura absorbe el daño antes que la vida
   const v = e.j[s].vida;
-  e.turno = r; e.j[r].tablero[0].dormido = false;
+  e.j[r].tablero[0].dormido = false;
   M.aplicar(e, r, { t: "atacar", de: "rv", a: "h" + s }, db, 0);
-  assert.equal(e.j[s].armadura, 7); assert.equal(e.j[s].vida, v);
+  assert.equal(e.j[s].armadura, 3); assert.equal(e.j[s].vida, v);
 }
 // --- Enojaste Destroyer of VC: destruye el VC y elegís una de tres ---
 for (const [i, op] of ["stats", "armadura", "lanzar"].entries()) {
@@ -758,7 +761,7 @@ for (const [i, op] of ["stats", "armadura", "lanzar"].entries()) {
   if (op === "stats") { assert.deepEqual([d.ataque, d.vida], [11, 11]); assert.equal(vr - e.j[r].vida, 14, "reparte el doble del ataque (sin esbirros: todo a la cara)"); }
   if (op === "armadura") assert.equal(e.j[s].armadura, 14);
   if (op === "lanzar") {
-    assert.equal(e.j[s].armadura, 4, "lo activa: efectos de las piezas");
+    assert.ok(e.j[s].tablero.some((m) => m.id === "putovc" && m.ataque === 7), "sale la unión");
     const piezas = e.j[s].mano.filter((c) => c.id === "cuidar_vc" || c.id === "ishowspeed");
     assert.equal(piezas.length, 2); assert.ok(piezas.every((c) => M.costeCarta(e, s, c, db) === 1), "las piezas cuestan 1");
   }

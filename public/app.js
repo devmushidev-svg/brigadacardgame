@@ -172,7 +172,7 @@ const PALABRAS = [
   { n: "Robo de vida", re: "robo de vida", clave: "robo_vida", d: "El daño que hace este esbirro al pelear se suma a la vida de tu héroe." },
   { n: "Colosal", re: "colosal(?: \\+\\d+)?", d: "Entra con apéndices (esbirros extra) a sus costados. El número dice cuántos." },
   { n: "Arma", re: "arma", d: "Se le equipa a tu héroe: puede atacar una vez por turno con el ataque del arma. Cada ataque gasta un uso; si ataca a un esbirro, ese esbirro le pega de vuelta a tu héroe." },
-  { n: "VC", re: "vc", d: "Al jugarla entra a tu PutoVC (una ubicación en tu mesa que no se puede destruir). Cuando tocás el PutoVC para lanzarlo, se activan los últimos alientos de todo lo que entró, y el VC vuelve a 0." },
+  { n: "VC", re: "vc", d: "Al jugarla entra a tu PutoVC (una ubicación en tu mesa que no se puede destruir). Al lanzarlo sale la unión de todo lo que entró: la suma de sus stats y todos sus efectos (últimos alientos, auras). Después el VC vuelve a 0." },
   { n: "Armadura", re: "armadura", d: "Absorbe el daño que recibe tu héroe antes que su vida." },
   { n: "Se fusiona", re: "se fusiona", d: "Si ya tenés uno igual en la mesa, se une a ese: le suma su ataque y su vida, y su efecto cuenta una vez más." },
   { n: "Activar", re: "activan?|activar", d: "Repite el grito de batalla y el último aliento del esbirro." },
@@ -1300,12 +1300,7 @@ function render(v) {
     if (!miTurno || recienCerrado() || $(".modal") || gesto?.movio) return;
     enviar({ t: "fin" }); $("#fin").disabled = true;
   });
-  const bvc = $("#vc");
-  if (bvc) bvc.onclick = () => {
-    const vc = P.vc;
-    if (!bvc.classList.contains("listo")) { toast(vc.piezas.length ? `En el VC: ${vc.piezas.map((id) => DB[id]?.nombre || id).join(", ")}. Lanzarlo cuesta ${vc.coste}.` : "El VC está vacío: jugá cartas con VC para llenarlo.", 2600); return; }
-    bvc.classList.remove("listo"); enviar({ t: "vc" });
-  };
+  $$("[data-vc]").forEach((b) => (b.onclick = () => verVC(+b.dataset.vc)));
   const bp = $("#poder");
   if (bp) bp.onclick = () => {
     if (!bp.classList.contains("listo")) { if (P.poder) toast(`${P.poder.nombre}: ${P.poder.texto || ""}`, 1800); return; }
@@ -1380,6 +1375,27 @@ function guiaTutorial(v) {
   if (medio && !boton) g.style.top = centro(medio).y + "px"; // sobre la línea del medio, entre las dos mesas
   if (foco) foco.classList.add("guia-foco");
   if (boton) $("#guia-ok").onclick = () => { G.intro = true; guiaTutorial(V); };
+}
+
+// ---------- PutoVC: al tocarlo se ven sus piezas y lo que saldría; el tuyo se lanza desde acá ----------
+function verVC(s) {
+  const vc = V?.j[s]?.vc;
+  if (!vc) return;
+  const P = V.j[s];
+  const puede = s === V.yo && V.turno === V.yo && V.fase === "jugando" && vc.piezas.length && P.mana >= vc.coste && P.tablero.length < 7;
+  const union = { ...DB.putovc, ataque: vc.ataque, vida: vc.vida };
+  const m = document.createElement("div");
+  m.className = "modal";
+  m.innerHTML = `<div class="modal-caja">
+    <div class="desc-titulo">PUTOVC${s === V.yo ? "" : ` DE ${esc(P.nombre).toUpperCase()}`}</div>
+    ${vc.piezas.length ? `${cartaHTML(union, { clase: "grande" })}<div class="relacionadas">${vc.piezas.map((id) => cartaHTML(DB[id] || {})).join("")}</div>
+      <div class="mull-info">Al lanzarlo sale la unión: la suma de las stats y los efectos de todas las piezas.</div>`
+      : '<div class="mull-info">Vacío: jugá cartas con VC para llenarlo.</div>'}
+    ${puede ? `<button class="boton" id="lanzar-vc" style="width:min(56vw,260px)">Lanzar (${vc.coste} de maná)</button>` : ""}</div>`;
+  document.body.append(m);
+  const abierto = Date.now();
+  m.onclick = (e) => { e.stopPropagation(); if (e.target !== m || Date.now() - abierto < 350) return; cerrarModal(m); };
+  $("#lanzar-vc", m) && ($("#lanzar-vc", m).onclick = (e) => { e.stopPropagation(); cerrarModal(m); enviar({ t: "vc" }); });
 }
 
 // ---------- mulligan: al empezar, cada uno elige qué cartas de su mano inicial cambiar ----------
@@ -1573,7 +1589,29 @@ const bajo = (x, y) => document.elementFromPoint(x, y)?.closest("[data-ref]")?.d
 const statsHTML = (c) => `<div class="palabras"><div><b>🔷 Maná (arriba):</b> lo que cuesta jugarla.</div>${c.tipo === "esbirro"
   ? `<div><b>🟡 Ataque (abajo a la izquierda):</b> el daño que hace al atacar.</div><div><b>❤️ Vida (abajo a la derecha):</b> el daño que aguanta; si llega a 0, muere.</div>`
   : `<div><b>Hechizo:</b> no tiene ataque ni vida; hace su efecto y se va.</div>`}</div>`;
-function zoom(idCarta, uid) {
+// cartas a las que hace referencia otra (el Tun que invoca, la recompensa de la misión, los apéndices...), como en Hearthstone
+function relacionadas(c, piezas = null) {
+  if (piezas) return piezas.filter((id) => DB[id]);
+  const ids = new Set();
+  const ver = (x) => {
+    if (!x || typeof x !== "object") return;
+    if (Array.isArray(x)) return x.forEach(ver);
+    for (const [k, v] of Object.entries(x)) {
+      if (k === "carta" && typeof v === "string") ids.add(v);
+      else if (k === "opciones" && Array.isArray(v)) v.forEach((id) => typeof id === "string" && ids.add(id));
+      else if (typeof v === "object") ver(v);
+    }
+  };
+  ver([c.grito, c.aliento, c.efectos, c.fin_turno, c.al_recibir_dano, c.al_atacar, c.al_robarse, c.cuando_muere, c.mision, c.colosal]);
+  ids.delete(c.id);
+  return [...ids].filter((id) => DB[id]);
+}
+const relacionadasHTML = (c, piezas) => {
+  const ids = relacionadas(c, piezas);
+  return ids.length ? `<div class="relacionadas">${ids.map((id) => cartaHTML(DB[id])).join("")}</div>` : "";
+};
+
+function zoom(idCarta, uid, ref = null) {
   if (V?.tutorial) { if (uid) G.verCarta = true; else if (V.j[1 - V.yo]?.tablero.some((m) => m.id === idCarta)) G.verRival = true; }
   const enMano = uid && V?.j[V.yo]?.mano?.find((x) => x.uid === uid);
   const c = enMano ? cartaMano(enMano) : DB[idCarta];
@@ -1581,7 +1619,11 @@ function zoom(idCarta, uid) {
   const puede = uid && V && V.yo >= 0 && V.turno === V.yo && V.fase === "jugando" && jugable(V, c);
   const m = document.createElement("div");
   m.className = "modal";
-  m.innerHTML = `<div class="modal-caja">${cartaHTML(c, { clase: "grande" })}${V?.tutorial ? statsHTML(c) : ""}${palabrasHTML(c)}
+  // un esbirro de la mesa: si es la unión del PutoVC, muestra sus piezas
+  const enMesa = ref && V && [0, 1].map((s) => V.j[s].tablero.find((x) => x.uid === ref)).find(Boolean);
+  const piezas = enMesa?.piezas || null;
+  const vista = enMesa ? { ...c, ataque: enMesa.ataque, vida: enMesa.vida } : c;
+  m.innerHTML = `<div class="modal-caja">${cartaHTML(vista, { clase: "grande" })}${relacionadasHTML(c, piezas)}${V?.tutorial ? statsHTML(c) : ""}${palabrasHTML(c)}
     ${puede ? '<button class="boton" id="jugar" style="width:min(56vw,260px)">Jugar</button>' : ""}</div>`;
   document.body.append(m);
   const abierto = Date.now();
@@ -1639,7 +1681,7 @@ app.addEventListener("pointerdown", (e) => {
   gesto.largo = setTimeout(() => {
     if (gesto && !gesto.movio && !apuntando) {
       const el = gesto.cartaEl || gesto.esbEl;
-      if (el?.dataset.carta) { zoom(el.dataset.carta, gesto.cartaEl?.dataset.uid || null); gesto = null; }
+      if (el?.dataset.carta) { zoom(el.dataset.carta, gesto.cartaEl?.dataset.uid || null, gesto.cartaEl ? null : el.dataset.ref); gesto = null; }
     }
   }, 450);
 
@@ -1740,7 +1782,7 @@ addEventListener("pointerup", (e) => {
   // toque simple sobre una carta de la mano = verla grande (con botón jugar)
   if (g && !g.movio && g.cartaEl && Date.now() - g.t < 450) zoom(g.cartaEl.dataset.carta, g.cartaEl.dataset.uid);
   // toque simple sobre un esbirro del rival = verlo grande
-  else if (g && !g.movio && g.esbEl?.classList.contains("esbirro") && +g.esbEl.dataset.seat !== V.yo && Date.now() - g.t < 450) zoom(g.esbEl.dataset.carta);
+  else if (g && !g.movio && g.esbEl?.classList.contains("esbirro") && +g.esbEl.dataset.seat !== V.yo && Date.now() - g.t < 450) zoom(g.esbEl.dataset.carta, null, g.esbEl.dataset.ref);
 });
 // que el navegador no arrastre imágenes ni abra el menú de mantener presionado (cortaba el arrastre de cartas)
 addEventListener("dragstart", (e) => e.preventDefault());
@@ -1750,7 +1792,7 @@ addEventListener("contextmenu", (e) => { if (e.target.closest(".mesa, .modal, .d
 const conMouse = matchMedia("(hover: hover) and (pointer: fine)").matches;
 const preview = $("#preview");
 function cartaDePoder(p, h) {
-  return { id: "poder", nombre: p.nombre, tipo: "hechizo", coste: p.coste, arte: p.arte || "⚡", texto: p.texto || "", clase: h?.clase };
+  return { id: "poder", nombre: p.nombre, tipo: "hechizo", coste: p.coste, arte: p.arte || "⚡", texto: p.texto || "", clase: h?.clase, efectos: p.efectos };
 }
 function mostrarPreview(el) {
   if (!V) return;
@@ -1773,7 +1815,8 @@ function mostrarPreview(el) {
     if (h) { carta = { id: h.id, nombre: h.nombre, tipo: "esbirro", coste: "", ataque: "", vida: p.vida, arte: h.arte, texto: `Poder: ${h.poder?.nombre || "ninguno"}. ${h.poder?.texto || ""}`, clase: h.clase }; extra = p.nombre; }
   }
   if (!carta) return;
-  preview.innerHTML = cartaHTML(carta) + (extra ? `<div class="ahora">${esc(extra)}</div>` : "") + palabrasHTML(carta);
+  const enMesa = el.classList.contains("esbirro") && V.j[+el.dataset.seat]?.tablero.find((x) => x.uid === el.dataset.ref);
+  preview.innerHTML = cartaHTML(carta) + (extra ? `<div class="ahora">${esc(extra)}</div>` : "") + relacionadasHTML(carta, enMesa?.piezas || null) + palabrasHTML(carta);
   preview.style.display = "block";
   const r = el.getBoundingClientRect(), pw = 236, ph = preview.offsetHeight;
   const x = r.right + 18 + pw < innerWidth ? r.right + 18 : r.left - pw - 18;
