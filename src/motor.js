@@ -936,7 +936,7 @@ function aplicarEfectos(estado, s, efectos, elegido, ev, db, fuente, ctx = {}) {
       continue;
     }
     if (ef.tipo === "global") {
-      estado.globales.push({ disparador: ef.disparador, tribu: ef.tribu || null, efectos: ef.efectos, origen: ef.origen || null, seat: s });
+      estado.globales.push({ disparador: ef.disparador, tribu: ef.tribu || null, efectos: ef.efectos, origen: ef.origen || null, excluir: ef.excluir || null, seat: s });
       ev.push({ e: "global", seat: s });
       continue;
     }
@@ -1021,7 +1021,7 @@ function resolverMuertes(estado, ev, db) {
     for (const { s, m } of muertos) {
       // efectos por el resto de la partida: "cada vez que muere uno de tus <tribu>" (Tun Iguana)
       for (const g of estado.globales) {
-        if (m.tribu && g.disparador === "muere_tribu" && g.seat === s && g.tribu === m.tribu && estado.fase === "jugando") aplicarEfectos(estado, s, g.efectos, null, ev, db, null);
+        if (m.tribu && g.disparador === "muere_tribu" && g.seat === s && g.tribu === m.tribu && !(g.excluir || []).includes(m.id) && estado.fase === "jugando") aplicarEfectos(estado, s, g.efectos, null, ev, db, null);
       }
       for (const s2 of [0, 1]) {
         for (const v of [...estado.j[s2].tablero]) {

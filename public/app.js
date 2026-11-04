@@ -976,8 +976,9 @@ async function animarUno(e, ev, v, nuevos, yo) {
           bala.style.left = desde.x + "px"; bala.style.top = desde.y + "px";
           $("#fx").append(bala);
           if (!sonidoCarta(cartaDeRef(e.de), "ataque")) Sonido.ataque();
+          setTimeout(() => bala.remove(), 1500); // por si la animación se corta (pestaña en segundo plano): que nunca quede trabado
           await bala.animate([{ transform: "translate(-50%,-50%) scale(.6) rotate(0)" }, { transform: `translate(calc(-50% + ${hasta.x - desde.x}px), calc(-50% + ${hasta.y - desde.y}px)) scale(1.3) rotate(540deg)` }],
-            { duration: 330, easing: "cubic-bezier(.5,0,.9,.6)" }).finished;
+            { duration: 330, easing: "cubic-bezier(.5,0,.9,.6)" }).finished.catch(() => {});
           bala.remove(); Sonido.golpe(1); particulas(hasta.x, hasta.y, "#ffd27a", 10, 50);
         }
         if (de && (a || ev.some((x) => x.e === "invoca" && x.uid === e.a))) {
@@ -1790,12 +1791,22 @@ function avisoGirar() {
     <button class="boton" id="girar-full">Pantalla completa y horizontal</button><button class="boton sec" id="girar-no">Jugar así igual</button>`;
   document.body.append(a);
   $("#girar-full").onclick = async () => {
-    try { await document.documentElement.requestFullscreen(); await screen.orientation?.lock?.("landscape"); } catch {}
-    setTimeout(avisoGirar, 400);
+    a.remove(); // se saca el aviso ya: si el celular tarda en girar, que no quede la pantalla tapada
+    sessionStorage.setItem("vertical-ok", "1");
+    try { await document.documentElement.requestFullscreen({ navigationUI: "hide" }); await screen.orientation?.lock?.("landscape"); } catch {}
+    redibujar();
   };
   $("#girar-no").onclick = () => { sessionStorage.setItem("vertical-ok", "1"); a.remove(); };
 }
-addEventListener("resize", () => avisoGirar());
+// al girar o entrar/salir de pantalla completa se vuelve a dibujar la mesa con el tamaño nuevo
+let redibujoPend = null;
+function redibujar() {
+  clearTimeout(redibujoPend);
+  redibujoPend = setTimeout(() => { avisoGirar(); if (V && V.fase === "jugando" && !animando && !gesto && !apuntando && !$(".modal")) render(V); }, 350);
+}
+addEventListener("resize", redibujar);
+screen.orientation?.addEventListener?.("change", redibujar);
+document.addEventListener("fullscreenchange", redibujar);
 
 // al cerrar algo encima de la mesa, se ignoran los toques un momento (si no, en Android
 // el mismo toque terminaba el turno o jugaba algo que estaba abajo)

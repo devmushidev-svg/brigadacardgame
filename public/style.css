@@ -248,6 +248,8 @@ img[src^="/arte/unislop-tareas/"] { filter: invert(1) drop-shadow(0 2px 3px #000
 .numero.buff { color: #ffe066; font-size: 22px; width: 90px; margin-left: -45px; }
 .particula { position: fixed; width: 8px; height: 8px; border-radius: 50%; pointer-events: none; z-index: 64; }
 .proyectil { position: fixed; font-size: 34px; z-index: 66; pointer-events: none; transform: translate(-50%, -50%); filter: drop-shadow(0 3px 3px #000a); }
+/* el esbirro que sale disparado: su imagen en una ficha redonda (sin esto la imagen salía a tamaño real, gigante) */
+.proyectil img { display: block; width: 52px; height: 52px; border-radius: 50%; object-fit: cover; border: 3px solid #d9b25a; }
 #flecha { position: fixed; inset: 0; width: 100%; height: 100%; pointer-events: none; z-index: 55; display: none; }
 #flecha path#flecha-linea { fill: none; stroke: #ff4d2e; stroke-width: 9; stroke-linecap: round; stroke-dasharray: 2 14;
   filter: drop-shadow(0 0 6px #ff2a00); animation: hormigas .5s linear infinite; }
@@ -544,3 +546,12 @@ img[src^="/arte/unislop-tareas/"] { filter: invert(1) drop-shadow(0 2px 3px #000
 .girar-icono { font-size: 64px; animation: girar-anim 1.6s ease-in-out infinite; }
 @keyframes girar-anim { 50% { transform: rotate(-90deg); } }
 .girar .boton { max-width: 320px; }
+/* ---------- celular en horizontal: todo según la altura, para que entren tu héroe y tu mano ---------- */
+@media (orientation: landscape) and (max-height: 500px) and (hover: none), (orientation: landscape) and (max-height: 500px) and (pointer: coarse) {
+  :root { --esb: clamp(40px, 13vh, 70px); --carta-w: clamp(70px, 20vh, 110px); }
+  .tablero { min-height: calc(var(--esb) * 1.15); }
+  .zona { padding: 1px 0; }
+  .mesa { padding: 2px 14px 0; }
+  .campo { margin: 2px calc(var(--esb) * 1.2); min-height: 0; }
+  .mano .carta:hover { transform: none; }
+}

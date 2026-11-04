@@ -1286,3 +1286,18 @@ console.log("ok: buffs de Tun");
   assert.equal(vr - e.j[r].vida, 7, "reparte los 7 de ataque que tenía");
 }
 console.log("ok: Tun Satánico");
+// --- Tun Iguana: el Tun Zombie al morir no invoca otro zombie (antes se encadenaban) ---
+{
+  const e = nueva(140); const s = e.turno, r = 1 - s;
+  e.j[s].tablero = []; e.j[r].tablero = []; e.globales = [];
+  preparar(e, s, ["tun_iguana"]);
+  M.aplicar(e, s, { t: "jugar", uid: "t0" }, db, 0);
+  e.j[s].tablero.push({ uid: "z1", id: "tun_zombie", tribu: "tun", ataque: 1, vida: 0, vidaMax: 1, ataques: 0 });
+  M.aplicar(e, s, { t: "fin" }, db, 0);
+  assert.ok(!e.j[s].tablero.some((m) => m.id === "tun_zombie"), "un zombie muerto no trae otro");
+  e.j[r].tablero = []; e.j[s].tablero.push({ uid: "tt", id: "tun", tribu: "tun", ataque: 1, vida: 0, vidaMax: 1, ataques: 0 });
+  const antes = e.j[r].vida;
+  M.aplicar(e, r, { t: "fin" }, db, 0);
+  assert.ok(e.j[r].vida < antes || e.j[s].tablero.some((m) => m.id === "tun_zombie"), "un Tun normal sí trae un zombie");
+}
+console.log("ok: Tun Zombie no se encadena");
