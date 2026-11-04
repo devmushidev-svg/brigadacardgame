@@ -924,6 +924,12 @@ async function procesar() {
       animando = true;
       try {
         if (V && V.fase === "jugando" && ev.length) await animar(ev, v, nuevos);
+        // terminó el mulligan: se dibuja la mesa y recién ahí sale lo de "al inicio de la partida" (Panamá)
+        else if (V && V.fase !== "jugando" && v.fase === "jugando" && ev.some((x) => x.e === "inicio_partida")) {
+          render(v);
+          await esperar(400);
+          await animar(ev.filter((x) => x.e === "inicio_partida"), v, nuevos);
+        }
         const antes = V;
         render(v);
         await despues(ev, v, antes, nuevos);
@@ -1125,6 +1131,21 @@ async function animarUno(e, ev, v, nuevos, yo) {
           if (sv) sv.textContent = +sv.textContent + e.vida;
           await esperar(300);
         }
+        break;
+      }
+      case "elegir": { // el rival descubre: se ven 3 cartas boca abajo y se queda con una
+        if (e.seat === yo || e.tipo !== "descubrir") break;
+        const caja = document.createElement("div");
+        caja.className = "rival-descubre";
+        caja.innerHTML = `<div class="rd-titulo">${esc(V.j[e.seat].nombre)} está descubriendo una carta…</div><div class="rd-cartas"><i></i><i></i><i></i></div>`;
+        document.body.append(caja);
+        Sonido.hechizo();
+        const elegida = caja.querySelectorAll("i")[Math.floor(Math.random() * 3)];
+        await esperar(1100);
+        elegida.classList.add("elegida");
+        await esperar(500);
+        caja.animate([{ opacity: 1 }, { opacity: 0 }], 250).onfinish = () => caja.remove();
+        await esperar(200);
         break;
       }
       case "repite": { // Coco Supremo: cada carta repetida aparece un momento
@@ -1356,7 +1377,7 @@ function potenciar(d, t) {
   return t.replace(/(\d+)(?= de daño)/g, (n) => `⟦${+n + p}⟧`).replace(/(reparte )(\d+)( más)/gi, (m, a, n, b) => `${a}⟦${+n + p}⟧${b}`);
 }
 const cartaMano = (c) => (DB[c.id] ? { ...DB[c.id], coste: c.coste ?? DB[c.id].coste, ataque: c.ataque ?? DB[c.id].ataque, vida: c.vida ?? DB[c.id].vida,
-  texto: potenciar(DB[c.id], DB[c.id].texto) + (c.cantidad != null ? ` (ahora: ${c.cantidad})` : "") + (c.veces != null ? ` (llevás ${c.veces})` : ""), contador: contadorMuertos(DB[c.id]) } : null);
+  texto: potenciar(DB[c.id], DB[c.id].texto) + (c.doble ? " Se lanza dos veces." : "") + (c.cantidad != null ? ` (ahora: ${c.cantidad})` : "") + (c.veces != null ? ` (llevás ${c.veces})` : ""), contador: contadorMuertos(DB[c.id]) } : null);
 // cartas que dependen de los Tun muertos llevan un contador en la carta
 function contadorMuertos(c) {
   const t = c.descuento?.por === "tribu_muertos" ? c.descuento.tribu : (c.efectos || []).find((e) => e.tipo === "invocar_por_muertos")?.tribu;

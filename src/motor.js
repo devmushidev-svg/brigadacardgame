@@ -238,6 +238,7 @@ function cumpleFiltro(c, f) {
   if (f?.genero && c.genero !== f.genero) return false;
   if (f?.tribu && c.tribu !== f.tribu) return false;
   if (f?.tipo && c.tipo !== f.tipo) return false;
+  if (f?.coste != null && c.coste !== f.coste) return false; // "descubre un hechizo de coste 3" (Midwest Emo)
   return true;
 }
 
@@ -623,11 +624,16 @@ function aplicarEfectos(estado, s, efectos, elegido, ev, db, fuente, ctx = {}) {
       }
       if (!tandas.length) continue;
       if (estado.pendiente) { // ya hay otra elección abierta: va una al azar
-        for (const ops of tandas) if (darCarta(estado, s, elegir(estado, ops), ev) && ef.rebaja) estado.j[s].mano[estado.j[s].mano.length - 1].rebaja = ef.rebaja;
+        for (const ops of tandas) if (darCarta(estado, s, elegir(estado, ops), ev)) {
+          const ult = estado.j[s].mano[estado.j[s].mano.length - 1];
+          if (ef.rebaja) ult.rebaja = ef.rebaja;
+          if (ef.doble) ult.doble = true;
+        }
         continue;
       }
       // "rebaja": la carta descubierta cuesta N menos (poder del héroe de hechizos)
-      estado.pendiente = { seat: s, tipo: "descubrir", opciones: tandas.shift(), siguientes: tandas, ...(ef.rebaja ? { rebaja: ef.rebaja } : {}) };
+      // "doble": el hechizo descubierto se lanza dos veces cuando lo jugás (Midwest Emo)
+      estado.pendiente = { seat: s, tipo: "descubrir", opciones: tandas.shift(), siguientes: tandas, ...(ef.rebaja ? { rebaja: ef.rebaja } : {}), ...(ef.doble ? { doble: true } : {}) };
       ev.push({ e: "elegir", seat: s, tipo: "descubrir" });
       continue;
     }
@@ -1132,6 +1138,7 @@ function resolverPendiente(estado, eleccion, ev, db) {
     if (darCarta(estado, pe.seat, id, ev)) {
       ev.push({ e: "descubierta", seat: pe.seat });
       if (pe.rebaja) { const mano = estado.j[pe.seat].mano; mano[mano.length - 1].rebaja = (mano[mano.length - 1].rebaja || 0) + pe.rebaja; }
+      if (pe.doble) { const mano = estado.j[pe.seat].mano; mano[mano.length - 1].doble = true; }
     }
     if (pe.siguientes?.length) { // "descubre dos": se abre la siguiente elección
       estado.pendiente = { seat: pe.seat, tipo: "descubrir", opciones: pe.siguientes.shift(), siguientes: pe.siguientes };
@@ -1278,7 +1285,8 @@ export function aplicar(estado, s, accion, db, ahora) {
       for (const eco of ecos) { eco.quedan--; if (eco.origen) ev.push({ e: "repite", seat: s, carta: eco.origen }); aplicarEfectos(estado, s, eco.efectos, null, ev, db, null); }
       p.ecos = (p.ecos || []).filter((x) => x.quedan > 0);
       // Unislop: por el resto de la partida tus Tareas se lanzan dos veces (una vez más por cada efecto así)
-      const veces = vecesTarea(estado, s, carta.etiquetas);
+      // un hechizo descubierto con Midwest Emo se lanza dos veces
+      const veces = vecesTarea(estado, s, carta.etiquetas) * (jugada.doble ? 2 : 1);
       for (let k = 0; k < veces && estado.fase === "jugando"; k++) {
         if (k) ev.push({ e: "repite", seat: s, carta: carta.id });
         aplicarEfectos(estado, s, carta.efectos, accion.objetivo, ev, db, null, { poderHechizo: poderHechizo(estado, s, db) });

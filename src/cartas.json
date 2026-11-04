@@ -561,7 +561,7 @@
    "id": "mascotas_tun",
    "nombre": "Mascotas de Tun",
    "tipo": "hechizo",
-   "coste": 1,
+   "coste": 2,
    "arte": "/arte/mascotas_tun.webp",
    "texto": "Roba 2 cartas.",
    "efectos": [
@@ -1635,12 +1635,12 @@
    "coste": 1,
    "clase": "tomis",
    "arte": "/arte/wey_emo.webp",
-   "texto": "Reparte 4 de daño entre los enemigos. Si eso mata a alguno, reparte 2 más.",
+   "texto": "Reparte 4 de daño entre los enemigos. Si eso mata a alguno, reparte 1 más.",
    "efectos": [
     {
      "tipo": "repartir",
      "cantidad": 4,
-     "siMuere": 2,
+     "siMuere": 1,
      "fx": "lagrima"
     }
    ],
@@ -1800,31 +1800,29 @@
    ],
    "arte": "/arte/audiophile.webp",
    "abarata_hechizos": 1,
-   "texto": "Tus hechizos cuestan 1 menos. Grito de batalla: robá una carta.",
-   "grito": [
-    {
-     "tipo": "robar",
-     "cantidad": 1
-    }
-   ]
+   "texto": "Tus hechizos cuestan 1 menos."
   },
   {
    "id": "midwest_emo",
    "nombre": "Midwest Emo",
-   "tipo": "hechizo",
-   "coste": 7,
+   "tipo": "esbirro",
+   "coste": 3,
    "clase": "tomis",
    "etiquetas": [
     "musica"
    ],
    "arte": "/arte/midwest_emo.webp",
-   "texto": "Vuelven a tu mano los 5 últimos hechizos que lanzaste. Cuestan 1 menos.",
-   "efectos": [
+   "texto": "Grito de batalla: descubre un hechizo de coste 3. Cuando lo juegues, se lanza dos veces.",
+   "ataque": 2,
+   "vida": 3,
+   "grito": [
     {
-     "tipo": "recuperar_hechizos",
-     "cantidad": 5,
-     "rebaja": 1,
-     "excepto": "midwest_emo"
+     "tipo": "descubrir",
+     "filtro": {
+      "tipo": "hechizo",
+      "coste": 3
+     },
+     "doble": true
     }
    ]
   },
@@ -1999,34 +1997,24 @@
   {
    "id": "slowcore",
    "nombre": "Slowcore",
-   "tipo": "hechizo",
+   "tipo": "esbirro",
    "coste": 4,
    "clase": "tomis",
    "etiquetas": [
     "musica"
    ],
    "arte": "/arte/slowcore.webp",
-   "texto": "Reparte 5 de daño entre los enemigos. Se repite al final de cada uno de tus turnos.",
-   "efectos": [
+   "texto": "Al final de tu turno, reparte 5 de daño entre los enemigos.",
+   "rareza": "legendaria",
+   "ataque": 3,
+   "vida": 3,
+   "fin_turno": [
     {
      "tipo": "repartir",
      "cantidad": 5,
      "fx": "caracol"
-    },
-    {
-     "tipo": "global",
-     "disparador": "fin_de_tu_turno",
-     "origen": "slowcore",
-     "efectos": [
-      {
-       "tipo": "repartir",
-       "cantidad": 5,
-       "fx": "caracol"
-      }
-     ]
     }
-   ],
-   "rareza": "legendaria"
+   ]
   },
   {
    "id": "noise",
@@ -2106,11 +2094,11 @@
     "musica"
    ],
    "arte": "/arte/shoegaze.webp",
-   "texto": "Lanza otra vez los 3 últimos hechizos que jugaste (con objetivos al azar).",
+   "texto": "Lanza otra vez los 2 últimos hechizos que jugaste (con objetivos al azar).",
    "efectos": [
     {
      "tipo": "repetir_hechizos",
-     "cantidad": 3,
+     "cantidad": 2,
      "excepto": "shoegaze"
     }
    ]

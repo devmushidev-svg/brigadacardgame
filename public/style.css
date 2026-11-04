@@ -556,3 +556,12 @@ img[src^="/arte/unislop-tareas/"] { filter: invert(1) drop-shadow(0 2px 3px #000
   .mano .carta:hover { transform: none; }
 }
 .carta .texto b.sube { color: #0f7a2a; font-size: 1.15em; text-shadow: 0 0 6px #6fff8a88; }
+/* ---------- el rival está descubriendo ---------- */
+.rival-descubre { position: fixed; inset: 0; z-index: 80; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 14px; background: #0008; pointer-events: none; }
+.rd-titulo { font: 700 clamp(16px, 4vw, 24px) var(--f-tit, serif); color: #ffe7a8; text-shadow: 0 2px 6px #000; }
+.rd-cartas { display: flex; gap: 14px; }
+.rd-cartas i { width: clamp(56px, 12vh, 90px); aspect-ratio: 5 / 7; border-radius: 8px; border: 3px solid #c9a34a; background: repeating-linear-gradient(45deg, #5a1d1d 0 8px, #6e2626 8px 16px);
+  box-shadow: 0 6px 14px #000a; animation: rd-flota 1s ease-in-out infinite alternate; }
+.rd-cartas i:nth-child(2) { animation-delay: .2s; } .rd-cartas i:nth-child(3) { animation-delay: .4s; }
+.rd-cartas i.elegida { transform: translateY(-24px) scale(1.15); box-shadow: 0 0 22px #ffd34f; animation: none; transition: transform .25s; }
+@keyframes rd-flota { to { transform: translateY(-8px); } }

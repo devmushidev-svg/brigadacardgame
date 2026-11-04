@@ -202,7 +202,7 @@ Diseño de Mario. Arquetipo: paladín molesto — llenar la mesa de Tun, buffear
 | Tun Brawl Stars | 2 | 2/3 | — (tribu Tun: cuenta para la misión y Tun Puto) | hecho |
 | Tun IA | 1 | 1/2 | Grito: descubre un Tun (tribu Tun) | hecho |
 | Mauro Sosa | 2 | 2/3 | Grito: si el rival tiene una mujer en la mano, te la robás | hecho — roba cartas con `"genero": "mujer"` (todavía no hay ninguna) |
-| Mascotas de Tun (hechizo) | 1 | — | Roba 2 cartas | hecho (ahora cuesta 1) |
+| Mascotas de Tun (hechizo) | 2 | — | Roba 2 cartas | hecho |
 | Nullscape (hechizo) | 4 | — | Todos los esbirros hacen parkour; solo uno al azar sobrevive | hecho (ahora es neutral) |
 | **Mario Multiplanet** (legendaria) | 7 | 5/6 | Escudo divino, robo de vida, acometida. Grito: invoca una copia de este esbirro | hecho — falta género; rareza propuesta |
 | **Rafael Fernando** (legendaria) | 6 | 3/7 | Colosal +99 (apéndices 2/3). Cuando muere un Rafael Fernando que no es el original, otro lo reemplaza (mientras queden de los 99) | hecho — falta imagen (🧍) y género; rareza propuesta |
@@ -335,3 +335,6 @@ Tras Tuna (cura 5, roba 2): Tun 85% vs Cruit, Tun 74% vs Tomis, Cruit 37% vs Tom
 **Animaciones de daño de Tomis:** cada hechizo que hace daño tiene su `fx` y tira algo propio desde tu héroe: Grindcore 🤘 (rápido, hace temblar la mesa), Wey Emo 😭, Breakcore ⚡ (con glitch), Post-rock 🎸, Música Andina 🦙, Slowcore 🐌 (lento; cuando se repite al final del turno también se muestra la carta), Noise 📢 (con estática), Deathconsciousness 🪱. Con poder de hechizo, el daño de tus hechizos en la mano se ve subido, en verde.
 
 Balance tras el nerf a Tomis (misión roba 2, músicos 2/3 sin hechizo, Mejor Música 1/2, Yamir roba 1) y Tun Iguana 8/8 (bot contra bot, 300 partidas): Tun 60% vs Cruit, Tun 55% vs Tomis, Tomis 56% vs Cruit.
+
+Cambios de Tomis (otra tanda): Wey Emo reparte 4 (+1 si mata), Audiophile ya no roba, **Slowcore** pasa a ser un esbirro legendario 4 maná 3/3 que al final de tu turno reparte 5 (si lo matan, se acaba), Shoegaze repite los 2 últimos hechizos, **Midwest Emo** pasa a ser un esbirro 3 maná 2/3 con Grito: descubre un hechizo de coste 3 que se lanza dos veces al jugarlo (`descubrir` con `filtro.coste` y `doble`). Mascotas de Tun cuesta 2. Panamá se anima después del mulligan; cuando el rival descubre se ven 3 cartas boca abajo.
+Balance (300 partidas): Tun 63% vs Cruit, Tun 70% vs Tomis, Cruit 50% vs Tomis.

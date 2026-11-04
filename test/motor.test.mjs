@@ -973,7 +973,7 @@ console.log("ok: Ethypostlife");
   const v2 = e2.j[r2].vida;
   M.aplicar(e2, s2, { t: "jugar", uid: "t0" }, db, 0);
   const muertos = 5 - e2.j[r2].tablero.length;
-  assert.equal(muertos + (v2 - e2.j[r2].vida), 6, "murió alguno: 4 + 2 de daño en total");
+  assert.equal(muertos + (v2 - e2.j[r2].vida), 5, "murió alguno: 4 + 1 de daño en total");
 }
 console.log("ok: Wey Emo Gritando");
 
@@ -1083,27 +1083,36 @@ console.log("ok: Contador de Scrobbles");
 }
 console.log("ok: Charts");
 
-// --- Audiophile: tus hechizos cuestan 1 menos; grito: roba una carta ---
+// --- Audiophile: tus hechizos cuestan 1 menos (ya no roba) ---
 {
   const e = nueva(123); const s = e.turno;
   e.j[s].tablero = [];
   preparar(e, s, ["audiophile", "fumando_porro"]);
   const n = e.j[s].mano.length;
   M.aplicar(e, s, { t: "jugar", uid: "t0" }, db, 0);
-  assert.equal(e.j[s].mano.length, n - 1 + 1, "robó una");
+  assert.equal(e.j[s].mano.length, n - 1, "ya no roba");
   assert.equal(M.costeCarta(e, s, e.j[s].mano.find((c) => c.id === "fumando_porro"), db), 2);
 }
 console.log("ok: Audiophile");
 
-// --- Midwest Emo: vuelven a tu mano tus 5 últimos hechizos, cuestan 1 menos ---
+// --- Midwest Emo: 3 maná 2/3, descubre un hechizo de coste 3 que se lanza dos veces ---
 {
-  const e = nueva(124); const s = e.turno;
-  e.j[s].tablero = [];
+  const e = nueva(124); const s = e.turno, r = 1 - s;
+  e.j[s].tablero = []; e.j[r].tablero = [];
   preparar(e, s, ["midwest_emo"]);
-  e.j[s].jugados = ["grindcore", "tun_brawl", "wey_emo", "breakcore", "fumando_porro", "mossad", "slowcore", "musica_andina"];
   M.aplicar(e, s, { t: "jugar", uid: "t0" }, db, 0);
-  assert.deepEqual(e.j[s].mano.map((c) => c.id), ["wey_emo", "breakcore", "fumando_porro", "slowcore", "musica_andina"], "los 5 últimos hechizos, sin esbirros ni sí mismo");
-  assert.ok(e.j[s].mano.every((c) => M.costeCarta(e, s, c, db) === Math.max(0, db[c.id].coste - 1)), "cuestan 1 menos");
+  assert.equal(e.j[s].tablero[0].id, "midwest_emo");
+  assert.equal(e.pendiente?.tipo, "descubrir");
+  assert.ok(e.pendiente.opciones.every((id) => db[id].tipo === "hechizo" && db[id].coste === 3), "solo hechizos de coste 3");
+  e.pendiente.opciones = ["breakcore", "breakcore", "breakcore"];
+  assert.ok(!M.aplicar(e, s, { t: "elegir", i: 0 }, db, 0).error);
+  const b = e.j[s].mano.find((c) => c.id === "breakcore");
+  assert.ok(b?.doble, "queda marcado");
+  e.j[s].mana = 10; e.j[s].tablero = [];
+  const vr = e.j[r].vida;
+  const res = M.aplicar(e, s, { t: "jugar", uid: b.uid }, db, 0);
+  assert.ok(!res.error, res.error);
+  assert.equal(vr - e.j[r].vida, 12, "se lanza dos veces: 2×3 + 2×3");
 }
 console.log("ok: Midwest Emo");
 
@@ -1175,20 +1184,21 @@ console.log("ok: Música Andina");
 }
 console.log("ok: Folklore");
 
-// --- Slowcore: reparte 5 ahora y al final de cada uno de tus turnos ---
+// --- Slowcore: esbirro 3/3, al final de tu turno reparte 5 (si lo matan, se acaba) ---
 {
   const e = nueva(129); const s = e.turno, r = 1 - s;
   e.j[s].tablero = []; e.j[r].tablero = [];
   preparar(e, s, ["slowcore"]);
   const vr = e.j[r].vida;
   M.aplicar(e, s, { t: "jugar", uid: "t0" }, db, 0);
-  assert.equal(vr - e.j[r].vida, 5);
+  assert.equal(vr - e.j[r].vida, 0, "al jugarlo no pega");
   M.aplicar(e, s, { t: "fin" }, db, 0);
-  assert.equal(vr - e.j[r].vida, 10, "al final de mi turno");
+  assert.equal(vr - e.j[r].vida, 5, "al final de mi turno");
   e.j[r].tablero = []; M.aplicar(e, r, { t: "fin" }, db, 0);
-  assert.equal(vr - e.j[r].vida, 10, "al final del turno del rival no");
+  assert.equal(vr - e.j[r].vida, 5, "al final del turno del rival no");
+  e.j[s].tablero = [];
   M.aplicar(e, s, { t: "fin" }, db, 0);
-  assert.equal(vr - e.j[r].vida, 15, "al final de mi siguiente turno sí");
+  assert.equal(vr - e.j[r].vida, 5, "muerto, ya no pega");
 }
 console.log("ok: Slowcore");
 
@@ -1218,7 +1228,7 @@ console.log("ok: Noise");
 }
 console.log("ok: Deathconsciousness");
 
-// --- Shoegaze: lanza otra vez tus 3 últimos hechizos ---
+// --- Shoegaze: lanza otra vez tus 2 últimos hechizos ---
 {
   const e = nueva(132); const s = e.turno, r = 1 - s;
   e.j[s].tablero = []; e.j[r].tablero = [];
@@ -1226,8 +1236,8 @@ console.log("ok: Deathconsciousness");
   e.j[s].jugados = ["grindcore", "wey_emo", "tun_brawl", "breakcore", "wey_emo"];
   const vr = e.j[r].vida;
   const res = M.aplicar(e, s, { t: "jugar", uid: "t0" }, db, 0);
-  assert.deepEqual(res.ev.filter((x) => x.e === "repite").map((x) => x.carta), ["wey_emo", "breakcore", "wey_emo"]);
-  assert.equal(vr - e.j[r].vida, 4 + 6 + 4, "sin esbirros: todo a la cara");
+  assert.deepEqual(res.ev.filter((x) => x.e === "repite").map((x) => x.carta), ["breakcore", "wey_emo"]);
+  assert.equal(vr - e.j[r].vida, 6 + 4, "sin esbirros: todo a la cara");
 }
 console.log("ok: Shoegaze");
 
