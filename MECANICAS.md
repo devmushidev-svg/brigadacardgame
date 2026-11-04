@@ -292,7 +292,7 @@ Con 50 de vida y mazos de 40, bot contra bot: Cruit gana ~45% con el poder del C
 
 ## Clase Tomis (clase de hechizos, inspirada en el Mago)
 
-Habilitado: se puede elegir en Mis mazos, sale en "Al azar" y tiene mazo precargado de 40 (sus 15 cartas de clase y neutrales). Un héroe nuevo se puede marcar `"enConstruccion": true` para que aparezca en la colección sin poder jugarse. Marco rojo. Retrato: `public/arte/heroe_tomis.webp`. Poder: **Scrobbling (2): descubre un hechizo de tu clase o neutral; cuesta 1 menos** (imagen: `public/arte/poder_tomis.webp`) (`{ "tipo": "descubrir", "filtro": { "tipo": "hechizo" }, "deMiClase": true, "rebaja": 1 }`). El héroe no se agrega hasta tener cartas de clase, para que no salga en "Al azar" con un mazo vacío.
+Habilitado: se puede elegir en Mis mazos, sale en "Al azar" y tiene mazo precargado de 40 (armado por Mario: sus cartas de clase más Mascotas de Tun ×2, Doxeo y Cruit Breakdown). Un héroe nuevo se puede marcar `"enConstruccion": true` para que aparezca en la colección sin poder jugarse. Marco rojo. Retrato: `public/arte/heroe_tomis.webp`. Poder: **Scrobbling (2): descubre un hechizo de tu clase o neutral; cuesta 1 menos** (imagen: `public/arte/poder_tomis.webp`) (`{ "tipo": "descubrir", "filtro": { "tipo": "hechizo" }, "deMiClase": true, "rebaja": 1 }`). El héroe no se agrega hasta tener cartas de clase, para que no salga en "Al azar" con un mazo vacío.
 
 | Carta | Coste | Stats | Efecto | Estado |
 |---|---|---|---|---|
