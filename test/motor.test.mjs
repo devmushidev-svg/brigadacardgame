@@ -955,3 +955,15 @@ console.log("ok: Ethypostlife");
   assert.equal(muertos + (v2 - e2.j[r2].vida), 8, "murió alguno: 5 + 3 de daño en total");
 }
 console.log("ok: Wey Emo Gritando");
+
+// --- Mossad Strongest Agent: cada vez que lanzás un hechizo, robás una carta ---
+{
+  const e = nueva(118); const s = e.turno;
+  e.j[s].tablero = [];
+  preparar(e, s, ["mossad", "grindcore"]);
+  M.aplicar(e, s, { t: "jugar", uid: "t0" }, db, 0);
+  const n = e.j[s].mano.length;
+  M.aplicar(e, s, { t: "jugar", uid: "t1", objetivo: "h" + (1 - s) }, db, 0);
+  assert.equal(e.j[s].mano.length, n - 1 + 1, "lanzó un hechizo y robó una");
+}
+console.log("ok: Mossad Strongest Agent");

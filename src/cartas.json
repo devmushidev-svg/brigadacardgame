@@ -1575,6 +1575,23 @@
      "siMuere": 3
     }
    ]
+  },
+  {
+   "id": "mossad",
+   "nombre": "Mossad Strongest Agent",
+   "tipo": "esbirro",
+   "coste": 4,
+   "ataque": 1,
+   "vida": 8,
+   "clase": "tomis",
+   "arte": "/arte/mossad.webp",
+   "texto": "Cada vez que lanzás un hechizo, robás una carta.",
+   "al_lanzar_hechizo": [
+    {
+     "tipo": "robar",
+     "cantidad": 1
+    }
+   ]
   }
  ],
  "heroes": [

@@ -92,6 +92,7 @@ En el texto de las cartas, las palabras clave salen en **negrita** y al ver la c
 | `cuando_ataca_aliado` | `{ "tribu": "tun", "ataque": 1, "vida": 1 }`: cada vez que uno de tus esbirros de esa tribu ataca, gana esos stats antes del golpe |
 | `al_robarse` | (en la carta) se lanza sola cuando la robás: no va a la mano y robás otra (Caca, como las plagas del Rey Exánime) |
 | `al_recibir_dano` | cada vez que este esbirro recibe daño (aunque muera por ese golpe) |
+| `al_lanzar_hechizo` | cada vez que lanzás un hechizo, mientras este esbirro esté en tu mesa (Mossad Strongest Agent) |
 | `al_atacar` | cada vez que este esbirro ataca, antes del golpe (Tun Astrónomo) |
 | `cuando_muere` | `{ "tribu": "tun", "efectos": [...] }`: cada vez que muere un esbirro de esa tribu (de cualquier lado) |
 | efecto `global` | por el resto de la partida, aunque la carta muera: `al_robar` (Panamá, para quien roba) o `muere_tribu` con `tribu` (cada vez que muere uno de TUS esbirros de esa tribu: Tun Iguana) |
@@ -297,6 +298,7 @@ Está en `heroes` con `"enConstruccion": true`: aparece en la colección pero no
 | Fumando Porro (hechizo) | 3 | — | Invoca un Homero 5/5 (ficha). Tus próximos 2 hechizos también invocan un Homero (se ve en la placa) | hecho |
 | **Ethypostlife** (legendaria) | 3 | 2/3 | Grito: por el resto de la partida, cada hechizo tuyo invoca un esbirro al azar de su mismo coste (si no hay, del más cercano por debajo; usa el coste original del hechizo) | hecho |
 | Wey Emo Gritando (hechizo) | 1 | — | Reparte 5 de daño al azar entre los enemigos; si muere alguno, reparte 3 más (una vez) | hecho |
+| Mossad Strongest Agent | 4 | 1/8 | Cada vez que lanzás un hechizo, robás una carta | hecho — falta género |
 
 **Poder de hechizo** (`poder_hechizo: N` en un esbirro): mientras esté en tu mesa, tus hechizos que hacen daño (`dano`, `repartir`, `robar_vida`) pegan N más.
 

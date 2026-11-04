@@ -1104,6 +1104,13 @@ export function aplicar(estado, s, accion, db, ahora) {
       ev.push({ e: "mision", seat: s, carta: carta.id });
     } else if (carta.tipo === "hechizo") {
       ev.push({ e: "hechizo", seat: s, carta: carta.id, objetivo: accion.objetivo || null });
+      // "cada vez que lanzás un hechizo" en tus esbirros (Mossad Strongest Agent)
+      for (const m of [...p.tablero]) {
+        const efs = efectosDe(m, "al_lanzar_hechizo", db);
+        if (!efs.length || m.vida <= 0 || estado.fase !== "jugando") continue;
+        ev.push({ e: "dispara", uid: m.uid, por: "hechizo" });
+        aplicarEfectos(estado, s, efs, null, ev, db, m.uid);
+      }
       // Ethypostlife: por el resto de la partida, cada hechizo tuyo invoca un esbirro al azar de su mismo coste
       // (si no hay ninguno de ese coste, del coste más cercano por debajo)
       for (const g of estado.globales.filter((x) => x.disparador === "hechizo_invoca" && x.seat === s)) {
