@@ -287,4 +287,10 @@ Con 50 de vida y mazos de 40, bot contra bot: Cruit gana ~45% con el poder del C
 
 ## Próximo héroe: Tomis (clase de hechizos, inspirada en el Mago)
 
-Pendiente: cartas de clase. Retrato: `public/arte/heroe_tomis.webp`. Poder: **Scrobbling (2): descubre un hechizo de tu clase o neutral; cuesta 1 menos** (imagen: `public/arte/poder_tomis.webp`) (`{ "tipo": "descubrir", "filtro": { "tipo": "hechizo" }, "deMiClase": true, "rebaja": 1 }`). El héroe no se agrega hasta tener cartas de clase, para que no salga en "Al azar" con un mazo vacío.
+Está en `heroes` con `"enConstruccion": true`: aparece en la colección pero no sale en "Al azar" ni se puede elegir para armar mazos. Al tener suficientes cartas, sacar esa marca y darle `mazoMeta`. Marco rojo. Retrato: `public/arte/heroe_tomis.webp`. Poder: **Scrobbling (2): descubre un hechizo de tu clase o neutral; cuesta 1 menos** (imagen: `public/arte/poder_tomis.webp`) (`{ "tipo": "descubrir", "filtro": { "tipo": "hechizo" }, "deMiClase": true, "rebaja": 1 }`). El héroe no se agrega hasta tener cartas de clase, para que no salga en "Al azar" con un mazo vacío.
+
+| Carta | Coste | Stats | Efecto | Estado |
+|---|---|---|---|---|
+| La Mejor Música que Jamás Escucharás | 2 | 1/5 | Poder de hechizo +1 | hecho |
+
+**Poder de hechizo** (`poder_hechizo: N` en un esbirro): mientras esté en tu mesa, tus hechizos que hacen daño (`dano`, `repartir`, `robar_vida`) pegan N más.

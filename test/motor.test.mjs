@@ -551,7 +551,7 @@ for (let g = 0; g < 2000; g++) {
 console.log(`ok: mecanicas + ${terminadas} partidas al azar, ${(turnosTot / terminadas).toFixed(1)} turnos promedio (max ${maxTurnos}), A/B/empate ${ganados.join("/")}, misiones completadas ${misiones}`);
 
 // --- mazos meta: válidos y se usan cuando no hay mazo armado ---
-for (const h of Object.values(heroes)) {
+for (const h of Object.values(heroes).filter((x) => !x.enConstruccion)) {
   assert.ok(M.validarMazo(db, heroes, { heroe: h.id, cartas: h.mazoMeta }), `mazo meta de ${h.id} valido`);
   const e = M.crearPartida(db, 9); e.j[0].nombre = "A"; e.j[1].nombre = "B";
   e.j[0].heroe = h.id;
@@ -864,3 +864,19 @@ console.log("ok: Mario, Rafael y El Tipo de la Foto");
   assert.equal(M.costeCarta(e, s, c, db), Math.max(0, db[c.id].coste - 1), "cuesta 1 menos");
 }
 console.log("ok: descubrir hechizo con descuento");
+
+// --- Tomis (en construcción): no sale al azar; poder de hechizo +1 ---
+{
+  for (let k = 0; k < 30; k++) {
+    const e = M.crearPartida(db, 200 + k); e.j[0].nombre = "A"; e.j[1].nombre = "B";
+    M.empezar(e, db, 0, heroes, false);
+    assert.ok(e.j.every((p) => p.heroe !== "tomis"), "un héroe en construcción no sale al azar");
+  }
+  const e = nueva(111); const s = e.turno, r = 1 - s;
+  e.j[s].tablero = []; e.j[r].tablero = [{ uid: "rv", id: "x", tribu: null, ataque: 1, vida: 9, vidaMax: 9, ataques: 0 }];
+  preparar(e, s, ["mejor_musica", "tunita"]);
+  M.aplicar(e, s, { t: "jugar", uid: "t0" }, db, 0);
+  M.aplicar(e, s, { t: "jugar", uid: "t1", objetivo: "rv" }, db, 0);
+  assert.equal(e.j[r].tablero[0].vida, 9 - 1 - 1, "Tunita hace 1 + 1 de poder de hechizo");
+}
+console.log("ok: Tomis y poder de hechizo");

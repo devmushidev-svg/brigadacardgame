@@ -220,6 +220,7 @@ const PALABRAS = [
   { n: "No puede atacar", re: "no puede atacar", clave: "no_ataca", d: "Este esbirro nunca ataca." },
   { n: "Descubre", re: "descubre|descubrir", d: "Elegís una de tres cartas al azar y va a tu mano." },
   { n: "Robar vida", re: "roban? (?:\\+?\\d+ )?de vida", d: "Hace ese daño y lo suma a la vida de tu héroe (puede pasar de tu vida máxima)." },
+  { n: "Poder de hechizo", re: "poder de hechizo(?: \\+\\d+)?", d: "Mientras este esbirro esté en tu mesa, tus hechizos que hacen daño pegan esa cantidad más." },
   { n: "Robo de vida", re: "robo de vida", clave: "robo_vida", d: "El daño que hace este esbirro al pelear se suma a la vida de tu héroe." },
   { n: "Colosal", re: "colosal(?: \\+\\d+)?", d: "Entra con apéndices (esbirros extra) a sus costados. El número dice cuántos." },
   { n: "Arma", re: "arma", d: "Se le equipa a tu héroe: puede atacar una vez por turno con el ataque del arma. Cada ataque gasta un uso; si ataca a un esbirro, ese esbirro le pega de vuelta a tu héroe." },
@@ -254,7 +255,7 @@ function cartaHTML(c, { uid = "", clase = "" } = {}) {
   return `<div class="carta ${esH ? "hechizo" : ""} ${c.tipo === "mision" ? "mision" : ""} ${c.rareza === "legendaria" ? "legendaria" : ""} ${clase}" ${uid ? `data-uid="${uid}"` : ""} data-carta="${esc(c.id)}"${marco ? ` style="--marco:${esc(marco)}"` : ""}>
     <div class="arte" style="--fondo:${colorDe(c.arquetipo || c.id)}">${artHTML(c.arte)}</div>
     ${c.contador != null ? `<div class="contador-carta" title="Tun muertos esta partida">☠ ${c.contador}</div>` : ""}
-    <div class="titulo ${((l) => (l > 19 ? "l4" : l > 15 ? "l3" : l > 12 ? "l2" : ""))((c.nombre || "").length)}">${esc(c.nombre)}</div>
+    <div class="titulo ${((l) => (l > 26 ? "l5" : l > 19 ? "l4" : l > 15 ? "l3" : l > 12 ? "l2" : ""))((c.nombre || "").length)}">${esc(c.nombre)}</div>
     <div class="texto ${((l) => (l > 115 ? "t4" : l > 85 ? "t3" : l > 50 ? "t2" : ""))((c.texto || "").length)}"><span>${textoHTML(c.texto || "")}</span></div>
     ${etiqueta ? `<div class="arq">${esc(etiqueta)}</div>` : ""}
     <div class="stat mana ${DB[c.id] && c.coste < DB[c.id].coste ? "rebajado" : ""}">${c.coste}</div>
@@ -623,7 +624,7 @@ function pantallaMazos() {
 }
 
 function elegirHeroe() {
-  const hs = Object.values(HEROES);
+  const hs = Object.values(HEROES).filter((h) => !h.enConstruccion);
   if (hs.length === 1) return editorMazo({ id: "m" + Date.now(), nombre: "Mazo de " + hs[0].nombre, heroe: hs[0].id, cartas: [] });
   app.innerHTML = `<div class="coleccion"><h2>Elegí un héroe</h2><div class="lista-heroes">${hs.map((h) => `<button class="heroe-op" data-h="${esc(h.id)}">
     <div class="heroe" style="--esb:110px;--fondo:${colorDe(h.id)}"><span class="heroe-arte">${artHTML(h.arte)}</span></div><b>${esc(h.nombre)}</b></button>`).join("")}</div>
@@ -698,7 +699,7 @@ function editorMazo(mazo) {
 // colección filtrada por clase, como Hearthstone: una pestaña por héroe, neutrales y fichas
 function pantallaColeccion(filtro = leerLS("filtroColeccion", "todas")) {
   const orden = (a, b) => a.coste - b.coste || a.nombre.localeCompare(b.nombre);
-  const grupos = [...Object.values(HEROES).map((h) => ({ k: h.id, t: h.nombre, arte: h.arte, cartas: Object.values(DB).filter((c) => !c.token && c.clase === h.id) })),
+  const grupos = [...Object.values(HEROES).map((h) => ({ k: h.id, t: h.nombre + (h.enConstruccion ? " (en construcción)" : ""), arte: h.arte, cartas: Object.values(DB).filter((c) => !c.token && c.clase === h.id) })),
     { k: "neutral", t: "Neutrales", cartas: Object.values(DB).filter((c) => !c.token && !c.clase) },
     { k: "fichas", t: "Fichas", cartas: Object.values(DB).filter((c) => c.token && c.id !== "moneda") }];
   grupos.forEach((g) => g.cartas.sort(orden));

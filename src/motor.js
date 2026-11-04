@@ -70,7 +70,7 @@ const maxCopias = (c) => (c.rareza === "legendaria" ? 1 : CONFIG.COPIAS_MAX);
 export function validarMazo(db, heroes, mazo) {
   if (!mazo || typeof mazo !== "object" || !Array.isArray(mazo.cartas)) return null;
   const h = heroes[mazo.heroe];
-  if (!h || mazo.cartas.length !== CONFIG.TAM_MAZO) return null;
+  if (!h || h.enConstruccion || mazo.cartas.length !== CONFIG.TAM_MAZO) return null;
   const copias = {};
   for (const id of mazo.cartas) {
     const c = db[id];
@@ -139,7 +139,7 @@ export function crearPartida(db, semilla) {
 export function empezar(estado, db, ahora, heroes = {}, mulligan = true) {
   const ev = [];
   estado.fase = "jugando";
-  const lista = Object.values(heroes);
+  const lista = Object.values(heroes).filter((h) => !h.enConstruccion); // un héroe en construcción no sale al azar
   for (const p of estado.j) {
     const h = heroes[p.heroe] || (lista.length ? elegir(estado, lista) : null); // sin mazo elegido: héroe al azar
     p.heroe = h ? h.id : null;
@@ -503,9 +503,16 @@ export function cantidadDe(estado, s, ef) {
   return n;
 }
 
+// poder de hechizo: lo que suman tus esbirros con "poder_hechizo" al daño de tus hechizos
+function poderHechizo(estado, s, db) {
+  return estado.j[s].tablero.filter((m) => m.vida > 0).reduce((t, m) => t + cartasDelEsbirro(m, db).reduce((u, c) => u + (c.poder_hechizo || 0), 0), 0);
+}
+
 function aplicarEfectos(estado, s, efectos, elegido, ev, db, fuente, ctx = {}) {
   for (const ef of efectos || []) {
-    const n = cantidadDe(estado, s, ef);
+    let n = cantidadDe(estado, s, ef);
+    // los hechizos que hacen daño pegan más con poder de hechizo
+    if (ctx.poderHechizo && ["dano", "repartir", "robar_vida"].includes(ef.tipo) && typeof n === "number") n += ctx.poderHechizo;
     if (ef.tipo === "robar") { for (let k = 0; k < n; k++) robar(estado, s, ev, db); continue; }
     if (ef.tipo === "mana") { const p = estado.j[s]; p.mana = Math.min(CONFIG.MAX_MANA, p.mana + n); ev.push({ e: "mana", seat: s, n }); continue; }
     if (ef.tipo === "robar_mano") {
@@ -1088,7 +1095,7 @@ export function aplicar(estado, s, accion, db, ahora) {
       const veces = vecesTarea(estado, s, carta.etiquetas);
       for (let k = 0; k < veces && estado.fase === "jugando"; k++) {
         if (k) ev.push({ e: "repite", seat: s, carta: carta.id });
-        aplicarEfectos(estado, s, carta.efectos, accion.objetivo, ev, db, null);
+        aplicarEfectos(estado, s, carta.efectos, accion.objetivo, ev, db, null, { poderHechizo: poderHechizo(estado, s, db) });
         resolverMuertes(estado, ev, db);
       }
     } else {

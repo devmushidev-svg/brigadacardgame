@@ -1448,6 +1448,18 @@
      "cantidad": 2
     }
    ]
+  },
+  {
+   "id": "mejor_musica",
+   "nombre": "La Mejor Música que Jamás Escucharás",
+   "tipo": "esbirro",
+   "coste": 2,
+   "ataque": 1,
+   "vida": 5,
+   "clase": "tomis",
+   "arte": "/arte/mejor_musica.webp",
+   "poder_hechizo": 1,
+   "texto": "Poder de hechizo +1."
   }
  ],
  "heroes": [
@@ -1581,6 +1593,30 @@
     "cruit_rage",
     "cruit_rage"
    ]
+  },
+  {
+   "id": "tomis",
+   "nombre": "Tomis",
+   "arte": "/arte/heroe_tomis.webp",
+   "clase": "tomis",
+   "enConstruccion": true,
+   "marco": "linear-gradient(160deg, #e2505a, #a3121a 40%, #4a0710 80%, #a3121a)",
+   "poder": {
+    "nombre": "Scrobbling",
+    "coste": 2,
+    "arte": "/arte/poder_tomis.webp",
+    "texto": "Descubre un hechizo de tu clase o neutral. Cuesta 1 menos.",
+    "efectos": [
+     {
+      "tipo": "descubrir",
+      "filtro": {
+       "tipo": "hechizo"
+      },
+      "deMiClase": true,
+      "rebaja": 1
+     }
+    ]
+   }
   }
  ]
 }

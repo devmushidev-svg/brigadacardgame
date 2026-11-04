@@ -142,6 +142,7 @@ img[src^="/arte/unislop-tareas/"] { filter: invert(1) drop-shadow(0 2px 3px #000
 .carta .titulo.l2 { font-size: calc(var(--carta-w) * .082); }
 .carta .titulo.l3 { font-size: calc(var(--carta-w) * .07); }
 .carta .titulo.l4 { font-size: calc(var(--carta-w) * .06); }
+.carta .titulo.l5 { font-size: calc(var(--carta-w) * .058); white-space: normal; line-height: 1.05; padding: 3% 9% 4%; } /* nombres muy largos: en dos renglones */
 .carta .texto.t2 { font-size: calc(var(--carta-w) * .072); line-height: 1.1; }
 .carta .texto.t3 { font-size: calc(var(--carta-w) * .063); line-height: 1.08; }
 .carta .texto.t4 { font-size: calc(var(--carta-w) * .056); line-height: 1.05; }
