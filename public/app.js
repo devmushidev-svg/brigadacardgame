@@ -635,9 +635,14 @@ function verMazo(mazo) {
   app.innerHTML = `<div class="coleccion"><h2>${esc(mazo.nombre)}</h2>
     <div class="ayuda" style="text-align:center;margin-top:-6px">${esc(h?.nombre || "?")} · ${mazo.cartas.length} cartas${mazo.fijo ? " · precargado" : ""}</div>
     <div class="rejilla">${cartas.map((c) => `<div class="ed-op" data-id="${esc(c.id)}">${cartaHTML(c)}${n(c.id) > 1 ? `<span class="ed-n">×${n(c.id)}</span>` : ""}</div>`).join("")}</div>
-    <div class="botones-mazos"><button class="boton sec" id="volver-mazos">Volver</button></div></div>`;
+    <div class="botones-mazos"><button class="boton" id="copiar-lista">Copiar lista</button><button class="boton sec" id="volver-mazos">Volver</button></div></div>`;
   $$(".rejilla .carta").forEach((el) => (el.onclick = () => zoom(el.dataset.carta)));
   $("#volver-mazos").onclick = pantallaMazos;
+  // la lista del mazo como texto (para pasarla y que se use como mazo precargado)
+  $("#copiar-lista").onclick = async () => {
+    const txt = `${mazo.heroe}: ${JSON.stringify(mazo.cartas)}`;
+    try { await navigator.clipboard.writeText(txt); toast("lista copiada"); } catch { prompt("Copiá la lista:", txt); }
+  };
 }
 
 function elegirHeroe() {
