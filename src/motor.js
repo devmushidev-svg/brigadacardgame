@@ -615,6 +615,12 @@ function aplicarEfectos(estado, s, efectos, elegido, ev, db, fuente, ctx = {}) {
       if (mano.length) { elegir(estado, mano).escondido = { carta: ef.carta, seat: s }; ev.push({ e: "esconde", seat: s, carta: ef.carta }); }
       continue;
     }
+    if (ef.tipo === "revivir") {
+      // Midwest Emo: revive tus N últimos esbirros que murieron en la partida (vuelven como recién invocados, sin grito)
+      const ids = (estado.j[s].muertos || []).slice(-n).reverse();
+      for (const id of ids) if (!invocar(estado, s, id, ev, db)) break;
+      continue;
+    }
     if (ef.tipo === "robar_rebajadas") {
       // robás N cartas y cada una cuesta `rebaja` menos
       const mano = estado.j[s].mano, antes = new Set(mano.map((c) => c.uid));
@@ -933,6 +939,7 @@ function resolverMuertes(estado, ev, db) {
     if (!muertos.length) { if (!estado.golpes.length) break; continue; }
     for (const { s, m, pos } of muertos) {
       ev.push({ e: "muere", uid: m.uid, seat: s });
+      if (m.id !== "putovc") (estado.j[s].muertos ||= []).push(m.id); // para revivirlos (Midwest Emo)
       if (m.tribu) (estado.muertosTribu ||= {})[m.tribu] = (estado.muertosTribu[m.tribu] || 0) + 1;
       const c = db[m.id];
       const alientos = efectosDe(m, "aliento", db);

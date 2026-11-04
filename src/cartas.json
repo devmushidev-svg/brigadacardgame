@@ -1752,6 +1752,24 @@
      "cantidad": 1
     }
    ]
+  },
+  {
+   "id": "midwest_emo",
+   "nombre": "Midwest Emo",
+   "tipo": "hechizo",
+   "coste": 4,
+   "clase": "tomis",
+   "etiquetas": [
+    "musica"
+   ],
+   "arte": "/arte/midwest_emo.webp",
+   "texto": "Revive tus 3 últimos esbirros que murieron esta partida.",
+   "efectos": [
+    {
+     "tipo": "revivir",
+     "cantidad": 3
+    }
+   ]
   }
  ],
  "heroes": [

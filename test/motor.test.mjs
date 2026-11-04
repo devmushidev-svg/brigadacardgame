@@ -1072,3 +1072,16 @@ console.log("ok: Charts");
   assert.equal(M.costeCarta(e, s, e.j[s].mano.find((c) => c.id === "fumando_porro"), db), 2);
 }
 console.log("ok: Audiophile");
+
+// --- Midwest Emo: revive tus 3 últimos esbirros muertos ---
+{
+  const e = nueva(124); const s = e.turno;
+  e.j[s].tablero = ["mossad", "tun_brawl", "mejor_musica", "yamir"].map((id, k) => ({ uid: "x" + k, id, tribu: null, ataque: 1, vida: 0, vidaMax: 1, ataques: 0 }));
+  preparar(e, s, ["midwest_emo"]);
+  M.aplicar(e, s, { t: "fin" }, db, 0); // mueren los cuatro
+  e.turno = s; e.j[s].mana = 10;
+  M.aplicar(e, s, { t: "jugar", uid: "t0" }, db, 0);
+  assert.deepEqual(e.j[s].tablero.map((m) => m.id).sort(), ["mejor_musica", "tun_brawl", "yamir"].sort(), "los 3 últimos en morir");
+  assert.ok(e.j[s].tablero.every((m) => m.vida === db[m.id].vida), "vuelven enteros");
+}
+console.log("ok: Midwest Emo");
