@@ -599,7 +599,7 @@
    "ataque": 5,
    "vida": 6,
    "rareza": "legendaria",
-   "arte": "🪐",
+   "arte": "/arte/mario_multiplanet.webp",
    "claves": [
     "escudo",
     "robo_vida",
