@@ -1853,11 +1853,11 @@
     "musica"
    ],
    "arte": "/arte/folklore.webp",
-   "texto": "Invoca un músico 2/2 con poder de hechizo +1 por cada 5 scrobbles que tengas (hasta 4).",
+   "texto": "Invoca un músico 2/2 por cada 3 scrobbles que tengas (hasta 4). Cada uno tiene poder de hechizo +1 y te da un hechizo al azar.",
    "efectos": [
     {
      "tipo": "invocar_por_scrobbles",
-     "cada": 5,
+     "cada": 3,
      "cartas": [
       "violeta_parra",
       "victor_jara",
@@ -1882,7 +1882,13 @@
    ],
    "poder_hechizo": 1,
    "arte": "/arte/violeta_parra.webp",
-   "texto": "Poder de hechizo +1."
+   "texto": "Poder de hechizo +1. Cuando se invoca, obtenés un hechizo al azar.",
+   "al_invocar": [
+    {
+     "tipo": "hechizo_azar_mano",
+     "cantidad": 1
+    }
+   ]
   },
   {
    "id": "victor_jara",
@@ -1899,7 +1905,13 @@
    ],
    "poder_hechizo": 1,
    "arte": "/arte/victor_jara.webp",
-   "texto": "Poder de hechizo +1."
+   "texto": "Poder de hechizo +1. Cuando se invoca, obtenés un hechizo al azar.",
+   "al_invocar": [
+    {
+     "tipo": "hechizo_azar_mano",
+     "cantidad": 1
+    }
+   ]
   },
   {
    "id": "eduardo_mateo",
@@ -1916,7 +1928,13 @@
    ],
    "poder_hechizo": 1,
    "arte": "/arte/eduardo_mateo.webp",
-   "texto": "Poder de hechizo +1."
+   "texto": "Poder de hechizo +1. Cuando se invoca, obtenés un hechizo al azar.",
+   "al_invocar": [
+    {
+     "tipo": "hechizo_azar_mano",
+     "cantidad": 1
+    }
+   ]
   },
   {
    "id": "chico_buarque",
@@ -1933,7 +1951,13 @@
    ],
    "poder_hechizo": 1,
    "arte": "/arte/chico_buarque.webp",
-   "texto": "Poder de hechizo +1."
+   "texto": "Poder de hechizo +1. Cuando se invoca, obtenés un hechizo al azar.",
+   "al_invocar": [
+    {
+     "tipo": "hechizo_azar_mano",
+     "cantidad": 1
+    }
+   ]
   },
   {
    "id": "slowcore",

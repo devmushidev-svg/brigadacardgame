@@ -1127,21 +1127,29 @@ console.log("ok: Post-rock");
 }
 console.log("ok: Música Andina");
 
-// --- Folklore: un músico por cada 5 scrobbles (hasta 4), cada uno con poder de hechizo +1 ---
+// --- Folklore: un músico por cada 3 scrobbles (hasta 4); cada uno da un hechizo al azar al invocarse ---
 {
   const e = nueva(128); const s = e.turno, r = 1 - s;
   e.j[s].tablero = []; e.j[r].tablero = [];
   preparar(e, s, ["folklore", "folklore"]);
-  e.j[s].scrobbles = 11;
+  e.j[s].scrobbles = 5;
   M.aplicar(e, s, { t: "jugar", uid: "t0" }, db, 0);
-  assert.deepEqual(e.j[s].tablero.map((m) => m.id), ["violeta_parra", "victor_jara"], "11 scrobbles (+1 de Folklore = 12): dos músicos");
-  e.j[s].tablero = []; e.j[s].scrobbles = 40; e.j[s].mana = 10;
+  assert.deepEqual(e.j[s].tablero.map((m) => m.id), ["violeta_parra", "victor_jara"], "5 (+1 = 6) scrobbles: dos músicos");
+  assert.equal(e.j[s].mano.filter((c) => c.uid !== "t1").length, 2, "cada músico dio un hechizo");
+  assert.ok(e.j[s].mano.filter((c) => c.uid !== "t1").every((c) => db[c.id].tipo === "hechizo"));
+  e.j[s].tablero = []; e.j[s].scrobbles = 40; e.j[s].mana = 10; e.j[s].mano = e.j[s].mano.filter((c) => c.uid === "t1");
   M.aplicar(e, s, { t: "jugar", uid: "t1" }, db, 0);
-  assert.deepEqual(e.j[s].tablero.map((m) => m.id), ["violeta_parra", "victor_jara", "eduardo_mateo", "chico_buarque"], "hasta 4");
+  assert.equal(e.j[s].tablero.length, 4, "hasta 4");
   e.j[s].mano = [{ uid: "w", id: "wey_emo" }]; e.j[s].mana = 10;
   const vr = e.j[r].vida;
   M.aplicar(e, s, { t: "jugar", uid: "w" }, db, 0);
   assert.equal(vr - e.j[r].vida, 5 + 4, "con 4 músicos: +4 de poder de hechizo");
+}
+// --- pool de hechizos al azar: tareas de Cruit sí (menos Laboratorio), fichas raras no ---
+{
+  const ids = M.hechizosAzar(db).map((c) => c.id);
+  assert.ok(ids.includes("t_tesis") && ids.includes("t_ensayo") && ids.includes("grindcore"));
+  assert.ok(!ids.includes("t_laboratorio") && !ids.includes("moneda") && !ids.includes("caca") && !ids.includes("vc_op_stats"));
 }
 console.log("ok: Folklore");
 

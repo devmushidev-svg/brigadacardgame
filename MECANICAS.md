@@ -93,6 +93,7 @@ En el texto de las cartas, las palabras clave salen en **negrita** y al ver la c
 | `al_robarse` | (en la carta) se lanza sola cuando la robás: no va a la mano y robás otra (Caca, como las plagas del Rey Exánime) |
 | `al_recibir_dano` | cada vez que este esbirro recibe daño (aunque muera por ese golpe) |
 | `al_lanzar_hechizo` | cada vez que lanzás un hechizo, mientras este esbirro esté en tu mesa (Mossad Strongest Agent) |
+| `al_invocar` | cada vez que el esbirro entra a la mesa, se juegue de la mano o lo invoque otra carta (los músicos de Folklore) |
 | `al_atacar` | cada vez que este esbirro ataca, antes del golpe (Tun Astrónomo) |
 | `cuando_muere` | `{ "tribu": "tun", "efectos": [...] }`: cada vez que muere un esbirro de esa tribu (de cualquier lado) |
 | efecto `global` | por el resto de la partida, aunque la carta muera: `al_robar` (Panamá, para quien roba) o `muere_tribu` con `tribu` (cada vez que muere uno de TUS esbirros de esa tribu: Tun Iguana) |
@@ -308,7 +309,7 @@ Está en `heroes` con `"enConstruccion": true`: aparece en la colección pero no
 | Breakcore (hechizo) | 3 | — | Reparte 3 de daño entre los enemigos, 3 veces (cada reparto suma el poder de hechizo) | hecho |
 | Post-rock (hechizo) | 15 | — | Cuesta 1 menos por cada hechizo que lanzaste esta partida (`descuento: { por: "hechizos_lanzados" }`). Reparte 20 de daño entre los enemigos | hecho (foto de Hesse Kassel) |
 | Música Andina (hechizo) | 5 | — | Restaura 10 de vida a tu héroe y reparte 10 de daño entre los enemigos | hecho — coste propuesto |
-| Folklore (hechizo) | 4 | — | Invoca un músico 2/2 con poder de hechizo +1 por cada 5 scrobbles (hasta 4), en orden: Violeta Parra ♀, Víctor Jara ♂, Eduardo Mateo ♂, Chico Buarque ♂ (fichas). Los scrobbles se cuentan aunque la misión no esté en juego | hecho |
+| Folklore (hechizo) | 4 | — | Invoca un músico 2/2 con poder de hechizo +1 por cada 3 scrobbles (hasta 4), en orden: Violeta Parra ♀, Víctor Jara ♂, Eduardo Mateo ♂, Chico Buarque ♂ (fichas). Cada músico, cuando se invoca (`al_invocar`), te da un hechizo al azar. Los scrobbles se cuentan aunque la misión no esté en juego | hecho |
 | Slowcore (hechizo) | 4 | — | Reparte 5 de daño entre los enemigos. Se repite al final de cada uno de tus turnos por el resto de la partida (global `fin_de_tu_turno`; las repeticiones no suman poder de hechizo) | hecho |
 | **Contador de Scrobbles** (misión legendaria, serie) | 1 | — | Suma un scrobble por cada hechizo o carta con etiqueta `musica` que jugás (todas las cartas de Tomis la tienen). Nivel 1 (5): robás 3 cartas que cuestan 1 menos. Nivel 2 (10): tus hechizos +2 de daño por el resto de la partida y robás 3 que cuestan 2 menos. Nivel 3 (20): obtenés **Charts** | hecho |
 | Descargar el FLAC (parte 2/3, ficha) | — | — | La misión pasa a esta carta al llegar al nivel 1 | hecho |
@@ -318,3 +319,5 @@ Está en `heroes` con `"enConstruccion": true`: aparece en la colección pero no
 **Poder de hechizo** (`poder_hechizo: N` en un esbirro): mientras esté en tu mesa, tus hechizos que hacen daño (`dano`, `repartir`, `robar_vida`) pegan N más.
 
 Efecto `eco_hechizos` (`cantidad`, `efectos`, `origen`): tus próximos N hechizos también hacen esos efectos. Si lanzás otro Fumando Porro, se suman.
+
+**Pool de hechizos al azar y de descubrir hechizos** (`hechizosAzar`): los hechizos del juego que van en mazos, más las tareas universitarias de Cruit (menos las que dan Leche, como Laboratorio). Lo usan Cruit Breakdown, Mi Playlist #67, el poder de Tomis, Charts no (repite los tuyos), y los músicos de Folklore.

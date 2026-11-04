@@ -443,6 +443,8 @@ function invocar(estado, s, id, ev, db, pos) {
   p.tablero.splice(i, 0, m);
   ev.push({ e: "invoca", seat: s, uid: m.uid, carta: id, pos: i });
   avanzarMision(estado, s, "invocar_tribu", m.tribu, ev, db);
+  // "cuando se invoca" (sale de la mano o lo invoca otra carta): los músicos de Folklore
+  if (c.al_invocar) aplicarEfectos(estado, s, c.al_invocar, null, ev, db, m.uid);
   return m;
 }
 
@@ -529,6 +531,12 @@ export function cantidadDe(estado, s, ef) {
   return n;
 }
 
+// hechizos que pueden salir al azar o en un descubrir: los del mazo y también las tareas universitarias de Cruit,
+// menos las que dan Leche (Laboratorio). Sin fichas raras (La Moneda, Caca, opciones de "elegí una")
+const daLeche = (c) => JSON.stringify(c.efectos || []).includes('"carta":"leche"');
+export const hechizosAzar = (db) => Object.values(db).filter((c) => c.tipo === "hechizo" && c.id !== "moneda" && !c.al_robarse &&
+  !(c.efectos || []).some((x) => x.tipo === "vc_opcion") && (!c.token || (c.etiquetas || []).includes("tarea_util")) && !(c.token && daLeche(c)));
+
 // lanza un hechizo eligiendo un objetivo válido al azar (si necesita y no hay, no se lanza)
 function lanzarConObjetivoAzar(estado, s, c, ev, db, ctx = {}) {
   let obj = null;
@@ -571,7 +579,8 @@ function aplicarEfectos(estado, s, efectos, elegido, ev, db, fuente, ctx = {}) {
       // como Hearthstone: 3 opciones distintas, el jugador se queda con una
       // "todas": true también ofrece fichas y hechizos (Escuela Alumnos: tareas universitarias)
       let base = ef.todas ? Object.values(db).filter((c) => c.tipo !== "mision" && cumpleFiltro(c, ef.filtro))
-        : ef.filtro?.tipo ? Object.values(db).filter((c) => !c.token && cumpleFiltro(c, ef.filtro)) // ej. "descubre un hechizo"
+        : ef.filtro?.tipo === "hechizo" ? hechizosAzar(db).filter((c) => cumpleFiltro(c, ef.filtro)) // "descubre un hechizo" (tareas incluidas)
+        : ef.filtro?.tipo ? Object.values(db).filter((c) => !c.token && cumpleFiltro(c, ef.filtro))
         : pozo(db, ef.filtro);
       // "deMiClase": solo de la clase de tu héroe o neutrales (si todavía no hay 3, se abre a todas)
       const mias = base.filter((c) => !c.clase || c.clase === estado.j[s].heroe);
@@ -622,6 +631,11 @@ function aplicarEfectos(estado, s, efectos, elegido, ev, db, fuente, ctx = {}) {
       // se esconde en una carta al azar de la mano del rival; cuando la juegue, vuelve a salir para vos
       const mano = estado.j[otro(s)].mano.filter((c) => !c.escondido);
       if (mano.length) { elegir(estado, mano).escondido = { carta: ef.carta, seat: s }; ev.push({ e: "esconde", seat: s, carta: ef.carta }); }
+      continue;
+    }
+    if (ef.tipo === "hechizo_azar_mano") { // obtenés N hechizos al azar (del mismo pool que los descubrir)
+      const pool = hechizosAzar(db);
+      for (let k = 0; k < n && pool.length; k++) darCarta(estado, s, elegir(estado, pool).id, ev);
       continue;
     }
     if (ef.tipo === "invocar_por_scrobbles") {
@@ -681,7 +695,7 @@ function aplicarEfectos(estado, s, efectos, elegido, ev, db, fuente, ctx = {}) {
       // Cruit Breakdown (como Yogg-Saron): un hechizo al azar por cada hechizo que lanzaste, con objetivos al azar.
       // Con "cantidad", son esos hechizos fijos (Mi Playlist #67: 2)
       const total = Math.min(30, ef.cantidad != null ? n : estado.j[s].hechizosLanzados || 0);
-      const pool = Object.values(db).filter((c) => c.tipo === "hechizo" && c.id !== "moneda" && !c.al_robarse && !(c.efectos || []).some((x) => x.tipo === "vc_opcion"));
+      const pool = hechizosAzar(db);
       for (let k = 0; k < total && pool.length; k++) {
         if (estado.fase !== "jugando" || (fuente && !buscar(estado, fuente)) || estado.pendiente) break;
         lanzarConObjetivoAzar(estado, s, elegir(estado, pool), ev, db);
