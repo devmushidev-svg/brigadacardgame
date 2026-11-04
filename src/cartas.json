@@ -1470,17 +1470,17 @@
    "coste": 2,
    "clase": "tomis",
    "arte": "/arte/grindcore.webp",
-   "texto": "Inflige 2 de daño. Después, inflige 3 de daño a todos los enemigos.",
+   "texto": "Inflige 1 de daño. Después, inflige 2 de daño a todos los enemigos.",
    "efectos": [
     {
      "tipo": "dano",
      "objetivo": "elegido",
-     "cantidad": 2
+     "cantidad": 1
     },
     {
      "tipo": "dano",
      "objetivo": "todos_enemigos",
-     "cantidad": 3
+     "cantidad": 2
     }
    ],
    "etiquetas": [
@@ -1581,12 +1581,12 @@
    "coste": 1,
    "clase": "tomis",
    "arte": "/arte/wey_emo.webp",
-   "texto": "Reparte 5 de daño entre los enemigos. Si eso mata a alguno, reparte 3 más.",
+   "texto": "Reparte 4 de daño entre los enemigos. Si eso mata a alguno, reparte 2 más.",
    "efectos": [
     {
      "tipo": "repartir",
-     "cantidad": 5,
-     "siMuere": 3
+     "cantidad": 4,
+     "siMuere": 2
     }
    ],
    "etiquetas": [
@@ -1622,9 +1622,9 @@
    "vida": 7,
    "clase": "tomis",
    "arte": "/arte/yamir.webp",
-   "texto": "Poder de hechizo +3. Tus hechizos cuestan 1 menos. Grito de batalla: robá 3 hechizos.",
+   "texto": "Poder de hechizo +1. Tus hechizos cuestan 1 menos. Grito de batalla: robá 3 hechizos.",
    "abarata_hechizos": 1,
-   "poder_hechizo": 3,
+   "poder_hechizo": 1,
    "grito": [
     {
      "tipo": "robar_filtro",
@@ -1667,7 +1667,7 @@
       "recompensa": [
        {
         "tipo": "poder_hechizo_heroe",
-        "cantidad": 2
+        "cantidad": 1
        },
        {
         "tipo": "robar_rebajadas",
@@ -1694,8 +1694,8 @@
    "nombre": "Charts",
    "tipo": "esbirro",
    "coste": 5,
-   "ataque": 8,
-   "vida": 8,
+   "ataque": 5,
+   "vida": 5,
    "clase": "tomis",
    "rareza": "legendaria",
    "token": true,
@@ -1719,7 +1719,7 @@
    "rareza": "legendaria",
    "token": true,
    "arte": "/arte/descargar_flac.webp",
-   "texto": "Serie de misiones: jugá 5 más. Recompensa: tus hechizos tienen +2 de daño esta partida. Robá 3 cartas; cuestan 2 menos."
+   "texto": "Serie de misiones: jugá 5 más. Recompensa: tus hechizos tienen +1 de daño esta partida. Robá 3 cartas; cuestan 2 menos."
   },
   {
    "id": "winamp",
@@ -1783,19 +1783,19 @@
     "musica"
    ],
    "arte": "/arte/breakcore.webp",
-   "texto": "Reparte 3 de daño entre los enemigos, 3 veces.",
+   "texto": "Reparte 2 de daño entre los enemigos, 3 veces.",
    "efectos": [
     {
      "tipo": "repartir",
-     "cantidad": 3
+     "cantidad": 2
     },
     {
      "tipo": "repartir",
-     "cantidad": 3
+     "cantidad": 2
     },
     {
      "tipo": "repartir",
-     "cantidad": 3
+     "cantidad": 2
     }
    ]
   },
@@ -1812,11 +1812,11 @@
    "descuento": {
     "por": "hechizos_lanzados"
    },
-   "texto": "Cuesta 1 menos por cada hechizo que lanzaste esta partida. Reparte 20 de daño entre los enemigos.",
+   "texto": "Cuesta 1 menos por cada hechizo que lanzaste esta partida. Reparte 10 de daño entre los enemigos.",
    "efectos": [
     {
      "tipo": "repartir",
-     "cantidad": 20
+     "cantidad": 10
     }
    ]
   },

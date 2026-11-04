@@ -297,17 +297,17 @@ Habilitado: se puede elegir en Mis mazos, sale en "Al azar" y tiene mazo precarg
 | Carta | Coste | Stats | Efecto | Estado |
 |---|---|---|---|---|
 | La Mejor Música que Jamás Escucharás | 2 | 1/5 | Poder de hechizo +1 | hecho |
-| Grindcore (hechizo) | 2 | — | 2 de daño a lo que elijas y 3 a todos los enemigos (el objetivo enemigo recibe los dos) | hecho |
+| Grindcore (hechizo) | 2 | — | 1 de daño a lo que elijas y 2 a todos los enemigos (el objetivo enemigo recibe los dos) | hecho |
 | Mi Playlist #67 | 3 | 3/2 | Último aliento: lanza 2 hechizos al azar (con objetivos al azar) | hecho |
 | Fumando Porro (hechizo) | 3 | — | Invoca un Homero 5/5 (ficha). Tus próximos 2 hechizos también invocan un Homero (se ve en la placa) | hecho |
 | **Ethypostlife** (legendaria) | 3 | 2/3 | Grito: por el resto de la partida, cada hechizo tuyo invoca un esbirro al azar de su mismo coste (si no hay, del más cercano por debajo; usa el coste original del hechizo) | hecho |
-| Wey Emo Gritando (hechizo) | 1 | — | Reparte 5 de daño al azar entre los enemigos; si muere alguno, reparte 3 más (una vez) | hecho |
+| Wey Emo Gritando (hechizo) | 1 | — | Reparte 4 de daño al azar entre los enemigos; si muere alguno, reparte 2 más (una vez) | hecho |
 | Mossad Strongest Agent | 4 | 1/8 | Cada vez que lanzás un hechizo, robás una carta | hecho — falta género |
-| Yamir | 5 | 3/7 | Poder de hechizo +3. Tus hechizos cuestan 1 menos (mientras esté en la mesa; campo `abarata_hechizos`). Grito: robás 3 hechizos de tu mazo | hecho — falta género |
+| Yamir | 5 | 3/7 | Poder de hechizo +1. Tus hechizos cuestan 1 menos (mientras esté en la mesa; campo `abarata_hechizos`). Grito: robás 3 hechizos de tu mazo | hecho — falta género |
 | Audiophile | 2 | 2/3 | Tus hechizos cuestan 1 menos. Grito: robás una carta | hecho |
 | Midwest Emo (hechizo) | 7 | — | Vuelven a tu mano los 5 últimos hechizos que lanzaste; cuestan 1 menos (efecto `recuperar_hechizos`; no cuenta a sí mismo) | hecho |
-| Breakcore (hechizo) | 3 | — | Reparte 3 de daño entre los enemigos, 3 veces (cada reparto suma el poder de hechizo) | hecho |
-| Post-rock (hechizo) | 15 | — | Cuesta 1 menos por cada hechizo que lanzaste esta partida (`descuento: { por: "hechizos_lanzados" }`). Reparte 20 de daño entre los enemigos | hecho (foto de Hesse Kassel) |
+| Breakcore (hechizo) | 3 | — | Reparte 2 de daño entre los enemigos, 3 veces (cada reparto suma el poder de hechizo) | hecho |
+| Post-rock (hechizo) | 15 | — | Cuesta 1 menos por cada hechizo que lanzaste esta partida (`descuento: { por: "hechizos_lanzados" }`). Reparte 10 de daño entre los enemigos | hecho (foto de Hesse Kassel) |
 | Música Andina (hechizo) | 5 | — | Restaura 10 de vida a tu héroe y reparte 10 de daño entre los enemigos | hecho — coste propuesto |
 | **Folklore** (hechizo legendario) | 4 | — | Invoca un músico 2/2 con poder de hechizo +1 por cada 3 scrobbles (hasta 4), en orden: Violeta Parra ♀, Víctor Jara ♂, Eduardo Mateo ♂, Chico Buarque ♂ (fichas). Cada músico, cuando se invoca (`al_invocar`), te da un hechizo al azar. Los scrobbles se cuentan aunque la misión no esté en juego | hecho |
 | **Slowcore** (hechizo legendario) | 4 | — | Reparte 5 de daño entre los enemigos. Se repite al final de cada uno de tus turnos por el resto de la partida (global `fin_de_tu_turno`; las repeticiones no suman poder de hechizo) | hecho |
@@ -316,13 +316,15 @@ Habilitado: se puede elegir en Mis mazos, sale en "Al azar" y tiene mazo precarg
 | Shoegaze (hechizo) | 6 | — | Lanza otra vez los 3 últimos hechizos que jugaste, con objetivos al azar (sin contarse a sí mismo) | hecho |
 | Review de RYM (hechizo) | 2 | — | Descubre una carta de tu mazo: la robás y obtenés una copia (efecto `descubrir_mazo`) | hecho |
 | Loop | 1 | 2/2 | Grito: obtenés una copia de una carta al azar de tu mano (efecto `copiar_mano`) | hecho |
-| **Contador de Scrobbles** (misión legendaria, serie) | 1 | — | Suma un scrobble por cada hechizo o carta con etiqueta `musica` que jugás (todas las cartas de Tomis la tienen). Nivel 1 (5): robás 3 cartas que cuestan 1 menos. Nivel 2 (10): tus hechizos +2 de daño por el resto de la partida y robás 3 que cuestan 2 menos. Nivel 3 (20): obtenés **Charts** | hecho |
+| **Contador de Scrobbles** (misión legendaria, serie) | 1 | — | Suma un scrobble por cada hechizo o carta con etiqueta `musica` que jugás (todas las cartas de Tomis la tienen). Nivel 1 (5): robás 3 cartas que cuestan 1 menos. Nivel 2 (10): tus hechizos +1 de daño por el resto de la partida y robás 3 que cuestan 2 menos. Nivel 3 (20): obtenés **Charts** | hecho |
 | Descargar el FLAC (parte 2/3, ficha) | — | — | La misión pasa a esta carta al llegar al nivel 1 | hecho |
 | Winamp (parte 3/3, ficha) | — | — | La misión pasa a esta carta al llegar al nivel 2 | hecho |
-| **Charts** (legendaria, recompensa) | 5 | 8/8 | Grito: repite, en orden, todos los hechizos que lanzaste esta partida (objetivos al azar, con tu poder de hechizo) | hecho |
+| **Charts** (legendaria, recompensa) | 5 | 5/5 | Grito: repite, en orden, todos los hechizos que lanzaste esta partida (objetivos al azar, con tu poder de hechizo) | hecho |
 
 **Poder de hechizo** (`poder_hechizo: N` en un esbirro): mientras esté en tu mesa, tus hechizos que hacen daño (`dano`, `repartir`, `robar_vida`) pegan N más.
 
 Efecto `eco_hechizos` (`cantidad`, `efectos`, `origen`): tus próximos N hechizos también hacen esos efectos. Si lanzás otro Fumando Porro, se suman.
 
 **Pool de hechizos al azar y de descubrir hechizos** (`hechizosAzar`): los hechizos del juego que van en mazos, más las tareas universitarias de Cruit (menos las que dan Leche, como Laboratorio). Lo usan Cruit Breakdown, Mi Playlist #67, el poder de Tomis, Charts no (repite los tuyos), y los músicos de Folklore.
+
+Balance con los mazos precargados de Mario (50 de vida, bot contra bot, 300 partidas): tras bajar el daño de Tomis, Tomis 78% vs Tun y 79% vs Cruit; Cruit 74% vs Tun. Con 30 o 40 de vida casi no cambia.

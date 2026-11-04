@@ -883,11 +883,11 @@ console.log("ok: Tomis y poder de hechizo");
   preparar(e, s, ["grindcore", "mejor_musica", "grindcore"]);
   const vr = e.j[r].vida;
   assert.ok(!M.aplicar(e, s, { t: "jugar", uid: "t0", objetivo: "rv" }, db, 0).error);
-  assert.equal(e.j[r].tablero[0].vida, 15); assert.equal(e.j[r].tablero[1].vida, 17); assert.equal(e.j[r].vida, vr - 3);
+  assert.equal(e.j[r].tablero[0].vida, 17); assert.equal(e.j[r].tablero[1].vida, 18); assert.equal(e.j[r].vida, vr - 2);
   M.aplicar(e, s, { t: "jugar", uid: "t1" }, db, 0);
   e.j[s].mana = 10;
   M.aplicar(e, s, { t: "jugar", uid: "t2", objetivo: "rv" }, db, 0);
-  assert.equal(e.j[r].tablero[0].vida, 15 - 3 - 4, "con poder de hechizo: 3 + 4");
+  assert.equal(e.j[r].tablero[0].vida, 17 - 2 - 3, "con poder de hechizo: 2 + 3");
 }
 console.log("ok: Grindcore");
 
@@ -940,14 +940,14 @@ console.log("ok: Ethypostlife");
   preparar(e, s, ["wey_emo"]);
   const vr = e.j[r].vida;
   M.aplicar(e, s, { t: "jugar", uid: "t0" }, db, 0);
-  assert.equal(vr - e.j[r].vida, 5, "sin esbirros: los 5 a la cara y nadie muere");
+  assert.equal(vr - e.j[r].vida, 4, "sin esbirros: los 4 a la cara y nadie muere");
   const e2 = nueva(117); const s2 = e2.turno, r2 = 1 - s2;
   e2.j[s2].tablero = []; e2.j[r2].tablero = Array.from({ length: 5 }, (_, k) => ({ uid: "z" + k, id: "x", tribu: null, ataque: 1, vida: 1, vidaMax: 1, ataques: 0 }));
   preparar(e2, s2, ["wey_emo"]);
   const v2 = e2.j[r2].vida;
   M.aplicar(e2, s2, { t: "jugar", uid: "t0" }, db, 0);
   const muertos = 5 - e2.j[r2].tablero.length;
-  assert.equal(muertos + (v2 - e2.j[r2].vida), 8, "murió alguno: 5 + 3 de daño en total");
+  assert.equal(muertos + (v2 - e2.j[r2].vida), 6, "murió alguno: 4 + 2 de daño en total");
 }
 console.log("ok: Wey Emo Gritando");
 
@@ -988,7 +988,7 @@ console.log("ok: Mossad Strongest Agent");
     assert.equal(M.costeCarta(e, s, g, db), 1, "Grindcore cuesta 1 menos");
     const vr = e.j[r].vida; e.j[s].mana = 10;
     M.aplicar(e, s, { t: "jugar", uid: g.uid, objetivo: "h" + r }, db, 0);
-    assert.equal(vr - e.j[r].vida, (2 + 3) + (3 + 3), "con poder de hechizo +3");
+    assert.equal(vr - e.j[r].vida, (1 + 1) + (2 + 1), "con poder de hechizo +1");
   }
 }
 console.log("ok: Yamir");
@@ -1019,13 +1019,13 @@ console.log("ok: Yamir");
   e.j[s].mano.push({ uid: "w9", id: "wey_emo" }); e.j[s].mana = 10;
   const vr = e.j[r].vida;
   M.aplicar(e, s, { t: "jugar", uid: "w9" }, db, 0);
-  assert.equal(e.j[s].poderHechizoExtra, 2, "nivel 2: +2 de daño de hechizos");
+  assert.equal(e.j[s].poderHechizoExtra, 1, "nivel 2: +1 de daño de hechizos");
   assert.equal(e.j[s].mision.nivel, 2); assert.equal(e.j[s].mision.meta, 20, "falta el nivel 3");
   assert.equal(e.j[s].mision.id, "winamp", "y a la parte 3");
   e.j[s].mano.push({ uid: "w8", id: "wey_emo" }); e.j[s].mana = 10;
   const v2 = e.j[r].vida;
   M.aplicar(e, s, { t: "jugar", uid: "w8" }, db, 0);
-  assert.equal(v2 - e.j[r].vida, 5 + 2 + 1, "Wey Emo con +2 del nivel y +1 de La Mejor Música");
+  assert.equal(v2 - e.j[r].vida, 4 + 1 + 1, "Wey Emo con +1 del nivel y +1 de La Mejor Música");
 }
 assert.ok(db.mossad.etiquetas.includes("musica"), "todas las cartas de Tomis son música");
 console.log("ok: Contador de Scrobbles");
@@ -1046,7 +1046,7 @@ console.log("ok: Contador de Scrobbles");
   const vr = e.j[r].vida;
   const res2 = M.aplicar(e, s, { t: "jugar", uid: ch.uid }, db, 0);
   assert.equal(res2.ev.filter((x) => x.e === "repite" && x.carta === "wey_emo").length, 2, "repite los 2 Wey Emo");
-  assert.equal(vr - e.j[r].vida, 10, "5 + 5 al héroe (sin esbirros)");
+  assert.equal(vr - e.j[r].vida, 8, "4 + 4 al héroe (sin esbirros)");
 }
 // la misión que empieza en la mano es la primera parte, no las otras
 {
@@ -1087,11 +1087,11 @@ console.log("ok: Midwest Emo");
   preparar(e, s, ["breakcore", "mejor_musica", "breakcore"]);
   const vr = e.j[r].vida;
   M.aplicar(e, s, { t: "jugar", uid: "t0" }, db, 0);
-  assert.equal(vr - e.j[r].vida, 9, "sin esbirros: los 9 a la cara");
+  assert.equal(vr - e.j[r].vida, 6, "sin esbirros: los 6 a la cara");
   M.aplicar(e, s, { t: "jugar", uid: "t1" }, db, 0);
   const v2 = e.j[r].vida; e.j[s].mana = 10;
   M.aplicar(e, s, { t: "jugar", uid: "t2" }, db, 0);
-  assert.equal(v2 - e.j[r].vida, 12, "con poder de hechizo +1: 4 + 4 + 4");
+  assert.equal(v2 - e.j[r].vida, 9, "con poder de hechizo +1: 3 + 3 + 3");
 }
 console.log("ok: Breakcore");
 
@@ -1106,7 +1106,7 @@ console.log("ok: Breakcore");
   e.j[s].mana = 6;
   const vr = e.j[r].vida;
   assert.ok(!M.aplicar(e, s, { t: "jugar", uid: "t0" }, db, 0).error);
-  assert.equal(vr - e.j[r].vida, 20);
+  assert.equal(vr - e.j[r].vida, 10);
 }
 console.log("ok: Post-rock");
 
@@ -1138,7 +1138,7 @@ console.log("ok: Música Andina");
   e.j[s].mano = [{ uid: "w", id: "wey_emo" }]; e.j[s].mana = 10;
   const vr = e.j[r].vida;
   M.aplicar(e, s, { t: "jugar", uid: "w" }, db, 0);
-  assert.equal(vr - e.j[r].vida, 5 + 4, "con 4 músicos: +4 de poder de hechizo");
+  assert.equal(vr - e.j[r].vida, 4 + 4, "con 4 músicos: +4 de poder de hechizo");
 }
 // --- pool de hechizos al azar: tareas de Cruit sí (menos Laboratorio), fichas raras no ---
 {
@@ -1200,7 +1200,7 @@ console.log("ok: Deathconsciousness");
   const vr = e.j[r].vida;
   const res = M.aplicar(e, s, { t: "jugar", uid: "t0" }, db, 0);
   assert.deepEqual(res.ev.filter((x) => x.e === "repite").map((x) => x.carta), ["wey_emo", "breakcore", "wey_emo"]);
-  assert.equal(vr - e.j[r].vida, 5 + 9 + 5, "sin esbirros: todo a la cara");
+  assert.equal(vr - e.j[r].vida, 4 + 6 + 4, "sin esbirros: todo a la cara");
 }
 console.log("ok: Shoegaze");
 
