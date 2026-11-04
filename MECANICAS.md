@@ -260,9 +260,9 @@ Sin mazo armado, el héroe sale al azar.
 
 ## Mazos meta
 
-**Tun (40):** todas las cartas que puede usar Tun, al máximo de copias (hoy son justo 40).
+**Tun (40):** lista armada por Mario.
 
-**Cruit (40):** todas las cartas que puede usar Cruit menos los dos Nullscape.
+**Cruit (40):** lista armada por Mario.
 
 Con los mazos de 20, bot contra bot, Cruit le ganaba a Tun ~68% (era ~95% antes de los nerfs a Estreñido, Cruit Baño y Cruit Sangre y el buff a Novia de Tun). Con los mazos de 30 y mulligan (Lechero 1/1, Cruit Vaca fuera de la tribu, Cruit Verity 3 de maná con Verity 5/5, Cruit Baño 4/2 de 2 de maná que reparte su ataque, Novia de Tun 3 de maná 2/1 que al morir invoca 2 Tun, Intolerante y Estreñido también al morir), Cruit gana ~46%. Con 50 de vida y los cambios a Tun (Tun Mujer, Mastermind, Porque Me Monean, Choza, misión de 20), ~41%.
 
