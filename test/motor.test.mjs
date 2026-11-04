@@ -1085,3 +1085,18 @@ console.log("ok: Audiophile");
   assert.ok(e.j[s].tablero.every((m) => m.vida === db[m.id].vida), "vuelven enteros");
 }
 console.log("ok: Midwest Emo");
+
+// --- Breakcore: reparte 3 de daño 3 veces (con poder de hechizo, +1 en cada reparto) ---
+{
+  const e = nueva(125); const s = e.turno, r = 1 - s;
+  e.j[s].tablero = []; e.j[r].tablero = [];
+  preparar(e, s, ["breakcore", "mejor_musica", "breakcore"]);
+  const vr = e.j[r].vida;
+  M.aplicar(e, s, { t: "jugar", uid: "t0" }, db, 0);
+  assert.equal(vr - e.j[r].vida, 9, "sin esbirros: los 9 a la cara");
+  M.aplicar(e, s, { t: "jugar", uid: "t1" }, db, 0);
+  const v2 = e.j[r].vida; e.j[s].mana = 10;
+  M.aplicar(e, s, { t: "jugar", uid: "t2" }, db, 0);
+  assert.equal(v2 - e.j[r].vida, 12, "con poder de hechizo +1: 4 + 4 + 4");
+}
+console.log("ok: Breakcore");

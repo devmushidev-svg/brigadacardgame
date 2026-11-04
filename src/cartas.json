@@ -1770,6 +1770,32 @@
      "cantidad": 3
     }
    ]
+  },
+  {
+   "id": "breakcore",
+   "nombre": "Breakcore",
+   "tipo": "hechizo",
+   "coste": 3,
+   "clase": "tomis",
+   "etiquetas": [
+    "musica"
+   ],
+   "arte": "🎛️",
+   "texto": "Reparte 3 de daño entre los enemigos, 3 veces.",
+   "efectos": [
+    {
+     "tipo": "repartir",
+     "cantidad": 3
+    },
+    {
+     "tipo": "repartir",
+     "cantidad": 3
+    },
+    {
+     "tipo": "repartir",
+     "cantidad": 3
+    }
+   ]
   }
  ],
  "heroes": [
