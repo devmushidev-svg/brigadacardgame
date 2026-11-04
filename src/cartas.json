@@ -1817,6 +1817,29 @@
      "cantidad": 20
     }
    ]
+  },
+  {
+   "id": "musica_andina",
+   "nombre": "Música Andina",
+   "tipo": "hechizo",
+   "coste": 5,
+   "clase": "tomis",
+   "etiquetas": [
+    "musica"
+   ],
+   "arte": "/arte/musica_andina.webp",
+   "texto": "Restaurá 10 de vida a tu héroe. Reparte 10 de daño entre los enemigos.",
+   "efectos": [
+    {
+     "tipo": "curar",
+     "objetivo": "heroe_propio",
+     "cantidad": 10
+    },
+    {
+     "tipo": "repartir",
+     "cantidad": 10
+    }
+   ]
   }
  ],
  "heroes": [

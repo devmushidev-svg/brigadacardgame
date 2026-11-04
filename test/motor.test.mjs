@@ -1115,3 +1115,15 @@ console.log("ok: Breakcore");
   assert.equal(vr - e.j[r].vida, 20);
 }
 console.log("ok: Post-rock");
+
+// --- Música Andina: cura 10 a tu héroe y reparte 10 entre los enemigos ---
+{
+  const e = nueva(127); const s = e.turno, r = 1 - s;
+  e.j[s].tablero = []; e.j[r].tablero = [];
+  preparar(e, s, ["musica_andina"]);
+  e.j[s].vida = 30;
+  const vr = e.j[r].vida;
+  M.aplicar(e, s, { t: "jugar", uid: "t0" }, db, 0);
+  assert.equal(e.j[s].vida, 40); assert.equal(vr - e.j[r].vida, 10);
+}
+console.log("ok: Música Andina");
