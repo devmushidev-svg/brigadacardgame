@@ -609,9 +609,22 @@ function pantallaMazos() {
           ${m.fijo ? '<button class="mini-btn copiar" title="copiar para editarlo">Copiar</button>' : '<button class="mini-btn editar">Editar</button><button class="mini-btn borrar">🗑</button>'}</div></div>`).join("")
       }</div>
     <div class="ayuda">Los mazos precargados no se borran: copialos para cambiarlos. "Al azar" en el lobby te da un héroe al azar con su mazo precargado.</div>
-    <div class="botones-mazos"><button class="boton" id="nuevo">Nuevo mazo</button>
+    <div class="botones-mazos"><button class="boton" id="nuevo">Nuevo mazo</button><button class="boton sec" id="pegar-mazo">Pegar mazo</button>
     <button class="boton sec" onclick="location.href='/'">Volver</button></div></div>`;
   $("#nuevo").onclick = elegirHeroe;
+  // pegar un mazo copiado con "Copiar lista" (formato: héroe: ["carta", ...])
+  $("#pegar-mazo").onclick = () => {
+    const txt = prompt("Pegá el mazo (el texto de \"Copiar lista\"):");
+    if (!txt) return;
+    const m = txt.trim().match(/^([a-z_]+)\s*:\s*(\[[\s\S]*\])$/);
+    let cartas = null;
+    try { cartas = m && JSON.parse(m[2]); } catch {}
+    if (!m || !HEROES[m[1]] || !Array.isArray(cartas)) return toast("ese texto no es un mazo");
+    const mazo = { id: "m" + Date.now(), nombre: "Mazo pegado de " + HEROES[m[1]].nombre, heroe: m[1], cartas: cartas.filter((id) => DB[id]) };
+    guardarLS("mazos", [...misMazos(), mazo]);
+    toast(mazoValido(mazo) ? "mazo pegado" : `pegado, pero incompleto (${mazo.cartas.length}/${TAM_MAZO})`, 2200);
+    pantallaMazos();
+  };
   $$(".mazo-tile").forEach((t) => {
     const id = t.dataset.id;
     const fijo = mazosFijos().find((m) => m.id === id);
