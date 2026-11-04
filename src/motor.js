@@ -223,6 +223,7 @@ function cumpleFiltro(c, f) {
   if (f?.etiqueta && !(c.etiquetas || []).includes(f.etiqueta)) return false;
   if (f?.genero && c.genero !== f.genero) return false;
   if (f?.tribu && c.tribu !== f.tribu) return false;
+  if (f?.tipo && c.tipo !== f.tipo) return false;
   return true;
 }
 
@@ -523,7 +524,12 @@ function aplicarEfectos(estado, s, efectos, elegido, ev, db, fuente, ctx = {}) {
     if (ef.tipo === "descubrir") {
       // como Hearthstone: 3 opciones distintas, el jugador se queda con una
       // "todas": true también ofrece fichas y hechizos (Escuela Alumnos: tareas universitarias)
-      const base = ef.todas ? Object.values(db).filter((c) => c.tipo !== "mision" && cumpleFiltro(c, ef.filtro)) : pozo(db, ef.filtro);
+      let base = ef.todas ? Object.values(db).filter((c) => c.tipo !== "mision" && cumpleFiltro(c, ef.filtro))
+        : ef.filtro?.tipo ? Object.values(db).filter((c) => !c.token && cumpleFiltro(c, ef.filtro)) // ej. "descubre un hechizo"
+        : pozo(db, ef.filtro);
+      // "deMiClase": solo de la clase de tu héroe o neutrales (si todavía no hay 3, se abre a todas)
+      const mias = base.filter((c) => !c.clase || c.clase === estado.j[s].heroe);
+      if (ef.deMiClase && mias.length >= 3) base = mias;
       const tandas = [];
       for (let k = 0; k < n; k++) {
         const lista = base.map((c) => c.id), ops = [];
@@ -531,8 +537,12 @@ function aplicarEfectos(estado, s, efectos, elegido, ev, db, fuente, ctx = {}) {
         if (ops.length) tandas.push(ops);
       }
       if (!tandas.length) continue;
-      if (estado.pendiente) { for (const ops of tandas) darCarta(estado, s, elegir(estado, ops), ev); continue; } // ya hay otra elección abierta
-      estado.pendiente = { seat: s, tipo: "descubrir", opciones: tandas.shift(), siguientes: tandas };
+      if (estado.pendiente) { // ya hay otra elección abierta: va una al azar
+        for (const ops of tandas) if (darCarta(estado, s, elegir(estado, ops), ev) && ef.rebaja) estado.j[s].mano[estado.j[s].mano.length - 1].rebaja = ef.rebaja;
+        continue;
+      }
+      // "rebaja": la carta descubierta cuesta N menos (poder del héroe de hechizos)
+      estado.pendiente = { seat: s, tipo: "descubrir", opciones: tandas.shift(), siguientes: tandas, ...(ef.rebaja ? { rebaja: ef.rebaja } : {}) };
       ev.push({ e: "elegir", seat: s, tipo: "descubrir" });
       continue;
     }
@@ -952,7 +962,10 @@ function resolverPendiente(estado, eleccion, ev, db) {
   if (pe.tipo === "descubrir") {
     estado.pendiente = null;
     const id = pe.opciones[eleccion];
-    if (darCarta(estado, pe.seat, id, ev)) ev.push({ e: "descubierta", seat: pe.seat });
+    if (darCarta(estado, pe.seat, id, ev)) {
+      ev.push({ e: "descubierta", seat: pe.seat });
+      if (pe.rebaja) { const mano = estado.j[pe.seat].mano; mano[mano.length - 1].rebaja = (mano[mano.length - 1].rebaja || 0) + pe.rebaja; }
+    }
     if (pe.siguientes?.length) { // "descubre dos": se abre la siguiente elección
       estado.pendiente = { seat: pe.seat, tipo: "descubrir", opciones: pe.siguientes.shift(), siguientes: pe.siguientes };
       ev.push({ e: "elegir", seat: pe.seat, tipo: "descubrir" });

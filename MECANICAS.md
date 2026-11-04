@@ -112,7 +112,7 @@ En el texto de las cartas, las palabras clave salen en **negrita** y al ver la c
 | `dar_carta` | pone `carta` en tu mano |
 | `global` | crea un efecto permanente con `disparador` y `efectos` |
 | `robar_mano` | te robás N cartas de la mano rival que cumplan el `filtro` (`{ "genero": "mujer" }`, `{ "etiqueta": ... }` o `{ "tribu": ... }`); si no hay, no pasa nada |
-| `descubrir` | como Hearthstone: muestra 3 cartas distintas del `filtro` (ej. tribu Tun) y te quedás con una; si se acaba el turno sin elegir, se elige al azar. `cantidad: 2` = dos elecciones seguidas; `todas: true` también ofrece fichas y hechizos |
+| `descubrir` | como Hearthstone: muestra 3 cartas distintas del `filtro` (ej. tribu Tun) y te quedás con una; si se acaba el turno sin elegir, se elige al azar. `cantidad: 2` = dos elecciones seguidas; `todas: true` también ofrece fichas y hechizos | Con `filtro: { "tipo": "hechizo" }` ofrece hechizos (sin fichas); `deMiClase: true` solo de tu clase o neutrales (si no hay 3, de todas); `rebaja: N` = la carta descubierta cuesta N menos.
 | `atraer_ataques` | tus otros esbirros (del `filtro`) atacan a esta carta, uno por uno, con choque normal |
 | `repetir_jugados` | repite los gritos y últimos alientos de las cartas del `filtro` que jugaste esta partida, en orden (Coco Supremo). Como Shudderwock: los efectos salen de quien los repite, así que un "gana +3/+3" lo buffea a él |
 | `barajar` | mete N copias de `carta` en lugares al azar del mazo (`lado: "enemigo"` = del rival) |
@@ -284,3 +284,7 @@ Con los mazos de 20, bot contra bot, Cruit le ganaba a Tun ~68% (era ~95% antes 
 - reinvocar los que murieron esta partida
 
 Con 50 de vida y mazos de 40, bot contra bot: Cruit gana ~45% con el poder del Coco y ~48% con "Hacer la tarea".
+
+## Próximo héroe: clase de hechizos (inspirada en el Mago)
+
+Pendiente: nombre, imagen y cartas de clase. Poder decidido: **(2) descubre un hechizo de tu clase o neutral; cuesta 1 menos** (`{ "tipo": "descubrir", "filtro": { "tipo": "hechizo" }, "deMiClase": true, "rebaja": 1 }`). El héroe no se agrega hasta tener cartas de clase, para que no salga en "Al azar" con un mazo vacío.

@@ -849,3 +849,18 @@ console.log("ok: armas y Cruit Breakdown");
   assert.ok(e.j[s].tablero.some((m) => m.id === "tipo_foto"), "vuelve a salir para su dueño");
 }
 console.log("ok: Mario, Rafael y El Tipo de la Foto");
+
+// --- poder del héroe de hechizos (todavía sin héroe): descubre un hechizo de tu clase o neutral; cuesta 1 menos ---
+{
+  const e = nueva(110); const s = e.turno;
+  e.j[s].poder = { nombre: "Descubrir hechizo", coste: 2, efectos: [{ tipo: "descubrir", filtro: { tipo: "hechizo" }, deMiClase: true, rebaja: 1 }] };
+  e.j[s].poderUsado = false; e.j[s].mana = 2; e.j[s].mano = [];
+  assert.ok(!M.aplicar(e, s, { t: "poder" }, db, 0).error);
+  assert.equal(e.pendiente?.tipo, "descubrir");
+  assert.ok(e.pendiente.opciones.length === 3 && e.pendiente.opciones.every((id) => db[id].tipo === "hechizo" && !db[id].token));
+  assert.ok(e.pendiente.opciones.every((id) => !db[id].clase || db[id].clase === e.j[s].heroe), "de su clase o neutrales");
+  M.aplicar(e, s, { t: "elegir", i: 0 }, db, 0);
+  const c = e.j[s].mano[0];
+  assert.equal(M.costeCarta(e, s, c, db), Math.max(0, db[c.id].coste - 1), "cuesta 1 menos");
+}
+console.log("ok: descubrir hechizo con descuento");
