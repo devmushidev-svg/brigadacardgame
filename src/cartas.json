@@ -169,7 +169,7 @@
    "vida": 5,
    "tribu": "tun",
    "clase": "tun",
-   "arte": "🦎",
+   "arte": "/arte/tun_iguana.webp",
    "texto": "Grito de batalla: por el resto de la partida, cada vez que muere uno de tus Tun, invoca un Tun Zombie que ataca a un enemigo al azar.",
    "grito": [
     {
