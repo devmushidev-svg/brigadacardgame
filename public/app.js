@@ -1700,6 +1700,8 @@ function zoom(idCarta, uid, ref = null) {
     cerrarModal(m);
   };
   $("#jugar", m) && ($("#jugar", m).onclick = (e) => { e.stopPropagation(); cerrarModal(m); intentarJugar(uid, null, centro(refEl("h" + V.yo))); });
+  // tocar una carta relacionada la abre en grande
+  $$(".relacionadas .carta", m).forEach((el) => (el.onclick = (e) => { e.stopPropagation(); cerrarModal(m); zoom(el.dataset.carta); }));
 }
 // al cerrar algo encima de la mesa, se ignoran los toques un momento (si no, en Android
 // el mismo toque terminaba el turno o jugaba algo que estaba abajo)
