@@ -582,7 +582,7 @@
    "coste": 4,
    "ataque": 3,
    "durabilidad": 3,
-   "arte": "🕵️",
+   "arte": "/arte/doxeo.webp",
    "texto": "Arma. Cada vez que tu héroe ataca, robás una carta legendaria de tu mazo.",
    "al_atacar": [
     {

@@ -208,7 +208,7 @@ Diseño de Mario. Arquetipo: paladín molesto — llenar la mesa de Tun, buffear
 | **Rafael Fernando** (legendaria) | 6 | 3/7 | Colosal +99 (apéndices 2/3). Cuando muere un Rafael Fernando que no es el original, otro lo reemplaza (mientras queden de los 99) | hecho — falta imagen (🧍) y género; rareza propuesta |
 | El Tipo de la Foto ♂ | 4 | 5/5 | Último aliento: se esconde en una carta al azar de la mano del rival; cuando la juegue, vuelve a salir para su dueño | hecho — falta imagen (📸) |
 | **Cruit Breakdown** (legendaria, neutral, tribu Cruit, como Yogg-Saron) | 10 | 7/5 | Grito: lanza un hechizo al azar por cada hechizo que lanzaste esta partida, con objetivos al azar | hecho — falta imagen (🤯) |
-| Doxeo (arma) | 4 | 3 de ataque, 3 usos | Cada vez que tu héroe ataca, robás una carta legendaria de tu mazo | hecho — falta imagen (🕵️); coste propuesto |
+| Doxeo (arma) | 4 | 3 de ataque, 3 usos | Cada vez que tu héroe ataca, robás una carta legendaria de tu mazo | hecho — coste propuesto |
 | Cuidar VC (VC) | 3 | 3/4 | Último aliento: obtenés 4 de armadura | hecho — falta imagen (🎧) |
 | Ishowspeed Tocándose ♂ (VC) | 4 | 4/3 | Último aliento: 3 de daño a todos los esbirros | hecho — falta imagen (⚡); coste y stats propuestos |
 | Enojaste Destroyer of VC | 6 | 4/4 | Grito: destruye tu PutoVC y elegís una: gana sus stats y reparte el doble de su ataque entre los enemigos; armadura igual al doble de su ataque; o lo lanzás gratis y obtenés sus piezas a coste 1 | hecho — falta imagen (😤), género; coste y stats propuestos |
