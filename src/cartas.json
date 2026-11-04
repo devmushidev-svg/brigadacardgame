@@ -163,13 +163,13 @@
    "nombre": "Tun Iguana",
    "genero": "hombre",
    "tipo": "esbirro",
-   "coste": 3,
-   "ataque": 5,
-   "vida": 5,
+   "coste": 8,
+   "ataque": 8,
+   "vida": 8,
    "tribu": "tun",
    "clase": "tun",
    "arte": "/arte/tun_iguana.webp",
-   "texto": "Grito de batalla: por el resto de la partida, cada vez que muere uno de tus Tun (que no sea un Tun Zombie), invoca un Tun Zombie que ataca a un enemigo al azar.",
+   "texto": "Grito de batalla: por el resto de la partida, cada vez que muere uno de tus Tun (que no sea un Tun Zombie), un Tun Zombie ataca a un enemigo al azar y se va.",
    "grito": [
     {
      "tipo": "global",
@@ -536,7 +536,9 @@
    "clase": "tun",
    "token": true,
    "arte": "/arte/tun_zombie.webp",
-   "texto": "Volvió del funeral."
+   "texto": "Ataca y se va. Como mucho 2 de ataque.",
+   "ataqueMax": 2,
+   "efimero": true
   },
   {
    "id": "funeral_tun",
@@ -1696,7 +1698,7 @@
    "clase": "tomis",
    "rareza": "legendaria",
    "arte": "/arte/scrobbles.webp",
-   "texto": "Serie de misiones: jugá 5 hechizos o cartas de música. Recompensa: robá 3 cartas; cuestan 1 menos.",
+   "texto": "Serie de misiones: jugá 5 hechizos o cartas de música. Recompensa: robá 2 cartas; cuestan 1 menos.",
    "mision": {
     "contar": "scrobble",
     "etapas": [
@@ -1706,7 +1708,7 @@
       "recompensa": [
        {
         "tipo": "robar_rebajadas",
-        "cantidad": 3,
+        "cantidad": 2,
         "rebaja": 1
        }
       ]
@@ -1721,8 +1723,12 @@
        },
        {
         "tipo": "robar_rebajadas",
-        "cantidad": 3,
-        "rebaja": 2
+        "cantidad": 2,
+        "rebaja": 0
+       },
+       {
+        "tipo": "rebaja_proxima",
+        "cantidad": 2
        }
       ]
      },
@@ -1769,7 +1775,7 @@
    "rareza": "legendaria",
    "token": true,
    "arte": "/arte/descargar_flac.webp",
-   "texto": "Serie de misiones: jugá 5 más. Recompensa: tus hechizos tienen +1 de daño esta partida. Robá 3 cartas; cuestan 2 menos."
+   "texto": "Serie de misiones: jugá 5 más. Recompensa: tus hechizos tienen +1 de daño esta partida. Robá 2 cartas. La próxima carta que juegues cuesta 2 menos."
   },
   {
    "id": "winamp",

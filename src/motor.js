@@ -64,7 +64,8 @@ export function costeCarta(estado, s, c, db) {
   if (!c) return 99;
   // aura "abarata_hechizos" de tus esbirros (Yamir: tus hechizos cuestan 1 menos)
   const aura = db[c.id]?.tipo === "hechizo" ? estado.j[s].tablero.filter((m) => m.vida > 0).reduce((t, m) => t + cartasDelEsbirro(m, db).reduce((u, x) => u + (x.abarata_hechizos || 0), 0), 0) : 0;
-  return Math.max(0, costeDe(estado, s, db[c.id]) - (c.rebaja || 0) - aura);
+  // "la próxima carta que juegues cuesta N menos" (misión de Tomis): vale para la primera que juegues
+  return Math.max(0, costeDe(estado, s, db[c.id]) - (c.rebaja || 0) - aura - (estado.j[s].rebajaProxima || 0));
 }
 // cartas que pueden salir al azar o en un descubrir
 const pozo = (db, filtro) => Object.values(db).filter((c) => !c.token && c.tipo === "esbirro" && cumpleFiltro(c, filtro));
@@ -448,6 +449,7 @@ function invocar(estado, s, id, ev, db, pos) {
   // "tus Tun tienen +1 de ataque por el resto de la partida"
   const mej = c.tribu && p.mejoras?.[c.tribu];
   if (mej) { m.ataque += mej.ataque || 0; m.vida += mej.vida || 0; m.vidaMax += mej.vida || 0; }
+  if (c.ataqueMax != null) m.ataque = Math.min(m.ataque, c.ataqueMax); // Tun Zombie: como mucho 2 de ataque aunque tengas mejoras
   const i = pos == null ? p.tablero.length : Math.max(0, Math.min(pos, p.tablero.length));
   p.tablero.splice(i, 0, m);
   ev.push({ e: "invoca", seat: s, uid: m.uid, carta: id, pos: i });
@@ -690,6 +692,11 @@ function aplicarEfectos(estado, s, efectos, elegido, ev, db, fuente, ctx = {}) {
       const mano = estado.j[s].mano, antes = new Set(mano.map((c) => c.uid));
       for (let k = 0; k < n; k++) robar(estado, s, ev, db);
       for (const c of mano) if (!antes.has(c.uid)) c.rebaja = (c.rebaja || 0) + (ef.rebaja || 0);
+      continue;
+    }
+    if (ef.tipo === "rebaja_proxima") { // la próxima carta que juegues cuesta N menos
+      estado.j[s].rebajaProxima = (estado.j[s].rebajaProxima || 0) + n;
+      ev.push({ e: "global", seat: s });
       continue;
     }
     if (ef.tipo === "poder_hechizo_heroe") { // poder de hechizo para el resto de la partida (no depende de esbirros)
@@ -959,6 +966,12 @@ function aplicarEfectos(estado, s, efectos, elegido, ev, db, fuente, ctx = {}) {
           const ene = ["h" + otro(lado), ...estado.j[otro(lado)].tablero.map((m) => m.uid)];
           chocar(estado, uid, elegir(estado, ene), ev);
           resolverMuertes(estado, ev, db);
+          // "efimero": ataca y se va, no queda en la mesa (Tun Zombie)
+          const queda = buscar(estado, uid);
+          if (queda && db[queda.obj.id]?.efimero) {
+            const tab = estado.j[lado].tablero, k = tab.findIndex((x) => x.uid === uid);
+            if (k >= 0) { tab.splice(k, 1); ev.push({ e: "muere", seat: lado, uid, carta: queda.obj.id }); }
+          }
         }
       }
       continue;
@@ -1225,6 +1238,7 @@ export function aplicar(estado, s, accion, db, ahora) {
       return { error: "no hay objetivos para este hechizo" };
     }
     p.mana -= coste;
+    p.rebajaProxima = 0; // la rebaja de "la próxima carta" se gasta con esta
     const [jugada] = p.mano.splice(i, 1);
     for (const et of carta.etiquetas || []) (p.jugadosEtiqueta ||= {})[et] = (p.jugadosEtiqueta[et] || 0) + 1;
     (p.jugados ||= []).push(carta.id); // historial de cartas jugadas (Coco Supremo)
@@ -1417,6 +1431,7 @@ export function vista(estado, yo, db0 = {}) {
           ...(ef ? { cantidad: cantidadDe(estado, s, ef) } : {}), ...(pc ? { veces: contarPorCada(estado, s, pc) } : {}), ...(yogg ? { veces: p.hechizosLanzados || 0 } : {}) };
       }) : undefined,
       mejoras: p.mejoras || null,
+      rebajaProxima: p.rebajaProxima || 0,
       gritoExtra: p.gritoExtra || null,
       ecos: (p.ecos || []).map((x) => ({ origen: x.origen, quedan: x.quedan })),
       armadura: p.armadura || 0,

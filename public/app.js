@@ -1370,6 +1370,7 @@ const mejorasHTML = (p) => Object.entries(p.mejoras || {}).filter(([, m]) => m.a
   .map(([t, m]) => `<div class="mejora" title="por el resto de la partida">${esc(t[0].toUpperCase() + t.slice(1))} ${m.ataque ? `+${m.ataque}⚔` : ""}${m.vida ? ` +${m.vida}❤` : ""}</div>`).join("")
   + (p.poderHechizo ? `<div class="mejora" title="tus hechizos pegan más por el resto de la partida">Hechizos +${p.poderHechizo}</div>` : "")
   + (p.gritoExtra ? `<div class="mejora" title="el próximo grito de batalla se activa ${p.gritoExtra.veces} veces">Grito ×${p.gritoExtra.veces}</div>` : "")
+  + (p.rebajaProxima ? `<div class="mejora" title="la próxima carta que juegues cuesta ${p.rebajaProxima} menos">Próxima −${p.rebajaProxima}</div>` : "")
   + (p.ecos || []).map((x) => `<div class="mejora" title="tus próximos ${x.quedan} hechizos también lo hacen">${esc(DB[x.origen]?.nombre || "Eco")} ×${x.quedan}</div>`).join("");
 function render(v) {
   V = v;

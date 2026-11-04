@@ -187,11 +187,11 @@ Diseño de Mario. Arquetipo: paladín molesto — llenar la mesa de Tun, buffear
 | Tuna (hechizo) | 2 | — | Restaura 5 de vida a tu héroe. Robás 2 cartas | hecho |
 | Tunita (hechizo) | 2 | — | 1 de daño a un esbirro, +1 por cada Tun que invocaste o jugaste esta partida | hecho |
 | **Funeral de Tun** (hechizo legendario) | 10 | — | Un Tun Zombie por cada Tun muerto en la partida; cada uno que no cabe da +1 de ataque o de vida a un Tun al azar | hecho |
-| Tun Zombie (ficha) | — | 1/1 | Lo invoca Funeral de Tun | hecho — **stats provisionales** |
+| Tun Zombie (ficha) | — | 1/1 | Lo invocan Funeral de Tun y Tun Iguana. Como mucho 2 de ataque aunque tengas mejoras (`ataqueMax`). El de la Iguana ataca y se va (`efimero`) | hecho |
 | **Porque Me Monean** (legendaria) | 6 | 3/5 | Grito: convierte a todos los esbirros del rival en Tun 1/1 | hecho |
 | Tun Amor (sin género) | 4 | 1/8 | Cada vez que uno de tus Tun ataca, gana +1/+1 | hecho |
 | Choza de Monos | 2 | 0/6 | Al final de tu turno, invoca tres Tun | hecho |
-| **Tun Iguana** (legendaria) | 3 | 5/5 | Grito: por el resto de la partida, cada vez que muere uno de tus Tun (no cuenta el Tun Zombie), invoca un Tun Zombie que ataca a un enemigo al azar | hecho — falta confirmar género |
+| **Tun Iguana** (legendaria) | 8 | 8/8 | Grito: por el resto de la partida, cada vez que muere uno de tus Tun (no cuenta el Tun Zombie), un Tun Zombie ataca a un enemigo al azar y se va (no queda en la mesa) | hecho — falta confirmar género |
 | Tun Astrónomo | 2 | 1/5 | Cada vez que ataca, un Tun de tu mano al azar cuesta 2 menos | hecho |
 | Tun Satánico | 3 | 1/1 | Grito: destruye a tus otros Tun y gana +2/+2 por cada uno. Último aliento: reparte su ataque como daño entre los enemigos (piedras) | hecho |
 
@@ -316,7 +316,7 @@ Habilitado: se puede elegir en Mis mazos, sale en "Al azar" y tiene mazo precarg
 | Shoegaze (hechizo) | 6 | — | Lanza otra vez los 3 últimos hechizos que jugaste, con objetivos al azar (sin contarse a sí mismo) | hecho |
 | Review de RYM (hechizo) | 2 | — | Descubre una carta de tu mazo: la robás y obtenés una copia (efecto `descubrir_mazo`) | hecho |
 | Loop | 1 | 2/2 | Grito: obtenés una copia de una carta al azar de tu mano (efecto `copiar_mano`) | hecho |
-| **Contador de Scrobbles** (misión legendaria, serie) | 1 | — | Suma un scrobble por cada hechizo o carta con etiqueta `musica` que jugás (todas las cartas de Tomis la tienen). Nivel 1 (5): robás 3 cartas que cuestan 1 menos. Nivel 2 (10): tus hechizos +1 de daño por el resto de la partida y robás 3 que cuestan 2 menos. Nivel 3 (20): obtenés **Charts** | hecho |
+| **Contador de Scrobbles** (misión legendaria, serie) | 1 | — | Suma un scrobble por cada hechizo o carta con etiqueta `musica` que jugás (todas las cartas de Tomis la tienen). Nivel 1 (5): robás 2 cartas que cuestan 1 menos. Nivel 2 (10): tus hechizos +1 de daño por el resto de la partida, robás 2 y la próxima carta que juegues cuesta 2 menos (`rebaja_proxima`). Nivel 3 (20): obtenés **Charts** | hecho |
 | Descargar el FLAC (parte 2/3, ficha) | — | — | La misión pasa a esta carta al llegar al nivel 1 | hecho |
 | Winamp (parte 3/3, ficha) | — | — | La misión pasa a esta carta al llegar al nivel 2 | hecho |
 | **Charts** (legendaria, recompensa) | 5 | 5/5 | Grito: repite, en orden, todos los hechizos que lanzaste esta partida (objetivos al azar, con tu poder de hechizo) | hecho |

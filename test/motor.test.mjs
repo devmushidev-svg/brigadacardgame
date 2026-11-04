@@ -658,6 +658,16 @@ console.log("ok: intolerante");
   assert.ok(res.ev.some((x) => x.e === "ataque"), "y ataca");
   assert.ok(e.j[r].vida < vr || e.j[r].tablero[0].vida < 50, "le pegó a un enemigo");
   assert.ok(res.ev.length < 400, "termina");
+  assert.ok(!e.j[s].tablero.some((m) => m.id === "tun_zombie"), "el zombie ataca y se va");
+  // con mejoras grandes, el zombie pega como mucho 2
+  e.j[s].mejoras = { tun: { ataque: 5, vida: 0 } };
+  e.j[s].tablero = [{ uid: "q1", id: "tun", tribu: "tun", ataque: 6, vida: 1, vidaMax: 1, ataques: 0 }];
+  e.j[r].tablero = [{ uid: "rw", id: "x", tribu: null, ataque: 1, vida: 50, vidaMax: 50, ataques: 0 }];
+  const res2 = M.aplicar(e, r, { t: "atacar", de: "rw", a: "q1" }, db, 0);
+  const at = res2.ev.find((x) => x.e === "ataque" && x.a !== "q1");
+  assert.ok(at, "ataca el zombie");
+  const golpe = res2.ev.filter((x) => x.e === "dano" && x.a === at.a).map((x) => x.n);
+  assert.ok(golpe.length && golpe.every((n) => n <= 2), "como mucho 2 de daño: " + golpe);
 }
 // --- Tun Astrónomo: al atacar, un Tun de tu mano cuesta 2 menos ---
 {
@@ -1027,7 +1037,7 @@ console.log("ok: Yamir");
   const res = M.aplicar(e, s, { t: "jugar", uid: "t6" }, db, 0);
   assert.ok(res.ev.some((x) => x.e === "mision_nivel" && x.nivel === 1), "nivel 1 a los 5");
   const nuevas = e.j[s].mano.filter((c) => !antes.has(c.uid) && c.id === "tun_brawl");
-  assert.ok(nuevas.length >= 3 && nuevas.every((c) => M.costeCarta(e, s, c, db) === db.tun_brawl.coste - 1), "robó 3 que cuestan 1 menos");
+  assert.ok(nuevas.length === 2 && nuevas.every((c) => M.costeCarta(e, s, c, db) === db.tun_brawl.coste - 1), "robó 2 que cuestan 1 menos");
   assert.equal(e.j[s].mision.meta, 10, "la meta pasa a 10");
   assert.equal(e.j[s].mision.id, "descargar_flac", "la misión pasa a la parte 2");
   // nivel 2
@@ -1038,6 +1048,12 @@ console.log("ok: Yamir");
   assert.equal(e.j[s].poderHechizoExtra, 1, "nivel 2: +1 de daño de hechizos");
   assert.equal(e.j[s].mision.nivel, 2); assert.equal(e.j[s].mision.meta, 20, "falta el nivel 3");
   assert.equal(e.j[s].mision.id, "winamp", "y a la parte 3");
+  assert.equal(e.j[s].rebajaProxima, 2, "nivel 2: la próxima carta cuesta 2 menos");
+  e.j[s].mano.push({ uid: "b9", id: "tun_brawl" }, { uid: "b8", id: "tun_brawl" });
+  assert.equal(M.costeCarta(e, s, { uid: "b9", id: "tun_brawl" }, db), Math.max(0, db.tun_brawl.coste - 2));
+  e.j[s].tablero = e.j[s].tablero.filter((m) => m.id === "mejor_musica"); e.j[s].mana = 10; const rb = M.aplicar(e, s, { t: "jugar", uid: "b9" }, db, 0); assert.ok(!rb.error, rb.error);
+  assert.equal(e.j[s].rebajaProxima, 0, "solo la primera carta");
+  assert.equal(M.costeCarta(e, s, { uid: "b8", id: "tun_brawl" }, db), M.costeDe(e, s, db.tun_brawl), "la segunda cuesta lo normal");
   e.j[s].mano.push({ uid: "w8", id: "wey_emo" }); e.j[s].mana = 10;
   const v2 = e.j[r].vida;
   M.aplicar(e, s, { t: "jugar", uid: "w8" }, db, 0);
