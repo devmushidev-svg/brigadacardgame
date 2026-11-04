@@ -1002,7 +1002,6 @@
    "ataque": 7,
    "vida": 5,
    "tribu": "cruit",
-   "clase": "cruit",
    "rareza": "legendaria",
    "arte": "🤯",
    "texto": "Grito de batalla: lanza un hechizo al azar por cada hechizo que lanzaste esta partida (con objetivos al azar).",

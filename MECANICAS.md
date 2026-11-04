@@ -206,6 +206,7 @@ Diseño de Mario. Arquetipo: paladín molesto — llenar la mesa de Tun, buffear
 | **Mario Multiplanet** (legendaria) | 7 | 5/6 | Escudo divino, robo de vida, acometida. Grito: invoca una copia de este esbirro | hecho — falta imagen (🪐) y género; rareza propuesta |
 | **Rafael Fernando** (legendaria) | 6 | 3/7 | Colosal +99 (apéndices 2/3). Cuando muere un Rafael Fernando que no es el original, otro lo reemplaza (mientras queden de los 99) | hecho — falta imagen (🧍) y género; rareza propuesta |
 | El Tipo de la Foto ♂ | 4 | 5/5 | Último aliento: se esconde en una carta al azar de la mano del rival; cuando la juegue, vuelve a salir para su dueño | hecho — falta imagen (📸) |
+| **Cruit Breakdown** ⚧ (legendaria, neutral, tribu Cruit, como Yogg-Saron) | 10 | 7/5 | Grito: lanza un hechizo al azar por cada hechizo que lanzaste esta partida, con objetivos al azar | hecho — falta imagen (🤯) |
 | Doxeo (arma) | 4 | 3 de ataque, 3 usos | Cada vez que tu héroe ataca, robás una carta legendaria de tu mazo | hecho — falta imagen (🕵️); coste propuesto |
 | Cuidar VC (VC) | 3 | 3/4 | Último aliento: obtenés 4 de armadura | hecho — falta imagen (🎧) |
 | Ishowspeed Tocándose ♂ (VC) | 4 | 4/3 | Último aliento: 3 de daño a todos los esbirros | hecho — falta imagen (⚡); coste y stats propuestos |
@@ -239,7 +240,6 @@ Diseño de Mario. Marco azul (provisional). Cruit es no binario: toda carta con 
 | Cruit Excel ⚧ (tribu Cruit, etiqueta programa) | 5 | 2/2 | Grito: +1/+1 por cada Tarea que lanzaste esta partida. No se le puede dar Leche | hecho |
 | Tarea de la U (hechizo, etiqueta Tarea) | 1 | — | Robás una carta y obtenés una tarea universitaria al azar | hecho |
 | **Coco Supremo** ⚧ (legendaria) | 9 | 7/5 | Grito: repite los gritos y últimos alientos de los Cruit que jugaste esta partida. Orden: primero el resto, después los que crecen por cada cosa (Excel) y al último los que pegan según su ataque (Baño) | hecho |
-| **Cruit Breakdown** ⚧ (legendaria, como Yogg-Saron) | 10 | 7/5 | Grito: lanza un hechizo al azar por cada hechizo que lanzaste esta partida, con objetivos al azar | hecho — falta imagen (🤯) |
 | Estreñido Cruit ⚧ | 1 | 1/2 | Grito y último aliento: mete 2 Cacas en el mazo del rival (al robarlas: 2 de daño y roba otra) | hecho |
 | Cruit Sangre ⚧ | 2 | 2/2 | Se fusiona con tus otros Cruit Sangre (suma stats, ×N en la carta). Al final de tu turno, roba 1 de vida por cada Sangre fusionada al enemigo con menos vida | hecho |
 | Cruit Vampiro ⚧ | 5 | 3/3 | Tus Cruit Sangre roban el doble de vida. Grito: invoca 2 Cruit Sangre (se fusionan en una, con animación) | hecho |
