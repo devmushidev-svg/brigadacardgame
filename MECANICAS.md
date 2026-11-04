@@ -285,6 +285,6 @@ Con los mazos de 20, bot contra bot, Cruit le ganaba a Tun ~68% (era ~95% antes 
 
 Con 50 de vida y mazos de 40, bot contra bot: Cruit gana ~45% con el poder del Coco y ~48% con "Hacer la tarea".
 
-## Próximo héroe: clase de hechizos (inspirada en el Mago)
+## Próximo héroe: Tomis (clase de hechizos, inspirada en el Mago)
 
-Pendiente: nombre, imagen y cartas de clase. Poder decidido: **(2) descubre un hechizo de tu clase o neutral; cuesta 1 menos** (`{ "tipo": "descubrir", "filtro": { "tipo": "hechizo" }, "deMiClase": true, "rebaja": 1 }`). El héroe no se agrega hasta tener cartas de clase, para que no salga en "Al azar" con un mazo vacío.
+Pendiente: imagen, nombre del poder y cartas de clase. Poder decidido: **(2) descubre un hechizo de tu clase o neutral; cuesta 1 menos** (`{ "tipo": "descubrir", "filtro": { "tipo": "hechizo" }, "deMiClase": true, "rebaja": 1 }`). El héroe no se agrega hasta tener cartas de clase, para que no salga en "Al azar" con un mazo vacío.
