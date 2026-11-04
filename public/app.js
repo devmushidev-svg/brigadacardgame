@@ -36,7 +36,43 @@ const Sonido = (() => {
     s.buffer = b; f.type = "lowpass"; f.frequency.value = filtro; g.gain.value = vol;
     s.connect(f).connect(g).connect(c.destination); s.start();
   }
+  // el sonido propio de cada carta: una melodía corta que sale de su id (siempre igual para esa carta, distinta entre cartas).
+  // La clase le da el timbre: Tun chilla (sierra que sube), Cruit es suave (triángulo), las neutrales varían.
+  function firma(c, momento) {
+    if (mudo || !c?.id) return;
+    let h = 2166136261;
+    for (const ch of c.id) h = Math.imul(h ^ ch.charCodeAt(0), 16777619);
+    const r = () => ((h = Math.imul(h ^ (h >>> 15), 2246822507) >>> 0) / 4294967296);
+    const escala = [[0, 2, 4, 7, 9], [0, 3, 5, 7, 10], [0, 2, 3, 7, 8], [0, 4, 5, 7, 11]][Math.floor(r() * 4)];
+    const base = 220 * 2 ** (Math.floor(r() * 12) / 12);
+    const onda = c.clase === "tun" ? "sawtooth" : c.clase === "cruit" ? "triangle" : ["sine", "triangle", "square"][Math.floor(r() * 3)];
+    const vol = onda === "sawtooth" || onda === "square" ? 0.05 : 0.11;
+    const sube = c.clase === "tun" ? 1.25 : 1; // el "uh-uh" de mono
+    const nota = (i) => base * 2 ** ((escala[((i % 5) + 5) % 5] + 12 * Math.floor(i / 5)) / 12);
+    const motivo = Array.from({ length: 3 + Math.floor(r() * 2) }, () => Math.floor(r() * 8));
+    const paso = 0.07 + r() * 0.05;
+    const leg = c.rareza === "legendaria";
+    if (momento === "ataque") { // dos golpes cortos
+      tono(nota(motivo[0]), 0.09, onda, vol * 1.3, 1.3);
+      tono(nota(motivo[1] + 2), 0.12, onda, vol * 1.3, 0.8, 0.07);
+      ruido(0.08, 0.12, 1400);
+      return;
+    }
+    if (momento === "muere") { // la melodía al revés, más grave y cayendo
+      [...motivo].reverse().forEach((n, i) => tono(nota(n) / 2, 0.2, onda, vol, 0.7, i * paso * 1.3));
+      return;
+    }
+    // jugar
+    motivo.forEach((n, i) => tono(nota(n), paso * 1.8, onda, vol, sube, i * paso));
+    if (leg) { // legendaria: arpegio que sube, acorde final largo y brillo
+      const fin = motivo.length * paso;
+      [0, 2, 4, 5, 7].forEach((k, i) => tono(nota(k + 5), 0.18, "triangle", 0.07, 1, fin + i * 0.06));
+      [0, 2, 4].forEach((k) => tono(nota(k + 10), 1.1, "sine", 0.06, 1, fin + 0.32));
+      [0, 1, 2].forEach((i) => tono(nota(14 + i * 2), 0.25, "sine", 0.03, 1.5, fin + 0.45 + i * 0.09));
+    }
+  }
   return {
+    firma,
     jugar() { ruido(0.22, 0.35, 380); tono(90, 0.25, "sine", 0.35, 0.5); },
     carta() { ruido(0.1, 0.12, 3000); },
     golpe(n = 2) { ruido(0.16 + 0.02 * Math.min(n, 8), 0.4, 420 + n * 70); tono(120, 0.22, "sine", 0.3, 0.45); },
@@ -151,9 +187,14 @@ addEventListener("pointerdown", () => Sonido.despertar(), { once: true });
 // "sonido" suelto es el de jugarla. Devuelve true si la carta tenía su propio sonido para ese momento.
 function sonidoCarta(id, momento) {
   const c = DB[id];
-  const url = c?.sonidos?.[momento] || (momento === "jugar" ? c?.sonido : null);
+  if (!c) return false;
+  const url = c.sonidos?.[momento] || (momento === "jugar" ? c.sonido : null);
   if (url) Sonido.archivo(url);
-  return !!url;
+  else {
+    Sonido.firma(c, momento); // cada carta tiene su sonido generado
+    if (momento === "jugar" && c.clase === "tun" && c.tipo === "esbirro") setTimeout(() => Sonido.mono(), 260); // y los Tun, su grito de mono
+  }
+  return true;
 }
 // la carta de un esbirro que está (o estaba) en la mesa
 const cartaDeRef = (ref) => V && [0, 1].map((s) => V.j[s].tablero.find((m) => m.uid === ref)).find(Boolean)?.id;
@@ -1141,9 +1182,9 @@ async function despues(ev, v, antes, nuevos) {
     if (!el) continue;
     const inv = ev.find((x) => (x.e === "invoca" || x.e === "transforma") && x.uid === uid);
     const c = DB[inv?.carta] || {};
-    const propio = sonidoCarta(inv?.carta, "jugar");
-    if (!propio && c.tribu === "tun" && !c.token) Sonido.mono();
-    else if (!propio && c.tribu === "tun" && monitos++ < 2) setTimeout(() => Sonido.monito(), monitos * 90);
+    // fichas invocadas de a muchas: solo suenan las primeras (los Tun 1/1 con su "uh" corto)
+    if (!c.token) sonidoCarta(inv?.carta, "jugar");
+    else if (monitos++ < 2) setTimeout(() => (c.id === "tun" ? Sonido.monito() : sonidoCarta(inv?.carta, "jugar")), monitos * 90);
     if (nuevos.especial?.has(uid)) { // ya hizo su entrada grande: solo brilla en su lugar
       el.animate([{ filter: "brightness(2.2) drop-shadow(0 0 20px #ffd34f)" }, { filter: "none" }], 700);
       continue;

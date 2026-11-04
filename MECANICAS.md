@@ -134,7 +134,7 @@ En el texto de las cartas, las palabras clave salen en **negrita** y al ver la c
 - `"vomito"`: un chorro verde que sale del esbirro y salpica a todos los objetivos (Cruit Intolerante)
 - `"devorar"`: los esbirros devorados vuelan girando hacia la carta, con gruñido demoníaco (Tun Satánico)
 
-**Sonidos:** las cartas de Tun suenan a mono al jugarse; los Tun invocados hacen un "uh" corto. Como en Hearthstone, cada carta puede tener audios propios para tres momentos (archivos en `public/sonidos/`):
+**Sonidos:** cada carta tiene su propio sonido generado (una melodía corta que sale de su id, distinta para cada carta) al jugarse, al atacar y al morir; las legendarias suman un arpegio y un acorde final. El timbre depende de la clase: Tun chilla (y los esbirros de Tun suman su grito de mono), Cruit es suave, las neutrales varían. Los Tun 1/1 invocados hacen un "uh" corto. Como en Hearthstone, cada carta puede tener audios propios para tres momentos (archivos en `public/sonidos/`):
 
 ```json
 "sonidos": { "jugar": "/sonidos/tun_puto_jugar.mp3", "ataque": "/sonidos/tun_puto_ataque.mp3", "muere": "/sonidos/tun_puto_muere.mp3" }
