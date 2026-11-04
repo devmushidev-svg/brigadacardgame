@@ -880,3 +880,18 @@ console.log("ok: descubrir hechizo con descuento");
   assert.equal(e.j[r].tablero[0].vida, 9 - 1 - 1, "Tunita hace 1 + 1 de poder de hechizo");
 }
 console.log("ok: Tomis y poder de hechizo");
+
+// --- Grindcore: 2 al objetivo y 3 a todos los enemigos (el objetivo recibe los dos); con poder de hechizo, +1 en cada parte ---
+{
+  const e = nueva(112); const s = e.turno, r = 1 - s;
+  e.j[s].tablero = []; e.j[r].tablero = [{ uid: "rv", id: "x", tribu: null, ataque: 1, vida: 20, vidaMax: 20, ataques: 0 }, { uid: "rw", id: "x", tribu: null, ataque: 1, vida: 20, vidaMax: 20, ataques: 0 }];
+  preparar(e, s, ["grindcore", "mejor_musica", "grindcore"]);
+  const vr = e.j[r].vida;
+  assert.ok(!M.aplicar(e, s, { t: "jugar", uid: "t0", objetivo: "rv" }, db, 0).error);
+  assert.equal(e.j[r].tablero[0].vida, 15); assert.equal(e.j[r].tablero[1].vida, 17); assert.equal(e.j[r].vida, vr - 3);
+  M.aplicar(e, s, { t: "jugar", uid: "t1" }, db, 0);
+  e.j[s].mana = 10;
+  M.aplicar(e, s, { t: "jugar", uid: "t2", objetivo: "rv" }, db, 0);
+  assert.equal(e.j[r].tablero[0].vida, 15 - 3 - 4, "con poder de hechizo: 3 + 4");
+}
+console.log("ok: Grindcore");

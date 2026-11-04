@@ -1460,6 +1460,27 @@
    "arte": "/arte/mejor_musica.webp",
    "poder_hechizo": 1,
    "texto": "Poder de hechizo +1."
+  },
+  {
+   "id": "grindcore",
+   "nombre": "Grindcore",
+   "tipo": "hechizo",
+   "coste": 6,
+   "clase": "tomis",
+   "arte": "/arte/grindcore.webp",
+   "texto": "Inflige 2 de daño. Inflige 3 de daño a todos los enemigos.",
+   "efectos": [
+    {
+     "tipo": "dano",
+     "objetivo": "elegido",
+     "cantidad": 2
+    },
+    {
+     "tipo": "dano",
+     "objetivo": "todos_enemigos",
+     "cantidad": 3
+    }
+   ]
   }
  ],
  "heroes": [

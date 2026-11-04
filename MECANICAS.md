@@ -292,5 +292,6 @@ Está en `heroes` con `"enConstruccion": true`: aparece en la colección pero no
 | Carta | Coste | Stats | Efecto | Estado |
 |---|---|---|---|---|
 | La Mejor Música que Jamás Escucharás | 2 | 1/5 | Poder de hechizo +1 | hecho |
+| Grindcore (hechizo) | 6 | — | 2 de daño a lo que elijas y 3 a todos los enemigos (el objetivo enemigo recibe los dos) | hecho — coste propuesto |
 
 **Poder de hechizo** (`poder_hechizo: N` en un esbirro): mientras esté en tu mesa, tus hechizos que hacen daño (`dano`, `repartir`, `robar_vida`) pegan N más.
