@@ -952,10 +952,10 @@ console.log("ok: Fumando Porro");
   e.j[s].tablero = []; // aunque Ethypostlife ya no esté, el efecto sigue
   M.aplicar(e, s, { t: "jugar", uid: "t1" }, db, 0);
   const otro = e.j[s].tablero.find((m) => m.id !== "homero");
-  assert.ok(otro && db[otro.id].coste === 3, "invoca un esbirro de 3 (además del Homero)");
+  assert.ok(otro && db[otro.id].coste === 5, "invoca un esbirro de 5 (además del Homero)");
   e.j[s].tablero = [];
   M.aplicar(e, s, { t: "jugar", uid: "t2" }, db, 0);
-  assert.ok(e.j[s].tablero.some((m) => db[m.id].coste === 1 && m.id !== "homero"), "un hechizo de 1 invoca uno de 1");
+  assert.ok(e.j[s].tablero.some((m) => db[m.id].coste === 2 && m.id !== "homero"), "un hechizo de 2 invoca uno de 2");
 }
 console.log("ok: Ethypostlife");
 
@@ -995,12 +995,12 @@ console.log("ok: Mossad Strongest Agent");
   e.j[s].tablero = [];
   preparar(e, s, ["yamir", "fumando_porro", "tun_brawl"]);
   const porro = e.j[s].mano.find((c) => c.id === "fumando_porro"), brawl = e.j[s].mano.find((c) => c.id === "tun_brawl");
-  assert.equal(M.costeCarta(e, s, porro, db), 3);
+  assert.equal(M.costeCarta(e, s, porro, db), 5);
   M.aplicar(e, s, { t: "jugar", uid: "t0" }, db, 0);
-  assert.equal(M.costeCarta(e, s, porro, db), 2, "el hechizo cuesta 1 menos");
+  assert.equal(M.costeCarta(e, s, porro, db), 4, "el hechizo cuesta 1 menos");
   assert.equal(M.costeCarta(e, s, brawl, db), db.tun_brawl.coste, "los esbirros no");
   e.j[s].tablero = [];
-  assert.equal(M.costeCarta(e, s, porro, db), 3, "sin Yamir vuelve a costar lo normal");
+  assert.equal(M.costeCarta(e, s, porro, db), 5, "sin Yamir vuelve a costar lo normal");
 }
 {
   const e = nueva(120); const s = e.turno, r = 1 - s;
@@ -1037,7 +1037,7 @@ console.log("ok: Yamir");
   const res = M.aplicar(e, s, { t: "jugar", uid: "t6" }, db, 0);
   assert.ok(res.ev.some((x) => x.e === "mision_nivel" && x.nivel === 1), "nivel 1 a los 5");
   const nuevas = e.j[s].mano.filter((c) => !antes.has(c.uid) && c.id === "tun_brawl");
-  assert.ok(nuevas.length === 2 && nuevas.every((c) => M.costeCarta(e, s, c, db) === db.tun_brawl.coste - 1), "robó 2 que cuestan 1 menos");
+  assert.ok(nuevas.length === 1 && nuevas.every((c) => M.costeCarta(e, s, c, db) === db.tun_brawl.coste - 1), "robó 1 que cuesta 1 menos");
   assert.equal(e.j[s].mision.meta, 10, "la meta pasa a 10");
   assert.equal(e.j[s].mision.id, "descargar_flac", "la misión pasa a la parte 2");
   // nivel 2
@@ -1083,15 +1083,18 @@ console.log("ok: Contador de Scrobbles");
 }
 console.log("ok: Charts");
 
-// --- Audiophile: tus hechizos cuestan 1 menos (ya no roba) ---
+// --- Audiophile: grito: tu próximo hechizo cuesta 2 menos (solo el primero) ---
 {
   const e = nueva(123); const s = e.turno;
   e.j[s].tablero = [];
-  preparar(e, s, ["audiophile", "fumando_porro"]);
+  preparar(e, s, ["audiophile", "fumando_porro", "wey_emo", "tun_brawl"]);
   const n = e.j[s].mano.length;
   M.aplicar(e, s, { t: "jugar", uid: "t0" }, db, 0);
-  assert.equal(e.j[s].mano.length, n - 1, "ya no roba");
-  assert.equal(M.costeCarta(e, s, e.j[s].mano.find((c) => c.id === "fumando_porro"), db), 2);
+  assert.equal(e.j[s].mano.length, n - 1, "no roba");
+  assert.equal(M.costeCarta(e, s, e.j[s].mano.find((c) => c.id === "fumando_porro"), db), 3, "5 - 2");
+  assert.equal(M.costeCarta(e, s, e.j[s].mano.find((c) => c.id === "tun_brawl"), db), M.costeDe(e, s, db.tun_brawl), "los esbirros no");
+  e.j[s].mana = 10; M.aplicar(e, s, { t: "jugar", uid: "t2" }, db, 0);
+  assert.equal(M.costeCarta(e, s, e.j[s].mano.find((c) => c.id === "fumando_porro"), db), 5, "se gastó con el primer hechizo");
 }
 console.log("ok: Audiophile");
 
@@ -1146,7 +1149,7 @@ console.log("ok: Breakcore");
 }
 console.log("ok: Post-rock");
 
-// --- Música Andina: cura 6 a tu héroe y reparte 6 entre los enemigos ---
+// --- Música Andina: cura 7 a tu héroe y reparte 7 entre los enemigos ---
 {
   const e = nueva(127); const s = e.turno, r = 1 - s;
   e.j[s].tablero = []; e.j[r].tablero = [];
@@ -1154,7 +1157,7 @@ console.log("ok: Post-rock");
   e.j[s].vida = 30;
   const vr = e.j[r].vida;
   M.aplicar(e, s, { t: "jugar", uid: "t0" }, db, 0);
-  assert.equal(e.j[s].vida, 36); assert.equal(vr - e.j[r].vida, 6);
+  assert.equal(e.j[s].vida, 37); assert.equal(vr - e.j[r].vida, 7);
 }
 console.log("ok: Música Andina");
 
@@ -1322,3 +1325,18 @@ console.log("ok: Tun Satánico");
   assert.ok(e.j[r].vida < antes || e.j[s].tablero.some((m) => m.id === "tun_zombie"), "un Tun normal sí trae un zombie");
 }
 console.log("ok: Tun Zombie no se encadena");
+// --- Scrobbles: también suman los hechizos repetidos y las cartas de música invocadas; Shoegaze muestra qué repite ---
+{
+  const e = nueva(150); const s = e.turno;
+  e.j[s].tablero = []; e.j[1 - s].tablero = [];
+  preparar(e, s, ["shoegaze", "fumando_porro"], 10);
+  e.j[s].jugados = ["grindcore", "wey_emo", "breakcore"];
+  e.j[s].scrobbles = 0;
+  assert.deepEqual(M.vista(e, s, db).j[s].mano.find((c) => c.id === "shoegaze").repite, ["Wey Emo Gritando", "Breakcore"], "Shoegaze dice qué repite");
+  M.aplicar(e, s, { t: "jugar", uid: "t0" }, db, 0);
+  assert.equal(e.j[s].scrobbles, 3, "Shoegaze (1) + 2 repetidos");
+  e.j[s].mana = 10; e.j[s].scrobbles = 0;
+  M.aplicar(e, s, { t: "jugar", uid: "t1" }, db, 0);
+  assert.equal(e.j[s].scrobbles, 2, "Fumando Porro (1) + Homero invocado (1)");
+}
+console.log("ok: scrobbles de repetidos e invocados");

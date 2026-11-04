@@ -1565,7 +1565,7 @@
    "id": "fumando_porro",
    "nombre": "Fumando Porro",
    "tipo": "hechizo",
-   "coste": 3,
+   "coste": 5,
    "clase": "tomis",
    "arte": "/arte/fumando_porro.webp",
    "texto": "Invoca un Homero 5/5. Tus próximos 2 hechizos también invocan uno.",
@@ -1603,7 +1603,10 @@
    "clase": "tomis",
    "token": true,
    "arte": "/arte/homero.webp",
-   "texto": "Otra producción de Marko."
+   "texto": "Otra producción de Marko.",
+   "etiquetas": [
+    "musica"
+   ]
   },
   {
    "id": "ethypostlife",
@@ -1701,7 +1704,7 @@
    "clase": "tomis",
    "rareza": "legendaria",
    "arte": "/arte/scrobbles.webp",
-   "texto": "Serie de misiones: jugá 5 hechizos o cartas de música. Recompensa: robá 2 cartas; cuestan 1 menos.",
+   "texto": "Serie de misiones: jugá, repetí o invocá 5 hechizos o cartas de música. Recompensa: robá una carta; cuesta 1 menos.",
    "mision": {
     "contar": "scrobble",
     "etapas": [
@@ -1711,7 +1714,7 @@
       "recompensa": [
        {
         "tipo": "robar_rebajadas",
-        "cantidad": 2,
+        "cantidad": 1,
         "rebaja": 1
        }
       ]
@@ -1725,9 +1728,8 @@
         "cantidad": 1
        },
        {
-        "tipo": "robar_rebajadas",
-        "cantidad": 2,
-        "rebaja": 0
+        "tipo": "robar",
+        "cantidad": 1
        }
       ]
      },
@@ -1774,7 +1776,7 @@
    "rareza": "legendaria",
    "token": true,
    "arte": "/arte/descargar_flac.webp",
-   "texto": "Serie de misiones: jugá 5 más. Recompensa: tus hechizos tienen +1 de daño esta partida. Robá 2 cartas."
+   "texto": "Serie de misiones: 5 más. Recompensa: tus hechizos tienen +1 de daño esta partida. Robá una carta."
   },
   {
    "id": "winamp",
@@ -1785,7 +1787,7 @@
    "rareza": "legendaria",
    "token": true,
    "arte": "/arte/winamp.webp",
-   "texto": "Serie de misiones: jugá 10 más. Recompensa: Charts."
+   "texto": "Serie de misiones: 10 más (jugados, repetidos o invocados). Recompensa: Charts."
   },
   {
    "id": "audiophile",
@@ -1799,8 +1801,13 @@
     "musica"
    ],
    "arte": "/arte/audiophile.webp",
-   "abarata_hechizos": 1,
-   "texto": "Tus hechizos cuestan 1 menos."
+   "texto": "Grito de batalla: tu próximo hechizo cuesta 2 menos.",
+   "grito": [
+    {
+     "tipo": "rebaja_hechizo",
+     "cantidad": 2
+    }
+   ]
   },
   {
    "id": "midwest_emo",
@@ -1887,16 +1894,16 @@
     "musica"
    ],
    "arte": "/arte/musica_andina.webp",
-   "texto": "Restaurá 6 de vida a tu héroe. Reparte 6 de daño entre los enemigos.",
+   "texto": "Restaurá 7 de vida a tu héroe. Reparte 7 de daño entre los enemigos.",
    "efectos": [
     {
      "tipo": "curar",
      "objetivo": "heroe_propio",
-     "cantidad": 6
+     "cantidad": 7
     },
     {
      "tipo": "repartir",
-     "cantidad": 6,
+     "cantidad": 7,
      "fx": "quena"
     }
    ]
@@ -2107,7 +2114,7 @@
    "id": "review_rym",
    "nombre": "Review de RYM",
    "tipo": "hechizo",
-   "coste": 2,
+   "coste": 3,
    "clase": "tomis",
    "etiquetas": [
     "musica"

@@ -65,7 +65,8 @@ export function costeCarta(estado, s, c, db) {
   // aura "abarata_hechizos" de tus esbirros (Yamir: tus hechizos cuestan 1 menos)
   const aura = db[c.id]?.tipo === "hechizo" ? estado.j[s].tablero.filter((m) => m.vida > 0).reduce((t, m) => t + cartasDelEsbirro(m, db).reduce((u, x) => u + (x.abarata_hechizos || 0), 0), 0) : 0;
   // "la próxima carta que juegues cuesta N menos" (misión de Tomis): vale para la primera que juegues
-  return Math.max(0, costeDe(estado, s, db[c.id]) - (c.rebaja || 0) - aura - (estado.j[s].rebajaProxima || 0));
+  const audio = db[c.id]?.tipo === "hechizo" ? estado.j[s].rebajaHechizo || 0 : 0; // Audiophile: tu próximo hechizo cuesta menos
+  return Math.max(0, costeDe(estado, s, db[c.id]) - (c.rebaja || 0) - aura - audio - (estado.j[s].rebajaProxima || 0));
 }
 // cartas que pueden salir al azar o en un descubrir
 const pozo = (db, filtro) => Object.values(db).filter((c) => !c.token && c.tipo === "esbirro" && cumpleFiltro(c, filtro));
@@ -455,6 +456,7 @@ function invocar(estado, s, id, ev, db, pos) {
   p.tablero.splice(i, 0, m);
   ev.push({ e: "invoca", seat: s, uid: m.uid, carta: id, pos: i });
   if (m.tribu) (p.invocadosTribu ||= {})[m.tribu] = (p.invocadosTribu[m.tribu] || 0) + 1;
+  if (!estado.desdeMano && (c.etiquetas || []).includes("musica")) scrobble(estado, s, ev, db); // una carta de música invocada suma un scrobble
   avanzarMision(estado, s, "invocar_tribu", m.tribu, ev, db);
   // "cuando se invoca" (sale de la mano o lo invoca otra carta): los músicos de Folklore
   if (c.al_invocar) aplicarEfectos(estado, s, c.al_invocar, null, ev, db, m.uid);
@@ -554,6 +556,12 @@ export const hechizosAzar = (db) => Object.values(db).filter((c) => c.tipo === "
   !(c.efectos || []).some((x) => x.tipo === "vc_opcion") && (!c.token || (c.etiquetas || []).includes("tarea_util")) && !(c.token && daLeche(c)));
 
 // lanza un hechizo eligiendo un objetivo válido al azar (si necesita y no hay, no se lanza)
+// scrobbles (misión de Tomis): se suma uno por cada hechizo o carta de música que jugás, repetís o invocás
+function scrobble(estado, s, ev, db) {
+  const p = estado.j[s];
+  p.scrobbles = (p.scrobbles || 0) + 1; // se cuentan aunque no haya misión (Folklore)
+  avanzarMision(estado, s, "scrobble", null, ev, db);
+}
 function lanzarConObjetivoAzar(estado, s, c, ev, db, ctx = {}) {
   let obj = null;
   if (necesitaObjetivo(c)) {
@@ -562,10 +570,17 @@ function lanzarConObjetivoAzar(estado, s, c, ev, db, ctx = {}) {
     obj = elegir(estado, refs);
   }
   ev.push({ e: "repite", seat: s, carta: c.id });
+  scrobble(estado, s, ev, db); // un hechizo repetido o lanzado al azar también suma
   aplicarEfectos(estado, s, c.efectos, obj, ev, db, null, ctx);
   resolverMuertes(estado, ev, db);
 }
 
+// los hechizos que repite Charts (todos) o Shoegaze (los N últimos, sin contar los que repiten); se muestran en la carta
+function hechizosARepetir(estado, s, ef, db) {
+  let ids = (estado.j[s].jugados || []).filter((id) => db[id]?.tipo === "hechizo" && !(db[id].efectos || []).some((x) => x.tipo === "repetir_hechizos"));
+  if (ef.cantidad != null) ids = ids.slice(-ef.cantidad);
+  return ids.slice(0, 40);
+}
 // poder de hechizo: lo que suman tus esbirros con "poder_hechizo" al daño de tus hechizos
 function poderHechizo(estado, s, db) {
   return (estado.j[s].poderHechizoExtra || 0) + estado.j[s].tablero.filter((m) => m.vida > 0).reduce((t, m) => t + cartasDelEsbirro(m, db).reduce((u, c) => u + (c.poder_hechizo || 0), 0), 0);
@@ -700,6 +715,10 @@ function aplicarEfectos(estado, s, efectos, elegido, ev, db, fuente, ctx = {}) {
       for (const c of mano) if (!antes.has(c.uid)) c.rebaja = (c.rebaja || 0) + (ef.rebaja || 0);
       continue;
     }
+    if (ef.tipo === "rebaja_hechizo") { // tu próximo hechizo cuesta N menos (Audiophile)
+      estado.j[s].rebajaHechizo = (estado.j[s].rebajaHechizo || 0) + n;
+      continue;
+    }
     if (ef.tipo === "rebaja_proxima") { // la próxima carta que juegues cuesta N menos
       estado.j[s].rebajaProxima = (estado.j[s].rebajaProxima || 0) + n;
       ev.push({ e: "global", seat: s });
@@ -746,10 +765,7 @@ function aplicarEfectos(estado, s, efectos, elegido, ev, db, fuente, ctx = {}) {
     if (ef.tipo === "repetir_hechizos") {
       // Charts: vuelve a lanzar, en orden, todos los hechizos que lanzaste esta partida (objetivos al azar, con tu poder de hechizo)
       // los que a su vez repiten hechizos (Shoegaze) no se repiten: si no, se repetirían sin fin
-      let ids = (estado.j[s].jugados || []).filter((id) => db[id]?.tipo === "hechizo" && !(db[id].efectos || []).some((x) => x.tipo === "repetir_hechizos"));
-      // "cantidad": solo los N últimos, sin contar el hechizo que se está lanzando (Shoegaze: 3)
-      if (ef.cantidad != null) ids = ids.slice(-n);
-      ids = ids.slice(0, 40);
+      const ids = hechizosARepetir(estado, s, ef, db);
       for (const id of ids) {
         if (estado.fase !== "jugando" || estado.pendiente) break;
         lanzarConObjetivoAzar(estado, s, db[id], ev, db, { poderHechizo: poderHechizo(estado, s, db) });
@@ -1252,10 +1268,9 @@ export function aplicar(estado, s, accion, db, ahora) {
     registrar(estado, `${p.nombre} jugo ${carta.nombre}`);
     if (carta.tipo === "hechizo") p.hechizosLanzados = (p.hechizosLanzados || 0) + 1; // los cuenta Cruit Breakdown
     // scrobbles (misión de Tomis): cada hechizo o carta de música que jugás
-    if (carta.tipo === "hechizo" || (carta.etiquetas || []).includes("musica")) {
-      p.scrobbles = (p.scrobbles || 0) + 1; // se cuentan aunque no haya misión (Folklore)
-      avanzarMision(estado, s, "scrobble", null, ev, db);
-    }
+    if (carta.tipo === "hechizo" || (carta.etiquetas || []).includes("musica")) scrobble(estado, s, ev, db);
+    // Audiophile: el próximo hechizo cuesta menos; se gasta con este
+    if (carta.tipo === "hechizo" && p.rebajaHechizo) p.rebajaHechizo = 0;
     if (carta.tipo === "arma") {
       p.arma = { id: carta.id, ataque: carta.ataque, durabilidad: carta.durabilidad };
       ev.push({ e: "arma", seat: s, carta: carta.id });
@@ -1282,18 +1297,20 @@ export function aplicar(estado, s, accion, db, ahora) {
       }
       // ecos pendientes de hechizos anteriores (Fumando Porro): este hechizo también los hace
       const ecos = (p.ecos || []).filter((x) => x.quedan > 0);
-      for (const eco of ecos) { eco.quedan--; if (eco.origen) ev.push({ e: "repite", seat: s, carta: eco.origen }); aplicarEfectos(estado, s, eco.efectos, null, ev, db, null); }
+      for (const eco of ecos) { eco.quedan--; if (eco.origen) { ev.push({ e: "repite", seat: s, carta: eco.origen }); scrobble(estado, s, ev, db); } aplicarEfectos(estado, s, eco.efectos, null, ev, db, null); }
       p.ecos = (p.ecos || []).filter((x) => x.quedan > 0);
       // Unislop: por el resto de la partida tus Tareas se lanzan dos veces (una vez más por cada efecto así)
       // un hechizo descubierto con Midwest Emo se lanza dos veces
       const veces = vecesTarea(estado, s, carta.etiquetas) * (jugada.doble ? 2 : 1);
       for (let k = 0; k < veces && estado.fase === "jugando"; k++) {
-        if (k) ev.push({ e: "repite", seat: s, carta: carta.id });
+        if (k) { ev.push({ e: "repite", seat: s, carta: carta.id }); scrobble(estado, s, ev, db); }
         aplicarEfectos(estado, s, carta.efectos, accion.objetivo, ev, db, null, { poderHechizo: poderHechizo(estado, s, db) });
         resolverMuertes(estado, ev, db);
       }
     } else {
+      estado.desdeMano = true; // invocar no lo cuenta como scrobble: ya se contó al jugarlo
       const m = invocar(estado, s, carta.id, ev, db, accion.pos);
+      delete estado.desdeMano;
       // Colosal: entra con sus apéndices a los lados; si el apéndice se reemplaza, lo que no entra queda de reserva
       if (m && carta.colosal) {
         const { carta: ap, cantidad } = carta.colosal;
@@ -1435,11 +1452,15 @@ export function vista(estado, yo, db0 = {}) {
         const ef = d && [...(d.efectos || []), ...(d.grito || [])].find((x) => x.bonus);
         const pc = d && [...(d.efectos || []), ...(d.grito || [])].find((x) => x.porCada)?.porCada;
         const yogg = d && (d.grito || []).some((x) => x.tipo === "hechizos_azar");
+        const rep = d && [...(d.efectos || []), ...(d.grito || [])].find((x) => x.tipo === "repetir_hechizos");
+        const repite = rep ? hechizosARepetir(estado, s, rep, db0).map((id) => db0[id]?.nombre) : null;
         return { ...c, coste: d ? costeCarta(estado, s, c, db0) : undefined, ...(mej ? { ataque: d.ataque + mej.ataque, vida: d.vida + mej.vida } : {}),
+          ...(repite ? { repite } : {}),
           ...(ef ? { cantidad: cantidadDe(estado, s, ef) } : {}), ...(pc ? { veces: contarPorCada(estado, s, pc) } : {}), ...(yogg ? { veces: p.hechizosLanzados || 0 } : {}) };
       }) : undefined,
       mejoras: p.mejoras || null,
       rebajaProxima: p.rebajaProxima || 0,
+      rebajaHechizo: p.rebajaHechizo || 0,
       gritoExtra: p.gritoExtra || null,
       ecos: (p.ecos || []).map((x) => ({ origen: x.origen, quedan: x.quedan })),
       armadura: p.armadura || 0,

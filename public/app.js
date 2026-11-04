@@ -1377,7 +1377,7 @@ function potenciar(d, t) {
   return t.replace(/(\d+)(?= de daño)/g, (n) => `⟦${+n + p}⟧`).replace(/(reparte )(\d+)( más)/gi, (m, a, n, b) => `${a}⟦${+n + p}⟧${b}`);
 }
 const cartaMano = (c) => (DB[c.id] ? { ...DB[c.id], coste: c.coste ?? DB[c.id].coste, ataque: c.ataque ?? DB[c.id].ataque, vida: c.vida ?? DB[c.id].vida,
-  texto: potenciar(DB[c.id], DB[c.id].texto) + (c.doble ? " Se lanza dos veces." : "") + (c.cantidad != null ? ` (ahora: ${c.cantidad})` : "") + (c.veces != null ? ` (llevás ${c.veces})` : ""), contador: contadorMuertos(DB[c.id]) } : null);
+  texto: potenciar(DB[c.id], DB[c.id].texto) + (c.doble ? " Se lanza dos veces." : "") + (c.repite ? (c.repite.length ? ` (repite: ${c.repite.slice(0, 6).join(", ")}${c.repite.length > 6 ? ` y ${c.repite.length - 6} más` : ""})` : " (todavía no lanzaste hechizos)") : "") + (c.cantidad != null ? ` (ahora: ${c.cantidad})` : "") + (c.veces != null ? ` (llevás ${c.veces})` : ""), contador: contadorMuertos(DB[c.id]) } : null);
 // cartas que dependen de los Tun muertos llevan un contador en la carta
 function contadorMuertos(c) {
   const t = c.descuento?.por === "tribu_muertos" ? c.descuento.tribu : (c.efectos || []).find((e) => e.tipo === "invocar_por_muertos")?.tribu;
@@ -1437,6 +1437,7 @@ const mejorasHTML = (p) => Object.entries(p.mejoras || {}).filter(([, m]) => m.a
   .map(([t, m]) => `<div class="mejora" title="por el resto de la partida">${esc(t[0].toUpperCase() + t.slice(1))} ${m.ataque ? `+${m.ataque}⚔` : ""}${m.vida ? ` +${m.vida}❤` : ""}</div>`).join("")
   + (p.poderHechizo ? `<div class="mejora" title="tus hechizos pegan más por el resto de la partida">Hechizos +${p.poderHechizo}</div>` : "")
   + (p.gritoExtra ? `<div class="mejora" title="el próximo grito de batalla se activa ${p.gritoExtra.veces} veces">Grito ×${p.gritoExtra.veces}</div>` : "")
+  + (p.rebajaHechizo ? `<div class="mejora" title="tu próximo hechizo cuesta ${p.rebajaHechizo} menos">Próximo hechizo −${p.rebajaHechizo}</div>` : "")
   + (p.rebajaProxima ? `<div class="mejora" title="la próxima carta que juegues cuesta ${p.rebajaProxima} menos">Próxima −${p.rebajaProxima}</div>` : "")
   + (p.ecos || []).map((x) => `<div class="mejora" title="tus próximos ${x.quedan} hechizos también lo hacen">${esc(DB[x.origen]?.nombre || "Eco")} ×${x.quedan}</div>`).join("");
 function render(v) {
