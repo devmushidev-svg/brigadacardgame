@@ -179,21 +179,21 @@ Diseño de Mario. Arquetipo: paladín molesto — llenar la mesa de Tun, buffear
 | Tun Puto | 3 | 1/5 | Cada vez que muere cualquier esbirro, arroja un Tun a un enemigo al azar: daño igual al ataque de tu Tun básico (`cantidad: "ataque_tun"`) | hecho |
 | Tun Tung Sahur | 1 | 1/1 | Grito: invoca un Tun 1/1 | hecho |
 | Tun Mujer ♀ | 5 | 2/8 | Grito: transforma a tus otros esbirros en Tun Puto | hecho |
-| Tun Cool | 10 | 6/7 | Cuesta 1 menos por cada otro Tun en el campo (los dos lados). Cada vez que recibe daño, invoca un Tun 1/1 | hecho |
-| Novia de Tun ♀ | 3 | 2/1 | Último aliento: invoca 2 Tun y tus Tun tienen +1 de ataque por el resto de la partida | hecho |
-| Tun Mastermind | 15 | 6/3 | Acometida. 1 menos por cada Tun muerto en la partida. Grito: invoca 3 Tun y tus Tun tienen +1 de ataque por el resto de la partida | hecho |
+| Tun Cool | 10 | 6/7 | Acometida. Robo de vida. 1 menos por cada otro Tun en el campo. Al recibir daño, invoca un Tun. Grito: invoca una copia sin habilidades (ficha) y robás 2 Tun | hecho |
+| Novia de Tun ♀ | 3 | 4/1 | Acometida. Último aliento: invoca 2 Tun y tus Tun tienen +1 de ataque por el resto de la partida | hecho |
+| Tun Mastermind | 15 | 6/3 | Acometida. 1 menos por cada Tun muerto en la partida. Grito: invoca 3 Tun, tus Tun tienen +1 de ataque por el resto de la partida y robás 2 Tun | hecho |
 | Comida (hechizo) | 3 | — | Llena tu mesa de Tun 1/1 | hecho |
-| Plátano (hechizo) | 1 | — | +2/+2 y provocar a uno de tus Tun | hecho |
-| Tuna (hechizo) | 2 | — | +1 de vida a tus Tun | hecho |
-| Tunita (hechizo) | 2 | — | 1 de daño a un esbirro, +1 por cada Tun que jugaste esta partida | hecho |
+| Plátano (hechizo) | 1 | — | +1/+1 a tus Tun. Robás 2 Tun | hecho |
+| Tuna (hechizo) | 2 | — | Por el resto de la partida, tus Tun tienen +1/+1 | hecho |
+| Tunita (hechizo) | 2 | — | 1 de daño a un esbirro, +1 por cada Tun que invocaste o jugaste esta partida. Robás 2 Tun | hecho |
 | **Funeral de Tun** (hechizo legendario) | 10 | — | Un Tun Zombie por cada Tun muerto en la partida; cada uno que no cabe da +1 de ataque o de vida a un Tun al azar | hecho |
 | Tun Zombie (ficha) | — | 1/1 | Lo invoca Funeral de Tun | hecho — **stats provisionales** |
 | **Porque Me Monean** (legendaria) | 6 | 3/5 | Grito: convierte a todos los esbirros del rival en Tun 1/1 | hecho |
 | Tun Amor (sin género) | 5 | 3/5 | Cada vez que uno de tus Tun ataca, gana +1/+1 | hecho |
 | Choza de Monos | 2 | 0/6 | Al final de tu turno, invoca tres Tun | hecho |
 | **Tun Iguana** (legendaria) | 3 | 5/5 | Grito: por el resto de la partida, cada vez que muere uno de tus Tun, invoca un Tun Zombie que ataca a un enemigo al azar | hecho — falta confirmar género |
-| Tun Astrónomo | 3 | 2/4 | Cada vez que ataca, un Tun de tu mano al azar cuesta 2 menos | hecho — falta imagen (🔭); coste y stats propuestos, falta confirmar género |
-| Tun Satánico | **5** | **3/3** | Grito: destruye a tus otros Tun y gana +2/+2 por cada uno | hecho — **coste y stats provisionales**, falta que Mario los defina |
+| Tun Astrónomo | 1 | 1/5 | Cada vez que ataca, un Tun de tu mano al azar cuesta 2 menos | hecho |
+| Tun Satánico | 3 | 1/1 | Grito: destruye a tus otros Tun y gana +2/+2 por cada uno. Último aliento: reparte su ataque como daño entre los enemigos (piedras) | hecho |
 
 ## Neutrales
 
@@ -308,10 +308,10 @@ Habilitado: se puede elegir en Mis mazos, sale en "Al azar" y tiene mazo precarg
 | Midwest Emo (hechizo) | 7 | — | Vuelven a tu mano los 5 últimos hechizos que lanzaste; cuestan 1 menos (efecto `recuperar_hechizos`; no cuenta a sí mismo) | hecho |
 | Breakcore (hechizo) | 3 | — | Reparte 2 de daño entre los enemigos, 3 veces (cada reparto suma el poder de hechizo) | hecho |
 | Post-rock (hechizo) | 15 | — | Cuesta 1 menos por cada hechizo que lanzaste esta partida (`descuento: { por: "hechizos_lanzados" }`). Reparte 10 de daño entre los enemigos | hecho (foto de Hesse Kassel) |
-| Música Andina (hechizo) | 5 | — | Restaura 10 de vida a tu héroe y reparte 10 de daño entre los enemigos | hecho — coste propuesto |
+| Música Andina (hechizo) | 5 | — | Restaura 6 de vida a tu héroe y reparte 6 de daño entre los enemigos | hecho |
 | **Folklore** (hechizo legendario) | 4 | — | Invoca un músico 2/2 con poder de hechizo +1 por cada 3 scrobbles (hasta 4), en orden: Violeta Parra ♀, Víctor Jara ♂, Eduardo Mateo ♂, Chico Buarque ♂ (fichas). Cada músico, cuando se invoca (`al_invocar`), te da un hechizo al azar. Los scrobbles se cuentan aunque la misión no esté en juego | hecho |
 | **Slowcore** (hechizo legendario) | 4 | — | Reparte 5 de daño entre los enemigos. Se repite al final de cada uno de tus turnos por el resto de la partida (global `fin_de_tu_turno`; las repeticiones no suman poder de hechizo) | hecho |
-| Noise (hechizo) | 7 | — | Ganás 10 de armadura. Inflige 10 de daño a todos los esbirros enemigos | hecho |
+| Noise (hechizo) | 7 | — | Ganás 5 de armadura. Inflige 10 de daño a todos los esbirros enemigos | hecho |
 | Deathconsciousness (hechizo) | 10 | — | Reparte 8 de daño entre los enemigos, restaura 8 de vida a tu héroe e invoca un Eternal Worm 8/8 (ficha) | hecho |
 | Shoegaze (hechizo) | 6 | — | Lanza otra vez los 3 últimos hechizos que jugaste, con objetivos al azar (sin contarse a sí mismo) | hecho |
 | Review de RYM (hechizo) | 2 | — | Descubre una carta de tu mazo: la robás y obtenés una copia (efecto `descubrir_mazo`) | hecho |
@@ -328,3 +328,4 @@ Efecto `eco_hechizos` (`cantidad`, `efectos`, `origen`): tus próximos N hechizo
 **Pool de hechizos al azar y de descubrir hechizos** (`hechizosAzar`): los hechizos del juego que van en mazos, más las tareas universitarias de Cruit (menos las que dan Leche, como Laboratorio). Lo usan Cruit Breakdown, Mi Playlist #67, el poder de Tomis, Charts no (repite los tuyos), y los músicos de Folklore.
 
 Balance con los mazos precargados de Mario (50 de vida, bot contra bot, 300 partidas): tras bajar el daño de Tomis, Tomis 78% vs Tun y 79% vs Cruit; Cruit 74% vs Tun. Con 30 o 40 de vida casi no cambia. Tras los buffs a Tun (Panamá al inicio, Tun Puto, Choza, Iguana): Tun 51% vs Cruit, Tun 36% vs Tomis, Cruit 20% vs Tomis.
+Tras el rework de Tun (Plátano, Tuna, Tunita, Novia, Astrónomo, Amor, Satánico, Cool, Mastermind) y Música Andina/Noise: Tun 90% vs Cruit, Tun 84% vs Tomis, Tomis 73% vs Cruit. Lo que más pesa: Tuna (+1/+1 permanente) junto con Tun Puto (su daño sube con el ataque del Tun).

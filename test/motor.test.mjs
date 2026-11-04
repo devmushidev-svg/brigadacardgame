@@ -129,7 +129,7 @@ for (let k = 0; k < 20; k++) {
   assert.ok(!M.aplicar(e, s, { t: "jugar", uid: "t1" }, db, 0).error);
   const sat = e.j[s].tablero.find((m) => m.id === "tun_satanico");
   assert.equal(e.j[s].tablero.length, 1, "solo queda Tun Satanico");
-  assert.equal(sat.ataque, 3 + 6); assert.equal(sat.vida, 3 + 6);
+  assert.equal(sat.ataque, 1 + 6); assert.equal(sat.vida, 1 + 6);
 }
 // --- Choza de Monos: 3 Tun al final del turno ---
 {
@@ -235,31 +235,37 @@ for (let k = 0; k < 20; k++) {
   assert.ok(M.aplicar(e, s, { t: "atacar", de: mm.uid, a: "h" + r }, db, 0).error, "acometida: no a la cara");
   assert.ok(!M.aplicar(e, s, { t: "atacar", de: mm.uid, a: "rv" }, db, 0).error, "acometida: si a esbirros");
 }
-// --- Comida y Plátano ---
+// --- Comida y Plátano: +1/+1 a tus Tun y roba 2 Tun ---
 {
   const e = nueva(33); const s = e.turno;
   e.j[s].tablero = [];
   preparar(e, s, ["comida", "platano"]);
+  e.j[s].mazo = ["tun_brawl", "mascotas_tun", "tun_puto", "tun_brawl"];
   M.aplicar(e, s, { t: "jugar", uid: "t0" }, db, 0);
   assert.equal(tuns(e, s), 7, "llena la mesa");
-  const t = e.j[s].tablero[0].uid;
-  assert.ok(!M.aplicar(e, s, { t: "jugar", uid: "t1", objetivo: t }, db, 0).error);
-  assert.ok(e.j[s].tablero[0].provocar && e.j[s].tablero[0].ataque === 3);
+  assert.ok(!M.aplicar(e, s, { t: "jugar", uid: "t1" }, db, 0).error);
+  assert.ok(e.j[s].tablero.every((m) => m.ataque === 2 && m.vida === 2), "+1/+1 a todos");
+  assert.ok(e.j[s].mano.length === 2 && e.j[s].mano.every((c) => db[c.id].tribu === "tun"), "robó 2 Tun");
 }
 
-// --- Tuna y Tunita ---
+// --- Tuna (+1/+1 a tus Tun el resto de la partida) y Tunita (cuenta los Tun invocados o jugados) ---
 {
   const e = nueva(34); const s = e.turno, r = 1 - s;
   e.j[s].tablero = []; e.j[r].tablero = [];
   preparar(e, s, ["tun_brawl", "tun_puto", "tuna", "tunita"]);
+  e.j[s].invocadosTribu = {};
   M.aplicar(e, s, { t: "jugar", uid: "t0" }, db, 0);
   M.aplicar(e, s, { t: "jugar", uid: "t1" }, db, 0);
   M.aplicar(e, s, { t: "jugar", uid: "t2" }, db, 0);
-  assert.deepEqual(e.j[s].tablero.map((m) => m.vida), [4, 6], "Tuna: +1 de vida a tus Tun");
-  assert.equal(M.vista(e, s, db).j[s].mano.find((c) => c.id === "tunita").cantidad, 3, "1 + 2 Tun jugados");
+  assert.deepEqual(e.j[s].tablero.map((m) => [m.ataque, m.vida]), [[3, 4], [2, 6]], "Tuna: +1/+1 a tus Tun");
+  e.j[s].poderUsado = false; e.j[s].mana = 10; M.aplicar(e, s, { t: "poder" }, db, 0);
+  assert.equal(e.j[s].tablero[2].ataque, 2, "los nuevos también");
+  assert.equal(M.vista(e, s, db).j[s].mano.find((c) => c.id === "tunita").cantidad, 4, "1 + 3 Tun (2 jugados + 1 invocado)");
   e.j[r].tablero = [{ uid: "rv", id: "x", tribu: null, ataque: 1, vida: 9, vidaMax: 9, ataques: 0 }];
+  e.j[s].mazo = ["tun_brawl", "tun_brawl"];
   assert.ok(!M.aplicar(e, s, { t: "jugar", uid: "t3", objetivo: "rv" }, db, 0).error);
-  assert.equal(e.j[r].tablero[0].vida, 6);
+  assert.equal(e.j[r].tablero[0].vida, 5);
+  assert.equal(e.j[s].mano.length, 2, "Tunita roba 2 Tun");
 }
 
 // --- Funeral de Tun: zombies por cada Tun muerto; los que no caben buffean ---
@@ -621,12 +627,17 @@ console.log("ok: intolerante");
   const e = nueva(70); const s = e.turno, r = 1 - s;
   e.j[s].tablero = []; e.j[r].tablero = [];
   preparar(e, s, ["tun_cool"]);
+  e.j[s].mazo = ["tun_brawl", "mascotas_tun", "tun_puto"];
   M.aplicar(e, s, { t: "jugar", uid: "t0" }, db, 0);
-  const g = e.j[s].tablero[0];
+  const g = e.j[s].tablero.find((m) => m.id === "tun_cool");
+  assert.ok(g.soloEsbirros && g.roboVida, "acometida y robo de vida");
+  const copia = e.j[s].tablero.find((m) => m.id === "tun_cool_copia");
+  assert.ok(copia && !copia.roboVida && copia.dormido, "invoca una copia sin habilidades");
+  assert.deepEqual(e.j[s].mano.map((c) => c.id).sort(), ["tun_brawl", "tun_puto"], "roba 2 Tun");
   e.j[r].tablero = [{ uid: "rv", id: "x", tribu: null, ataque: 1, vida: 9, vidaMax: 9, ataques: 0 }];
   e.turno = r;
   M.aplicar(e, r, { t: "atacar", de: "rv", a: g.uid }, db, 0);
-  assert.equal(tuns(e, s), 2, "le pegaron: invoca un Tun");
+  assert.equal(tuns(e, s), 3, "le pegaron: invoca un Tun");
 }
 // --- Tun Iguana: tus Tun al morir invocan un Tun Zombie que ataca (aunque la Iguana muera) ---
 {
@@ -870,6 +881,7 @@ console.log("ok: descubrir hechizo con descuento");
   const e = nueva(111); const s = e.turno, r = 1 - s;
   e.j[s].tablero = []; e.j[r].tablero = [{ uid: "rv", id: "x", tribu: null, ataque: 1, vida: 9, vidaMax: 9, ataques: 0 }];
   preparar(e, s, ["mejor_musica", "tunita"]);
+  e.j[s].invocadosTribu = {}; // sin Tun invocados (Panamá del inicio pudo invocar alguno)
   M.aplicar(e, s, { t: "jugar", uid: "t0" }, db, 0);
   M.aplicar(e, s, { t: "jugar", uid: "t1", objetivo: "rv" }, db, 0);
   assert.equal(e.j[r].tablero[0].vida, 9 - 1 - 1, "Tunita hace 1 + 1 de poder de hechizo");
@@ -1110,7 +1122,7 @@ console.log("ok: Breakcore");
 }
 console.log("ok: Post-rock");
 
-// --- Música Andina: cura 10 a tu héroe y reparte 10 entre los enemigos ---
+// --- Música Andina: cura 6 a tu héroe y reparte 6 entre los enemigos ---
 {
   const e = nueva(127); const s = e.turno, r = 1 - s;
   e.j[s].tablero = []; e.j[r].tablero = [];
@@ -1118,7 +1130,7 @@ console.log("ok: Post-rock");
   e.j[s].vida = 30;
   const vr = e.j[r].vida;
   M.aplicar(e, s, { t: "jugar", uid: "t0" }, db, 0);
-  assert.equal(e.j[s].vida, 40); assert.equal(vr - e.j[r].vida, 10);
+  assert.equal(e.j[s].vida, 36); assert.equal(vr - e.j[r].vida, 6);
 }
 console.log("ok: Música Andina");
 
@@ -1165,14 +1177,14 @@ console.log("ok: Folklore");
 }
 console.log("ok: Slowcore");
 
-// --- Noise: 10 de armadura y 10 de daño a los esbirros enemigos ---
+// --- Noise: 5 de armadura y 10 de daño a los esbirros enemigos ---
 {
   const e = nueva(130); const s = e.turno, r = 1 - s;
   e.j[s].tablero = [{ uid: "a", id: "x", tribu: null, ataque: 1, vida: 9, vidaMax: 9, ataques: 0 }];
   e.j[r].tablero = [{ uid: "b", id: "x", tribu: null, ataque: 1, vida: 12, vidaMax: 12, ataques: 0 }];
   preparar(e, s, ["noise"]);
   M.aplicar(e, s, { t: "jugar", uid: "t0" }, db, 0);
-  assert.equal(e.j[s].armadura, 10);
+  assert.equal(e.j[s].armadura, 5);
   assert.equal(e.j[s].tablero[0].vida, 9, "los tuyos no");
   assert.equal(e.j[r].tablero[0].vida, 2);
 }
@@ -1257,3 +1269,16 @@ console.log("ok: Loop");
   assert.equal(v2 - e.j[r].vida, 3, "con +2 de ataque a tus Tun, pega 3");
 }
 console.log("ok: buffs de Tun");
+
+// --- Tun Satánico: último aliento reparte su ataque entre los enemigos ---
+{
+  const e = nueva(136); const s = e.turno, r = 1 - s;
+  e.globales = [];
+  e.j[s].tablero = [{ uid: "ts", id: "tun_satanico", tribu: "tun", ataque: 7, vida: 0, vidaMax: 7, ataques: 0 }];
+  e.j[r].tablero = [];
+  preparar(e, s, []);
+  const vr = e.j[r].vida;
+  M.aplicar(e, s, { t: "fin" }, db, 0);
+  assert.equal(vr - e.j[r].vida, 7, "reparte los 7 de ataque que tenía");
+}
+console.log("ok: Tun Satánico");

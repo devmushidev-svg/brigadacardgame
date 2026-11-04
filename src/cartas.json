@@ -208,9 +208,9 @@
    "nombre": "Tun Astrónomo",
    "genero": "hombre",
    "tipo": "esbirro",
-   "coste": 3,
-   "ataque": 2,
-   "vida": 4,
+   "coste": 1,
+   "ataque": 1,
+   "vida": 5,
    "tribu": "tun",
    "clase": "tun",
    "arte": "🔭",
@@ -251,14 +251,13 @@
    "nombre": "Tun Satánico",
    "entrada": "demonio",
    "tipo": "esbirro",
-   "coste": 5,
-   "ataque": 3,
-   "vida": 3,
+   "coste": 3,
+   "ataque": 1,
+   "vida": 1,
    "tribu": "tun",
    "clase": "tun",
    "arte": "/arte/tun_satanico.webp",
-   "statsProvisionales": true,
-   "texto": "Grito de batalla: destruye a tus otros Tun y gana +2/+2 por cada uno.",
+   "texto": "Grito de batalla: destruye a tus otros Tun y gana +2/+2 por cada uno. Último aliento: reparte su ataque como daño entre los enemigos.",
    "grito": [
     {
      "tipo": "devorar",
@@ -268,6 +267,13 @@
      "ataque": 2,
      "vida": 2,
      "fx": "devorar"
+    }
+   ],
+   "aliento": [
+    {
+     "tipo": "repartir",
+     "cantidad": "ataque",
+     "fx": "piedra"
     }
    ]
   },
@@ -302,7 +308,7 @@
    "tribu": "tun",
    "clase": "tun",
    "arte": "/arte/tun_cool.webp",
-   "texto": "Cuesta 1 menos por cada otro Tun en el campo de batalla. Cada vez que recibe daño, invoca un Tun 1/1.",
+   "texto": "Acometida. Robo de vida. Cuesta 1 menos por cada otro Tun en el campo. Cada vez que recibe daño, invoca un Tun 1/1. Grito de batalla: invoca una copia sin habilidades. Robá 2 Tun.",
    "descuento": {
     "por": "tribu_en_mesa",
     "tribu": "tun"
@@ -313,7 +319,39 @@
      "carta": "tun",
      "cantidad": 1
     }
+   ],
+   "claves": [
+    "acometida",
+    "robo_vida"
+   ],
+   "grito": [
+    {
+     "tipo": "invocar",
+     "carta": "tun_cool_copia",
+     "cantidad": 1
+    },
+    {
+     "tipo": "robar_filtro",
+     "filtro": {
+      "tribu": "tun"
+     },
+     "cantidad": 2
+    }
    ]
+  },
+  {
+   "id": "tun_cool_copia",
+   "nombre": "Tun Cool",
+   "genero": "hombre",
+   "tipo": "esbirro",
+   "coste": 10,
+   "ataque": 6,
+   "vida": 7,
+   "tribu": "tun",
+   "clase": "tun",
+   "token": true,
+   "arte": "/arte/tun_cool.webp",
+   "texto": "Copia sin habilidades."
   },
   {
    "id": "tun_mujer",
@@ -378,17 +416,23 @@
    "coste": 1,
    "clase": "tun",
    "arte": "/arte/platano.webp",
-   "texto": "Dale +2/+2 y provocar a uno de tus Tun.",
+   "texto": "Dale +1/+1 a tus Tun. Robá 2 Tun.",
    "efectos": [
     {
      "tipo": "buff",
-     "objetivo": "elegido_aliado",
+     "objetivo": "aliados",
      "filtro": {
       "tribu": "tun"
      },
-     "ataque": 2,
-     "vida": 2,
-     "provocar": true
+     "ataque": 1,
+     "vida": 1
+    },
+    {
+     "tipo": "robar_filtro",
+     "filtro": {
+      "tribu": "tun"
+     },
+     "cantidad": 2
     }
    ]
   },
@@ -398,12 +442,12 @@
    "genero": "mujer",
    "tipo": "esbirro",
    "coste": 3,
-   "ataque": 2,
+   "ataque": 4,
    "vida": 1,
    "tribu": "tun",
    "clase": "tun",
    "arte": "/arte/novia_tun.webp",
-   "texto": "Último aliento: invoca 2 Tun y, por el resto de la partida, tus Tun tienen +1 de ataque.",
+   "texto": "Acometida. Último aliento: invoca 2 Tun y, por el resto de la partida, tus Tun tienen +1 de ataque.",
    "aliento": [
     {
      "tipo": "mejora_tribu",
@@ -415,6 +459,9 @@
      "carta": "tun",
      "cantidad": 2
     }
+   ],
+   "claves": [
+    "acometida"
    ]
   },
   {
@@ -435,7 +482,7 @@
     "por": "tribu_muertos",
     "tribu": "tun"
    },
-   "texto": "Acometida. Cuesta 1 menos por cada Tun que murió esta partida. Grito de batalla: invoca 3 Tun y tus Tun tienen +1 de ataque por el resto de la partida.",
+   "texto": "Acometida. Cuesta 1 menos por cada Tun que murió esta partida. Grito de batalla: invoca 3 Tun y tus Tun tienen +1 de ataque por el resto de la partida. Robá 2 Tun.",
    "grito": [
     {
      "tipo": "invocar",
@@ -446,6 +493,13 @@
      "tipo": "mejora_tribu",
      "tribu": "tun",
      "ataque": 1
+    },
+    {
+     "tipo": "robar_filtro",
+     "filtro": {
+      "tribu": "tun"
+     },
+     "cantidad": 2
     }
    ]
   },
@@ -456,14 +510,12 @@
    "coste": 2,
    "clase": "tun",
    "arte": "/arte/tuna.webp",
-   "texto": "Dale +1 de vida a tus Tun.",
+   "texto": "Por el resto de la partida, tus Tun tienen +1/+1.",
    "efectos": [
     {
-     "tipo": "buff",
-     "objetivo": "aliados",
-     "filtro": {
-      "tribu": "tun"
-     },
+     "tipo": "mejora_tribu",
+     "tribu": "tun",
+     "ataque": 1,
      "vida": 1
     }
    ]
@@ -475,16 +527,23 @@
    "coste": 2,
    "clase": "tun",
    "arte": "/arte/tunita.webp",
-   "texto": "Inflige 1 de daño a un esbirro. +1 por cada Tun que jugaste esta partida.",
+   "texto": "Inflige 1 de daño a un esbirro, +1 por cada Tun que invocaste o jugaste esta partida. Robá 2 Tun.",
    "efectos": [
     {
      "tipo": "dano",
      "objetivo": "elegido_esbirro",
      "cantidad": 1,
      "bonus": {
-      "por": "tribu_jugados",
+      "por": "tribu_invocados",
       "tribu": "tun"
      }
+    },
+    {
+     "tipo": "robar_filtro",
+     "filtro": {
+      "tribu": "tun"
+     },
+     "cantidad": 2
     }
    ]
   },
@@ -753,9 +812,9 @@
    "id": "tun_amor",
    "nombre": "Tun Amor",
    "tipo": "esbirro",
-   "coste": 5,
-   "ataque": 3,
-   "vida": 5,
+   "coste": 4,
+   "ataque": 1,
+   "vida": 8,
    "tribu": "tun",
    "clase": "tun",
    "arte": "/arte/tun_amor.webp",
@@ -1844,16 +1903,16 @@
     "musica"
    ],
    "arte": "/arte/musica_andina.webp",
-   "texto": "Restaurá 10 de vida a tu héroe. Reparte 10 de daño entre los enemigos.",
+   "texto": "Restaurá 6 de vida a tu héroe. Reparte 6 de daño entre los enemigos.",
    "efectos": [
     {
      "tipo": "curar",
      "objetivo": "heroe_propio",
-     "cantidad": 10
+     "cantidad": 6
     },
     {
      "tipo": "repartir",
-     "cantidad": 10
+     "cantidad": 6
     }
    ]
   },
@@ -2014,11 +2073,11 @@
     "musica"
    ],
    "arte": "/arte/noise.webp",
-   "texto": "Ganás 10 de armadura. Inflige 10 de daño a todos los esbirros enemigos.",
+   "texto": "Ganás 5 de armadura. Inflige 10 de daño a todos los esbirros enemigos.",
    "efectos": [
     {
      "tipo": "armadura",
-     "cantidad": 10
+     "cantidad": 5
     },
     {
      "tipo": "dano",

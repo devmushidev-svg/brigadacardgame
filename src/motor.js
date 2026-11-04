@@ -451,6 +451,7 @@ function invocar(estado, s, id, ev, db, pos) {
   const i = pos == null ? p.tablero.length : Math.max(0, Math.min(pos, p.tablero.length));
   p.tablero.splice(i, 0, m);
   ev.push({ e: "invoca", seat: s, uid: m.uid, carta: id, pos: i });
+  if (m.tribu) (p.invocadosTribu ||= {})[m.tribu] = (p.invocadosTribu[m.tribu] || 0) + 1;
   avanzarMision(estado, s, "invocar_tribu", m.tribu, ev, db);
   // "cuando se invoca" (sale de la mano o lo invoca otra carta): los músicos de Folklore
   if (c.al_invocar) aplicarEfectos(estado, s, c.al_invocar, null, ev, db, m.uid);
@@ -539,6 +540,7 @@ export function cantidadDe(estado, s, ef) {
   if (ef.cantidad === "ataque_tun") return 1 + (estado.j[s].mejoras?.tun?.ataque || 0);
   let n = ef.cantidad ?? 1;
   if (ef.bonus?.por === "tribu_jugados") n += estado.j[s].jugadosTribu?.[ef.bonus.tribu] || 0;
+  if (ef.bonus?.por === "tribu_invocados") n += estado.j[s].invocadosTribu?.[ef.bonus.tribu] || 0; // Tunita: jugados o invocados
   return n;
 }
 
@@ -792,7 +794,8 @@ function aplicarEfectos(estado, s, efectos, elegido, ev, db, fuente, ctx = {}) {
     }
     if (ef.tipo === "repartir") {
       // daño repartido al azar de a 1 punto entre los enemigos vivos; "cantidad": "ataque" usa el ataque de quien lo lanza (Cruit Baño)
-      const total = ef.cantidad === "ataque" ? buscar(estado, fuente)?.obj.ataque || 0 : n;
+      // si quien lo lanza ya murió (último aliento de Tun Satánico), usa el ataque que tenía al morir
+      const total = ef.cantidad === "ataque" ? buscar(estado, fuente)?.obj.ataque ?? ctx.muerto?.ataque ?? 0 : n;
       const r = otro(s);
       const golpeados = new Set();
       for (let k = 0; k < total && estado.j[r].vida > 0; k++) {
@@ -1009,7 +1012,7 @@ function resolverMuertes(estado, ev, db) {
       if (m.tribu) (estado.muertosTribu ||= {})[m.tribu] = (estado.muertosTribu[m.tribu] || 0) + 1;
       const c = db[m.id];
       const alientos = efectosDe(m, "aliento", db);
-      if (alientos.length) aplicarEfectos(estado, s, alientos, null, ev, db, null);
+      if (alientos.length) aplicarEfectos(estado, s, alientos, null, ev, db, null, { muerto: m });
       // apéndices que se reemplazan (Rafael Fernando: Colosal +99) mientras quede reserva
       const res = estado.j[s].reservas;
       if (c?.reemplazo && res?.[m.id] > 0 && estado.fase === "jugando") { res[m.id]--; invocar(estado, s, m.id, ev, db, pos); }
