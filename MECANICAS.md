@@ -59,7 +59,7 @@ Más campos: `colosal: { carta, cantidad }` (entra con apéndices a los costados
 
 Otros campos: `fusionar: true` (si ya hay uno igual en tu mesa se suma a ese; `porApilado` en un efecto lo multiplica por las fusionadas), `excluir: { "etiqueta": "programa" }` en un efecto (no puede elegir esos esbirros: a Cruit Excel no se le da Leche). Global `tareas_dobles` (Unislop): tus Tareas se lanzan una vez más.
 
-Campos: `id`, `nombre`, `coste`, `ataque`, `vida`, `texto`, `arte` (emoji o `/arte/x.png` en `public/arte/`), `clase`, `tribu`, `rareza` (`legendaria`), `token: true` (no entra al mazo; solo se invoca o se da), `arquetipo`, `genero` (`hombre`, `mujer` o `no_binario`; **toda carta de personaje lleva uno**, se pregunta al crearla; sale como ♂ ♀ ⚧ abajo de la carta), `etiquetas` (lista libre, ej. `["mujer"]`, para efectos que buscan cartas por etiqueta), `descuento` (`{ "por": "tribu_en_mesa", "tribu": "tun" }`: cuesta 1 menos por cada esbirro de esa tribu en la mesa, de los dos lados; `"lados": "propio"` solo cuenta los tuyos; `{ "por": "tribu_muertos", "tribu": "tun" }`: 1 menos por cada Tun que murió en la partida, de los dos lados), `entrada` (animación al entrar: `legendaria` —automática en legendarias— o `demonio`).
+Campos: `id`, `nombre`, `coste`, `ataque`, `vida`, `texto`, `arte` (emoji o `/arte/x.png` en `public/arte/`), `clase`, `tribu`, `rareza` (`legendaria`), `token: true` (no entra al mazo; solo se invoca o se da), `arquetipo`, `genero` (`hombre`, `mujer` o `no_binario`; **toda carta de personaje lleva uno**, se pregunta al crearla; sale como ♂ ♀ abajo de la carta), `etiquetas` (lista libre, ej. `["mujer"]`, para efectos que buscan cartas por etiqueta), `descuento` (`{ "por": "tribu_en_mesa", "tribu": "tun" }`: cuesta 1 menos por cada esbirro de esa tribu en la mesa, de los dos lados; `"lados": "propio"` solo cuenta los tuyos; `{ "por": "tribu_muertos", "tribu": "tun" }`: 1 menos por cada Tun que murió en la partida, de los dos lados), `entrada` (animación al entrar: `legendaria` —automática en legendarias— o `demonio`).
 
 ## Palabras clave en el texto
 
@@ -206,7 +206,7 @@ Diseño de Mario. Arquetipo: paladín molesto — llenar la mesa de Tun, buffear
 | **Mario Multiplanet** (legendaria) | 7 | 5/6 | Escudo divino, robo de vida, acometida. Grito: invoca una copia de este esbirro | hecho — falta imagen (🪐) y género; rareza propuesta |
 | **Rafael Fernando** (legendaria) | 6 | 3/7 | Colosal +99 (apéndices 2/3). Cuando muere un Rafael Fernando que no es el original, otro lo reemplaza (mientras queden de los 99) | hecho — falta imagen (🧍) y género; rareza propuesta |
 | El Tipo de la Foto ♂ | 4 | 5/5 | Último aliento: se esconde en una carta al azar de la mano del rival; cuando la juegue, vuelve a salir para su dueño | hecho — falta imagen (📸) |
-| **Cruit Breakdown** ⚧ (legendaria, neutral, tribu Cruit, como Yogg-Saron) | 10 | 7/5 | Grito: lanza un hechizo al azar por cada hechizo que lanzaste esta partida, con objetivos al azar | hecho — falta imagen (🤯) |
+| **Cruit Breakdown** (legendaria, neutral, tribu Cruit, como Yogg-Saron) | 10 | 7/5 | Grito: lanza un hechizo al azar por cada hechizo que lanzaste esta partida, con objetivos al azar | hecho — falta imagen (🤯) |
 | Doxeo (arma) | 4 | 3 de ataque, 3 usos | Cada vez que tu héroe ataca, robás una carta legendaria de tu mazo | hecho — falta imagen (🕵️); coste propuesto |
 | Cuidar VC (VC) | 3 | 3/4 | Último aliento: obtenés 4 de armadura | hecho — falta imagen (🎧) |
 | Ishowspeed Tocándose ♂ (VC) | 4 | 4/3 | Último aliento: 3 de daño a todos los esbirros | hecho — falta imagen (⚡); coste y stats propuestos |
@@ -228,32 +228,32 @@ Diseño de Mario. Arquetipo: paladín molesto — llenar la mesa de Tun, buffear
 
 ## Clase Cruit
 
-Diseño de Mario. Marco azul (provisional). Cruit es no binario: toda carta con su nombre lleva `"genero": "no_binario"` (⚧).
+Diseño de Mario. Marco azul (provisional). Cruit es no binario: toda carta con su nombre lleva `"genero": "no_binario"` (sin símbolo en la carta).
 
 | Carta | Coste | Stats | Efecto | Estado |
 |---|---|---|---|---|
 | Héroe Cruit | — | 50 | Poder (1) "Hacer la tarea": recibís 2 de daño y robás una carta. Cuenta como Tarea (Cruit Excel la cuenta; con Unislop se lanza dos veces) | hecho (retrato con fondo de leche) |
-| Coco ⚧ (ficha, el hámster) | — | 1/1 | Carga. Muere al final de tu turno | hecho |
-| Cruit Intolerante a la Lactosa ⚧ (tribu Cruit) | 2 | 1/3 | Grito y último aliento: 2 de daño a todos los demás esbirros (vómito) | hecho |
+| Coco (ficha, el hámster) | — | 1/1 | Carga. Muere al final de tu turno | hecho |
+| Cruit Intolerante a la Lactosa (tribu Cruit) | 2 | 1/3 | Grito y último aliento: 2 de daño a todos los demás esbirros (vómito) | hecho |
 | Lechero ♂ | 1 | 1/1 | Grito: obtenés una Leche | hecho |
 | Leche (hechizo) | 1 | — | +1/+1 a un esbirro; si es un Cruit, activa su grito y su último aliento | hecho |
-| Cruit Excel ⚧ (tribu Cruit, etiqueta programa) | 5 | 2/2 | Grito: +1/+1 por cada Tarea que lanzaste esta partida. No se le puede dar Leche | hecho |
+| Cruit Excel (tribu Cruit, etiqueta programa) | 5 | 2/2 | Grito: +1/+1 por cada Tarea que lanzaste esta partida. No se le puede dar Leche | hecho |
 | Tarea de la U (hechizo, etiqueta Tarea) | 1 | — | Robás una carta y obtenés una tarea universitaria al azar | hecho |
-| **Coco Supremo** ⚧ (legendaria) | 9 | 7/5 | Grito: repite los gritos y últimos alientos de los Cruit que jugaste esta partida. Orden: primero el resto, después los que crecen por cada cosa (Excel) y al último los que pegan según su ataque (Baño) | hecho |
-| Estreñido Cruit ⚧ | 1 | 1/2 | Grito y último aliento: mete 2 Cacas en el mazo del rival (al robarlas: 2 de daño y roba otra) | hecho |
-| Cruit Sangre ⚧ | 2 | 2/2 | Se fusiona con tus otros Cruit Sangre (suma stats, ×N en la carta). Al final de tu turno, roba 1 de vida por cada Sangre fusionada al enemigo con menos vida | hecho |
-| Cruit Vampiro ⚧ | 5 | 3/3 | Tus Cruit Sangre roban el doble de vida. Grito: invoca 2 Cruit Sangre (se fusionan en una, con animación) | hecho |
+| **Coco Supremo** (legendaria) | 9 | 7/5 | Grito: repite los gritos y últimos alientos de los Cruit que jugaste esta partida. Orden: primero el resto, después los que crecen por cada cosa (Excel) y al último los que pegan según su ataque (Baño) | hecho |
+| Estreñido Cruit | 1 | 1/2 | Grito y último aliento: mete 2 Cacas en el mazo del rival (al robarlas: 2 de daño y roba otra) | hecho |
+| Cruit Sangre | 2 | 2/2 | Se fusiona con tus otros Cruit Sangre (suma stats, ×N en la carta). Al final de tu turno, roba 1 de vida por cada Sangre fusionada al enemigo con menos vida | hecho |
+| Cruit Vampiro | 5 | 3/3 | Tus Cruit Sangre roban el doble de vida. Grito: invoca 2 Cruit Sangre (se fusionan en una, con animación) | hecho |
 | Caca (ficha) | 0 | — | Se lanza al robarla: 2 de daño a quien la roba y roba otra | hecho |
-| Cruit Tostadora ⚧ | 1 | 1/2 | Grito: robás una carta | hecho |
-| Cruit Baño ⚧ | 2 | 4/2 | Grito: inflige daño igual a su ataque, repartido al azar entre todos los enemigos (chorros de agua) | hecho |
-| **Cruit Vaca** ⚧ (legendaria, tribu Vaca: no cuenta como Cruit) | 4 | 3/4 | Grito: una Leche a cada uno de tus otros esbirros (+1/+1 y activa a los Cruit) | hecho |
-| **Cruit Verity** ⚧ (legendaria) | 3 | 3/1 | Último aliento: invoca a Verity 5/5 | hecho |
-| Verity ⚧ (ficha, forma monstruosa) | 5 | 5/5 | — | hecho |
+| Cruit Tostadora | 1 | 1/2 | Grito: robás una carta | hecho |
+| Cruit Baño | 2 | 4/2 | Grito: inflige daño igual a su ataque, repartido al azar entre todos los enemigos (chorros de agua) | hecho |
+| **Cruit Vaca** (legendaria, tribu Vaca: no cuenta como Cruit) | 4 | 3/4 | Grito: una Leche a cada uno de tus otros esbirros (+1/+1 y activa a los Cruit) | hecho |
+| **Cruit Verity** (legendaria) | 3 | 3/1 | Último aliento: invoca a Verity 5/5 | hecho |
+| Verity (ficha, forma monstruosa) | 5 | 5/5 | — | hecho |
 | **Unislop** (legendaria) | 4 | 3/3 | Grito: obtenés 3 tareas universitarias distintas al azar. Por el resto de la partida, tus Tareas se lanzan dos veces | hecho — falta género |
 | Escuela Alumnos | 2 | 2/2 | Grito: descubre dos tareas universitarias | hecho — falta imagen (🏫); coste propuesto |
 | Cruit Rage (hechizo) | 2 | — | El próximo grito de batalla de un Cruit que juegues se activa 3 veces | hecho — falta imagen (😡) |
-| Elliot Cruit ⚧ (tribu Cruit, Forsaken) | 2 | 2/2 | Al final de tu turno, una pizza cura 3 a un aliado herido al azar | hecho |
-| Chance Cruit ⚧ (tribu Cruit, Forsaken) | 3 | 3/3 | Grito: moneda. Cara: 6 de daño a un enemigo al azar. Cruz: 3 de daño a tu héroe | hecho |
+| Elliot Cruit (tribu Cruit, Forsaken) | 2 | 2/2 | Al final de tu turno, una pizza cura 3 a un aliado herido al azar | hecho |
+| Chance Cruit (tribu Cruit, Forsaken) | 3 | 3/3 | Grito: moneda. Cara: 6 de daño a un enemigo al azar. Cruz: 3 de daño a tu héroe | hecho |
 
 Sin mazo armado, el héroe sale al azar.
 

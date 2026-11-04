@@ -249,7 +249,7 @@ const palabrasHTML = (c) => {
 
 function cartaHTML(c, { uid = "", clase = "" } = {}) {
   const esH = c.tipo === "hechizo" || c.tipo === "mision";
-  const etiqueta = [c.clase ? HEROES[c.clase]?.nombre || c.clase : (c.token ? "" : "Neutral"), c.arquetipo || "", c.tribu && c.tribu !== c.clase ? c.tribu[0].toUpperCase() + c.tribu.slice(1) : "", { hombre: "♂", mujer: "♀", no_binario: "⚧" }[c.genero] || ""].filter(Boolean).join(" · ");
+  const etiqueta = [c.clase ? HEROES[c.clase]?.nombre || c.clase : (c.token ? "" : "Neutral"), c.arquetipo || "", c.tribu && c.tribu !== c.clase ? c.tribu[0].toUpperCase() + c.tribu.slice(1) : "", { hombre: "♂", mujer: "♀" }[c.genero] || ""].filter(Boolean).join(" · ");
   // como en Hearthstone: las cartas de clase llevan el marco del color de su héroe; las neutrales, piedra gris
   const marco = c.clase && c.tipo !== "mision" ? HEROES[c.clase]?.marco : null;
   return `<div class="carta ${esH ? "hechizo" : ""} ${c.tipo === "mision" ? "mision" : ""} ${c.rareza === "legendaria" ? "legendaria" : ""} ${clase}" ${uid ? `data-uid="${uid}"` : ""} data-carta="${esc(c.id)}"${marco ? ` style="--marco:${esc(marco)}"` : ""}>
@@ -1675,7 +1675,7 @@ function relacionadas(c, piezas = null) {
 }
 const relacionadasHTML = (c, piezas) => {
   const ids = relacionadas(c, piezas);
-  return ids.length ? `<div class="relacionadas">${ids.map((id) => cartaHTML(DB[id])).join("")}</div>` : "";
+  return ids.length ? `<div class="relacionadas ${ids.length > 2 ? "varias" : ""}">${ids.map((id) => cartaHTML(DB[id])).join("")}</div>` : "";
 };
 
 function zoom(idCarta, uid, ref = null) {
@@ -1690,8 +1690,10 @@ function zoom(idCarta, uid, ref = null) {
   const enMesa = ref && V && [0, 1].map((s) => V.j[s].tablero.find((x) => x.uid === ref)).find(Boolean);
   const piezas = enMesa?.piezas || null;
   const vista = enMesa ? { ...c, ataque: enMesa.ataque, vida: enMesa.vida } : c;
-  m.innerHTML = `<div class="modal-caja">${cartaHTML(vista, { clase: "grande" })}${relacionadasHTML(c, piezas)}${V?.tutorial ? statsHTML(c) : ""}${palabrasHTML(c)}
-    ${puede ? '<button class="boton" id="jugar" style="width:min(56vw,260px)">Jugar</button>' : ""}</div>`;
+  // en pantallas anchas las cartas relacionadas van al costado de la carta grande; en el celular, abajo
+  const rel = relacionadasHTML(c, piezas);
+  m.innerHTML = `<div class="modal-caja ${rel ? "con-rel" : ""}"><div class="zoom-principal">${cartaHTML(vista, { clase: "grande" })}${V?.tutorial ? statsHTML(c) : ""}${palabrasHTML(c)}
+    ${puede ? '<button class="boton" id="jugar" style="width:min(56vw,260px)">Jugar</button>' : ""}</div>${rel}</div>`;
   document.body.append(m);
   const abierto = Date.now();
   m.onclick = (e) => {
@@ -1885,9 +1887,9 @@ function mostrarPreview(el) {
   }
   if (!carta) return;
   const enMesa = el.classList.contains("esbirro") && V.j[+el.dataset.seat]?.tablero.find((x) => x.uid === el.dataset.ref);
-  preview.innerHTML = cartaHTML(carta) + (extra ? `<div class="ahora">${esc(extra)}</div>` : "") + relacionadasHTML(carta, enMesa?.piezas || null) + palabrasHTML(carta);
-  preview.style.display = "block";
-  const r = el.getBoundingClientRect(), pw = 236, ph = preview.offsetHeight;
+  preview.innerHTML = `<div class="prev-principal">${cartaHTML(carta)}${extra ? `<div class="ahora">${esc(extra)}</div>` : ""}${palabrasHTML(carta)}</div>` + relacionadasHTML(carta, enMesa?.piezas || null);
+  preview.style.display = "flex";
+  const r = el.getBoundingClientRect(), pw = preview.offsetWidth, ph = preview.offsetHeight;
   const x = r.right + 18 + pw < innerWidth ? r.right + 18 : r.left - pw - 18;
   preview.style.left = Math.max(6, x) + "px";
   preview.style.top = Math.min(innerHeight - ph - 6, Math.max(6, r.top + r.height / 2 - ph / 2)) + "px";

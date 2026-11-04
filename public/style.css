@@ -505,5 +505,16 @@ img[src^="/arte/unislop-tareas/"] { filter: invert(1) drop-shadow(0 2px 3px #000
 .relacionadas .carta { --carta-w: clamp(110px, 29vw, 220px); cursor: pointer; }
 .relacionadas .carta:hover { transform: translateY(-4px); }
 .modal { overflow-y: auto; }
-#preview .relacionadas { margin-top: 8px; max-width: 470px; }
+.zoom-principal { display: grid; gap: 10px; justify-items: center; }
+#preview { gap: 12px; align-items: flex-start; }
+.prev-principal { display: grid; justify-items: center; }
+#preview .relacionadas { max-width: 330px; justify-content: flex-start; }
 #preview .relacionadas .carta { --carta-w: 150px; }
+/* en pantallas anchas: carta grande a la izquierda y sus relacionadas al costado */
+@media (min-width: 720px) {
+  .modal-caja.con-rel { grid-template-columns: auto auto; align-items: center; gap: 22px; }
+  .modal-caja.con-rel .relacionadas { display: grid; grid-template-columns: auto; gap: 14px; max-width: none; }
+  .modal-caja.con-rel .relacionadas.varias { grid-template-columns: auto auto; }
+  .modal-caja.con-rel .relacionadas .carta { --carta-w: min(calc(100vw - 420px), 31vh, 220px); }
+  .modal-caja.con-rel .relacionadas.varias .carta { --carta-w: min(calc((100vw - 440px) / 2), 31vh, 220px); }
+}
