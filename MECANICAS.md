@@ -304,7 +304,7 @@ Está en `heroes` con `"enConstruccion": true`: aparece en la colección pero no
 | Mossad Strongest Agent | 4 | 1/8 | Cada vez que lanzás un hechizo, robás una carta | hecho — falta género |
 | Yamir | 5 | 3/7 | Poder de hechizo +3. Tus hechizos cuestan 1 menos (mientras esté en la mesa; campo `abarata_hechizos`). Grito: robás 3 hechizos de tu mazo | hecho — falta género |
 | Audiophile | 2 | 2/3 | Tus hechizos cuestan 1 menos. Grito: robás una carta | hecho |
-| Midwest Emo (hechizo) | 4 | — | Revive tus 3 últimos esbirros que murieron esta partida (efecto `revivir`; vuelven como recién invocados, sin grito) | hecho |
+| Midwest Emo (hechizo) | 7 | — | Vuelven a tu mano los 5 últimos hechizos que lanzaste; cuestan 1 menos (efecto `recuperar_hechizos`; no cuenta a sí mismo) | hecho |
 | Breakcore (hechizo) | 3 | — | Reparte 3 de daño entre los enemigos, 3 veces (cada reparto suma el poder de hechizo) | hecho |
 | Post-rock (hechizo) | 15 | — | Cuesta 1 menos por cada hechizo que lanzaste esta partida (`descuento: { por: "hechizos_lanzados" }`). Reparte 20 de daño entre los enemigos | hecho (foto de Hesse Kassel) |
 | Música Andina (hechizo) | 5 | — | Restaura 10 de vida a tu héroe y reparte 10 de daño entre los enemigos | hecho — coste propuesto |

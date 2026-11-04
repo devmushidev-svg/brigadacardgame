@@ -630,6 +630,13 @@ function aplicarEfectos(estado, s, efectos, elegido, ev, db, fuente, ctx = {}) {
       for (let i = 0; i < k; i++) if (!invocar(estado, s, ef.cartas[i], ev, db)) break;
       continue;
     }
+    if (ef.tipo === "recuperar_hechizos") {
+      // Midwest Emo: vuelven a tu mano tus N últimos hechizos lanzados (sin contar el que se está lanzando), con descuento
+      const ids = (estado.j[s].jugados || []).filter((id) => db[id]?.tipo === "hechizo");
+      if (ids.length && ids[ids.length - 1] === ef.excepto) ids.pop();
+      for (const id of ids.slice(-n)) if (darCarta(estado, s, id, ev) && ef.rebaja) estado.j[s].mano[estado.j[s].mano.length - 1].rebaja = ef.rebaja;
+      continue;
+    }
     if (ef.tipo === "revivir") {
       // Midwest Emo: revive tus N últimos esbirros que murieron en la partida (vuelven como recién invocados, sin grito)
       const ids = (estado.j[s].muertos || []).slice(-n).reverse();

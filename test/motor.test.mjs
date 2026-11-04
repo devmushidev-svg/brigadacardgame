@@ -1073,16 +1073,15 @@ console.log("ok: Charts");
 }
 console.log("ok: Audiophile");
 
-// --- Midwest Emo: revive tus 3 últimos esbirros muertos ---
+// --- Midwest Emo: vuelven a tu mano tus 5 últimos hechizos, cuestan 1 menos ---
 {
   const e = nueva(124); const s = e.turno;
-  e.j[s].tablero = ["mossad", "tun_brawl", "mejor_musica", "yamir"].map((id, k) => ({ uid: "x" + k, id, tribu: null, ataque: 1, vida: 0, vidaMax: 1, ataques: 0 }));
+  e.j[s].tablero = [];
   preparar(e, s, ["midwest_emo"]);
-  M.aplicar(e, s, { t: "fin" }, db, 0); // mueren los cuatro
-  e.turno = s; e.j[s].mana = 10;
+  e.j[s].jugados = ["grindcore", "tun_brawl", "wey_emo", "breakcore", "fumando_porro", "mossad", "slowcore", "musica_andina"];
   M.aplicar(e, s, { t: "jugar", uid: "t0" }, db, 0);
-  assert.deepEqual(e.j[s].tablero.map((m) => m.id).sort(), ["mejor_musica", "tun_brawl", "yamir"].sort(), "los 3 últimos en morir");
-  assert.ok(e.j[s].tablero.every((m) => m.vida === db[m.id].vida), "vuelven enteros");
+  assert.deepEqual(e.j[s].mano.map((c) => c.id), ["wey_emo", "breakcore", "fumando_porro", "slowcore", "musica_andina"], "los 5 últimos hechizos, sin esbirros ni sí mismo");
+  assert.ok(e.j[s].mano.every((c) => M.costeCarta(e, s, c, db) === Math.max(0, db[c.id].coste - 1)), "cuestan 1 menos");
 }
 console.log("ok: Midwest Emo");
 

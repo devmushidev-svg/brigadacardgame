@@ -1757,17 +1757,19 @@
    "id": "midwest_emo",
    "nombre": "Midwest Emo",
    "tipo": "hechizo",
-   "coste": 4,
+   "coste": 7,
    "clase": "tomis",
    "etiquetas": [
     "musica"
    ],
    "arte": "/arte/midwest_emo.webp",
-   "texto": "Revive tus 3 últimos esbirros que murieron esta partida.",
+   "texto": "Vuelven a tu mano los 5 últimos hechizos que lanzaste. Cuestan 1 menos.",
    "efectos": [
     {
-     "tipo": "revivir",
-     "cantidad": 3
+     "tipo": "recuperar_hechizos",
+     "cantidad": 5,
+     "rebaja": 1,
+     "excepto": "midwest_emo"
     }
    ]
   },
