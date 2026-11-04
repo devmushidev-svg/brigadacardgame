@@ -1989,6 +1989,29 @@
     }
    ],
    "rareza": "legendaria"
+  },
+  {
+   "id": "noise",
+   "nombre": "Noise",
+   "tipo": "hechizo",
+   "coste": 7,
+   "clase": "tomis",
+   "etiquetas": [
+    "musica"
+   ],
+   "arte": "/arte/noise.webp",
+   "texto": "Ganás 10 de armadura. Inflige 10 de daño a todos los esbirros.",
+   "efectos": [
+    {
+     "tipo": "armadura",
+     "cantidad": 10
+    },
+    {
+     "tipo": "dano",
+     "objetivo": "todos_esbirros",
+     "cantidad": 10
+    }
+   ]
   }
  ],
  "heroes": [

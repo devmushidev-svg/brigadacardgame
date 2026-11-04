@@ -1164,3 +1164,16 @@ console.log("ok: Folklore");
   assert.equal(vr - e.j[r].vida, 15, "al final de mi siguiente turno sí");
 }
 console.log("ok: Slowcore");
+
+// --- Noise: 10 de armadura y 10 de daño a todos los esbirros ---
+{
+  const e = nueva(130); const s = e.turno, r = 1 - s;
+  e.j[s].tablero = [{ uid: "a", id: "x", tribu: null, ataque: 1, vida: 9, vidaMax: 9, ataques: 0 }];
+  e.j[r].tablero = [{ uid: "b", id: "x", tribu: null, ataque: 1, vida: 12, vidaMax: 12, ataques: 0 }];
+  preparar(e, s, ["noise"]);
+  M.aplicar(e, s, { t: "jugar", uid: "t0" }, db, 0);
+  assert.equal(e.j[s].armadura, 10);
+  assert.equal(e.j[s].tablero.length, 0, "también los tuyos");
+  assert.equal(e.j[r].tablero[0].vida, 2);
+}
+console.log("ok: Noise");
