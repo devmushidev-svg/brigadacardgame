@@ -1665,7 +1665,7 @@ function relacionadas(c, piezas = null) {
     if (Array.isArray(x)) return x.forEach(ver);
     for (const [k, v] of Object.entries(x)) {
       if (k === "carta" && typeof v === "string") ids.add(v);
-      else if (k === "opciones" && Array.isArray(v)) v.forEach((id) => typeof id === "string" && ids.add(id));
+      else if ((k === "opciones" || k === "cartas") && Array.isArray(v)) v.forEach((id) => typeof id === "string" && ids.add(id));
       else if (typeof v === "object") ver(v);
     }
   };

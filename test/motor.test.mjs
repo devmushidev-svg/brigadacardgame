@@ -1127,3 +1127,21 @@ console.log("ok: Post-rock");
   assert.equal(e.j[s].vida, 40); assert.equal(vr - e.j[r].vida, 10);
 }
 console.log("ok: Música Andina");
+
+// --- Folklore: un músico por cada 5 scrobbles (hasta 4), cada uno con poder de hechizo +1 ---
+{
+  const e = nueva(128); const s = e.turno, r = 1 - s;
+  e.j[s].tablero = []; e.j[r].tablero = [];
+  preparar(e, s, ["folklore", "folklore"]);
+  e.j[s].scrobbles = 11;
+  M.aplicar(e, s, { t: "jugar", uid: "t0" }, db, 0);
+  assert.deepEqual(e.j[s].tablero.map((m) => m.id), ["violeta_parra", "victor_jara"], "11 scrobbles (+1 de Folklore = 12): dos músicos");
+  e.j[s].tablero = []; e.j[s].scrobbles = 40; e.j[s].mana = 10;
+  M.aplicar(e, s, { t: "jugar", uid: "t1" }, db, 0);
+  assert.deepEqual(e.j[s].tablero.map((m) => m.id), ["violeta_parra", "victor_jara", "eduardo_mateo", "chico_buarque"], "hasta 4");
+  e.j[s].mano = [{ uid: "w", id: "wey_emo" }]; e.j[s].mana = 10;
+  const vr = e.j[r].vida;
+  M.aplicar(e, s, { t: "jugar", uid: "w" }, db, 0);
+  assert.equal(vr - e.j[r].vida, 5 + 4, "con 4 músicos: +4 de poder de hechizo");
+}
+console.log("ok: Folklore");

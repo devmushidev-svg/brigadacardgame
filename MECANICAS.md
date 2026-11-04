@@ -308,6 +308,7 @@ Está en `heroes` con `"enConstruccion": true`: aparece en la colección pero no
 | Breakcore (hechizo) | 3 | — | Reparte 3 de daño entre los enemigos, 3 veces (cada reparto suma el poder de hechizo) | hecho |
 | Post-rock (hechizo) | 15 | — | Cuesta 1 menos por cada hechizo que lanzaste esta partida (`descuento: { por: "hechizos_lanzados" }`). Reparte 20 de daño entre los enemigos | hecho (foto de Hesse Kassel) |
 | Música Andina (hechizo) | 5 | — | Restaura 10 de vida a tu héroe y reparte 10 de daño entre los enemigos | hecho — coste propuesto |
+| Folklore (hechizo) | 4 | — | Invoca un músico 2/2 con poder de hechizo +1 por cada 5 scrobbles (hasta 4), en orden: Violeta Parra ♀, Víctor Jara ♂, Eduardo Mateo ♂, Chico Buarque ♂ (fichas). Los scrobbles se cuentan aunque la misión no esté en juego | hecho |
 | **Contador de Scrobbles** (misión legendaria, serie) | 1 | — | Suma un scrobble por cada hechizo o carta con etiqueta `musica` que jugás (todas las cartas de Tomis la tienen). Nivel 1 (5): robás 3 cartas que cuestan 1 menos. Nivel 2 (10): tus hechizos +2 de daño por el resto de la partida y robás 3 que cuestan 2 menos. Nivel 3 (20): obtenés **Charts** | hecho |
 | Descargar el FLAC (parte 2/3, ficha) | — | — | La misión pasa a esta carta al llegar al nivel 1 | hecho |
 | Winamp (parte 3/3, ficha) | — | — | La misión pasa a esta carta al llegar al nivel 2 | hecho |

@@ -616,6 +616,12 @@ function aplicarEfectos(estado, s, efectos, elegido, ev, db, fuente, ctx = {}) {
       if (mano.length) { elegir(estado, mano).escondido = { carta: ef.carta, seat: s }; ev.push({ e: "esconde", seat: s, carta: ef.carta }); }
       continue;
     }
+    if (ef.tipo === "invocar_por_scrobbles") {
+      // Folklore: una carta de la lista por cada `cada` scrobbles que tengas, en orden (hasta la cantidad de cartas)
+      const k = Math.min(ef.cartas.length, Math.floor((estado.j[s].scrobbles || 0) / (ef.cada || 5)));
+      for (let i = 0; i < k; i++) if (!invocar(estado, s, ef.cartas[i], ev, db)) break;
+      continue;
+    }
     if (ef.tipo === "revivir") {
       // Midwest Emo: revive tus N últimos esbirros que murieron en la partida (vuelven como recién invocados, sin grito)
       const ids = (estado.j[s].muertos || []).slice(-n).reverse();
@@ -1158,7 +1164,10 @@ export function aplicar(estado, s, accion, db, ahora) {
     registrar(estado, `${p.nombre} jugo ${carta.nombre}`);
     if (carta.tipo === "hechizo") p.hechizosLanzados = (p.hechizosLanzados || 0) + 1; // los cuenta Cruit Breakdown
     // scrobbles (misión de Tomis): cada hechizo o carta de música que jugás
-    if (carta.tipo === "hechizo" || (carta.etiquetas || []).includes("musica")) avanzarMision(estado, s, "scrobble", null, ev, db);
+    if (carta.tipo === "hechizo" || (carta.etiquetas || []).includes("musica")) {
+      p.scrobbles = (p.scrobbles || 0) + 1; // se cuentan aunque no haya misión (Folklore)
+      avanzarMision(estado, s, "scrobble", null, ev, db);
+    }
     if (carta.tipo === "arma") {
       p.arma = { id: carta.id, ataque: carta.ataque, durabilidad: carta.durabilidad };
       ev.push({ e: "arma", seat: s, carta: carta.id });
@@ -1345,6 +1354,7 @@ export function vista(estado, yo, db0 = {}) {
       ecos: (p.ecos || []).map((x) => ({ origen: x.origen, quedan: x.quedan })),
       armadura: p.armadura || 0,
       poderHechizo: p.poderHechizoExtra || 0,
+      scrobbles: p.scrobbles || 0,
       arma: p.arma || null,
       heroeAtaco: !!p.heroeAtaco,
       vc: p.vc ? { ...p.vc, coste: CONFIG.COSTE_VC } : null,
