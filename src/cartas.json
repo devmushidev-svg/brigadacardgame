@@ -1932,6 +1932,35 @@
    "poder_hechizo": 1,
    "arte": "/arte/chico_buarque.webp",
    "texto": "Poder de hechizo +1."
+  },
+  {
+   "id": "slowcore",
+   "nombre": "Slowcore",
+   "tipo": "hechizo",
+   "coste": 4,
+   "clase": "tomis",
+   "etiquetas": [
+    "musica"
+   ],
+   "arte": "/arte/slowcore.webp",
+   "texto": "Reparte 5 de daño entre los enemigos. Se repite al final de cada uno de tus turnos.",
+   "efectos": [
+    {
+     "tipo": "repartir",
+     "cantidad": 5
+    },
+    {
+     "tipo": "global",
+     "disparador": "fin_de_tu_turno",
+     "origen": "slowcore",
+     "efectos": [
+      {
+       "tipo": "repartir",
+       "cantidad": 5
+      }
+     ]
+    }
+   ]
   }
  ],
  "heroes": [

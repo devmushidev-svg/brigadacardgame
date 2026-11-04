@@ -285,6 +285,14 @@ function inicioTurno(estado, s, ev, db, ahora) {
 }
 
 function finTurno(estado, s, ev, db) {
+  // efectos "por el resto de la partida, al final de tus turnos" (Slowcore)
+  for (const g of estado.globales.filter((x) => x.disparador === "fin_de_tu_turno" && x.seat === s)) {
+    if (estado.fase !== "jugando") return;
+    if (g.origen) ev.push({ e: "dispara_global", seat: g.seat, carta: g.origen });
+    aplicarEfectos(estado, g.seat, g.efectos, null, ev, db, null);
+    resolverMuertes(estado, ev, db);
+  }
+  if (estado.fase !== "jugando") return;
   // efectos "al final de tu turno"
   for (const m of [...estado.j[s].tablero]) {
     const efs = efectosDe(m, "fin_turno", db);

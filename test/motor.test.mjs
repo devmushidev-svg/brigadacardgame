@@ -1145,3 +1145,20 @@ console.log("ok: Música Andina");
   assert.equal(vr - e.j[r].vida, 5 + 4, "con 4 músicos: +4 de poder de hechizo");
 }
 console.log("ok: Folklore");
+
+// --- Slowcore: reparte 5 ahora y al final de cada uno de tus turnos ---
+{
+  const e = nueva(129); const s = e.turno, r = 1 - s;
+  e.j[s].tablero = []; e.j[r].tablero = [];
+  preparar(e, s, ["slowcore"]);
+  const vr = e.j[r].vida;
+  M.aplicar(e, s, { t: "jugar", uid: "t0" }, db, 0);
+  assert.equal(vr - e.j[r].vida, 5);
+  M.aplicar(e, s, { t: "fin" }, db, 0);
+  assert.equal(vr - e.j[r].vida, 10, "al final de mi turno");
+  e.j[r].tablero = []; M.aplicar(e, r, { t: "fin" }, db, 0);
+  assert.equal(vr - e.j[r].vida, 10, "al final del turno del rival no");
+  M.aplicar(e, s, { t: "fin" }, db, 0);
+  assert.equal(vr - e.j[r].vida, 15, "al final de mi siguiente turno sí");
+}
+console.log("ok: Slowcore");
