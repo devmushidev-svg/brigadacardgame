@@ -369,7 +369,8 @@ function lanzarVC(estado, s, vc, ev, db) {
 function danar(estado, ref, n, ev, extra = {}) {
   const t = buscar(estado, ref);
   if (!t || n <= 0) return;
-  if (extra.fx) ev.push({ e: "fx", fx: extra.fx, de: extra.de || null, a: ref });
+  // todo daño de una carta lleva su efecto visual; si la carta no tiene uno propio, va el genérico ("golpe")
+  if ((extra.fx || extra.de) && !extra.sinFx) ev.push({ e: "fx", fx: extra.fx || "golpe", de: extra.de || null, a: ref });
   if (t.tipo === "heroe") return danarHeroe(estado, t.seat, n, ev);
   if (t.obj.escudo) {
     t.obj.escudo = false;
@@ -849,7 +850,7 @@ function aplicarEfectos(estado, s, efectos, elegido, ev, db, fuente, ctx = {}) {
         const antes = t.tipo === "heroe" ? t.obj.vida : t.obj.vida, escudo = t.tipo === "esbirro" && t.obj.escudo;
         ev.push({ e: "fx", fx: "sangre", de: ref, a: "h" + s });
         const veces = ef.porApilado ? buscar(estado, fuente)?.obj.apilado || 1 : 1; // Cruit Sangre fusionada roba por cada una
-        danar(estado, ref, n * veces * mult, ev);
+        danar(estado, ref, n * veces * mult, ev, { fx: ef.fx || "vampiro", de: fuente || "h" + s });
         const quitado = escudo ? 0 : Math.max(0, antes - t.obj.vida);
         if (quitado) {
           // robar vida SUMA: puede pasar de la vida máxima (y la sube)
@@ -1004,7 +1005,7 @@ function aplicarEfectos(estado, s, efectos, elegido, ev, db, fuente, ctx = {}) {
     for (const ref of refs) {
       const t = buscar(estado, ref);
       if (!t) continue;
-      if (ef.tipo === "dano") danar(estado, ref, n, ev, { fx: fxGrupo ? null : ef.fx, de: fuente || "h" + s }); // un hechizo sale de tu héroe
+      if (ef.tipo === "dano") danar(estado, ref, n, ev, { fx: ef.fx, sinFx: fxGrupo, de: fuente || "h" + s }); // un hechizo sale de tu héroe
       else if (ef.tipo === "curar") { if (ef.fx) ev.push({ e: "fx", fx: ef.fx, de: fuente, a: ref }); curar(estado, ref, n, ev); }
       else if (ef.tipo === "destruir" && t.tipo === "esbirro") { t.obj.vida = 0; ev.push({ e: "destruido", a: ref }); }
       else if (ef.tipo === "buff" && t.tipo === "esbirro") {

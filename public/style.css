@@ -15,8 +15,8 @@
   --f-tit: "Cinzel", "Georgia", serif;
   --f-txt: "Alegreya Sans", "Trebuchet MS", sans-serif;
   /* textura de ruido para piedra/madera/pergamino */
-  --ruido: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='160' height='160'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='3' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 .55 0'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>");
-  --vetas: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='400' height='120'><filter id='w'><feTurbulence type='fractalNoise' baseFrequency='.004 .09' numOctaves='4'/><feColorMatrix values='0 0 0 0 .1  0 0 0 0 .05  0 0 0 0 0  0 0 0 .7 0'/></filter><rect width='100%' height='100%' filter='url(%23w)'/></svg>");
+  --ruido: url("/tex/ruido.png"); /* textura pregenerada: el filtro SVG en vivo era muy pesado en el celular */
+  --vetas: url("/tex/vetas.png");
 }
 * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
 html, body { margin: 0; height: 100%; background: #120b06; color: var(--texto); font-family: var(--f-txt); overflow: hidden; }
@@ -565,3 +565,18 @@ img[src^="/arte/unislop-tareas/"] { filter: invert(1) drop-shadow(0 2px 3px #000
 .rd-cartas i:nth-child(2) { animation-delay: .2s; } .rd-cartas i:nth-child(3) { animation-delay: .4s; }
 .rd-cartas i.elegida { transform: translateY(-24px) scale(1.15); box-shadow: 0 0 22px #ffd34f; animation: none; transition: transform .25s; }
 @keyframes rd-flota { to { transform: translateY(-8px); } }
+/* ---------- efectos de daño ---------- */
+.fx-svg { position: fixed; inset: 0; width: 100vw; height: 100vh; pointer-events: none; z-index: 67; overflow: visible; }
+.fx-arco { position: fixed; left: -22px; top: -30px; width: 44px; height: 60px; border: 5px solid; border-left: none; border-top-color: transparent !important; border-bottom-color: transparent !important; border-radius: 50%; z-index: 67; pointer-events: none; }
+.fx-columna { position: fixed; top: 0; width: 46px; transform-origin: 50% 0; z-index: 67; pointer-events: none;
+  background: linear-gradient(90deg, transparent, var(--c) 30%, #fff 50%, var(--c) 70%, transparent); box-shadow: 0 0 30px var(--c); border-radius: 0 0 23px 23px; }
+.fx-estatica { position: fixed; z-index: 67; pointer-events: none; border-radius: 50%; background: url("/tex/ruido.png"), #ffffff55; background-size: 40px 40px; mix-blend-mode: hard-light; }
+.fx-texto { position: fixed; z-index: 68; pointer-events: none; font: 900 clamp(20px, 5vh, 34px) var(--f-tit); letter-spacing: 1px; -webkit-text-stroke: 2px #000; text-shadow: 0 3px 0 #000; white-space: nowrap; }
+.fx-flash { position: fixed; z-index: 66; pointer-events: none; border-radius: 50%; background: radial-gradient(circle, #fff 0%, var(--c) 35%, transparent 70%); }
+.fx-gota { position: fixed; width: 6px; height: 10px; border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%; z-index: 67; pointer-events: none; }
+.fx-nota { position: fixed; left: 0; top: 0; margin: -14px 0 0 -8px; font: 900 26px serif; z-index: 67; pointer-events: none; text-shadow: 0 0 8px #000, 0 2px 0 #000; }
+/* ---------- mano en el celular (como Hearthstone): carta grande sobre el dedo ---------- */
+#scrub { position: fixed; bottom: calc(var(--carta-w) * 0.9 + 8px); z-index: 75; pointer-events: none; filter: drop-shadow(0 12px 18px #000c); }
+#scrub .carta { --carta-w: min(46vw, 40vh, 230px); }
+@media (orientation: landscape) and (max-height: 500px) { #scrub .carta { --carta-w: min(30vw, 56vh, 200px); } #scrub { bottom: calc(var(--carta-w) * 0.7); } }
+.mano .carta.scrub-sel { transform: translateY(-22%) scale(1.08) !important; z-index: 9; transition: transform .08s; }

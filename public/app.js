@@ -288,6 +288,7 @@ function numero(el, txt, tipo) {
 }
 
 function particulas(x, y, color, n = 14, fuerza = 70) {
+  if (POCO) n = Math.ceil(n / 2); // en el celular, la mitad: se siente más liviano
   for (let i = 0; i < n; i++) {
     const p = document.createElement("div");
     p.className = "particula"; p.style.left = x + "px"; p.style.top = y + "px"; p.style.background = color;
@@ -392,42 +393,156 @@ async function lanzarCosa(desdeEl, aEl, html, tam = 34, dur = 600, gira = true) 
   x.remove();
   particulas(d.x, d.y, "#ffb347", 14, 50);
 }
-// ---------- animaciones de daño de las cartas de Tomis: cada hechizo tira lo suyo ----------
-const FX_MUSICA = {
-  grind: { html: "🤘", tam: 38, dur: 260, color: "#ff2a2a", arco: 0.1, glitch: false, temblor: true }, // Grindcore: blast beat, rápido y rojo
-  lagrima: { html: "😭", tam: 34, dur: 380, color: "#5ab0ff", arco: 0.6 },                         // Wey Emo Gritando
-  amen: { html: "⚡", tam: 32, dur: 170, color: "#ffe14a", arco: 0, glitch: true },                  // Breakcore: cortes rapidísimos
-  crescendo: { html: "🎸", tam: 42, dur: 360, color: "#ffd34f", arco: 0.7, gira: true },            // Post-rock: subida épica
-  quena: { html: "🦙", tam: 36, dur: 360, color: "#e8c48a", arco: 0.5 },                           // Música Andina
-  caracol: { html: "🐌", tam: 32, dur: 480, color: "#9ad07a", arco: 0.25 },                        // Slowcore: lento
-  estatica: { html: "📢", tam: 30, dur: 220, color: "#d8d8d8", arco: 0, glitch: true },            // Noise: estática
-  gusano: { html: "🪱", tam: 40, dur: 380, color: "#d06a8a", arco: 0.45, gira: true },             // Deathconsciousness
-};
-let fxSonido = 0;
-async function fxMusica(f, desdeEl, aEl) {
-  if (!aEl) return;
-  const o = centro(desdeEl || aEl), d = centro(aEl), x = document.createElement("div");
-  x.style.cssText = `position:fixed;left:0;top:0;font-size:${f.tam}px;line-height:1;z-index:67;pointer-events:none;filter:drop-shadow(0 0 10px ${f.color}) drop-shadow(0 3px 2px #000a)`;
-  x.textContent = f.html;
-  $("#fx").append(x);
-  setTimeout(() => x.remove(), f.dur + 1000); // nunca queda trabado
-  if (Date.now() - fxSonido > 140) { fxSonido = Date.now(); Sonido.lanzar(); }
-  // sale del que lo lanza con un destello, así se ve de dónde viene
-  particulas(o.x, o.y, f.color, 6, 30);
-  const alto = (Math.abs(d.x - o.x) * 0.3 + 70) * (f.arco || 0), kf = [];
-  for (let i = 0; i <= 16; i++) {
-    const t = i / 16;
-    kf.push({ transform: `translate(${o.x + (d.x - o.x) * t - f.tam / 2}px, ${o.y + (d.y - o.y) * t - Math.sin(Math.PI * t) * alto - f.tam / 2}px) rotate(${f.gira ? t * 540 : 0}deg) scale(${0.7 + t * 0.6})`, offset: t });
-  }
-  const estela = setInterval(() => { const r = x.getBoundingClientRect(); particulas(r.left + r.width / 2, r.top + r.height / 2, f.color, 2, 14); }, 45);
-  await x.animate(kf, { duration: f.dur, easing: "ease-in" }).finished.catch(() => {});
-  clearInterval(estela); x.remove();
-  onda(d.x, d.y, f.color, 120);
-  particulas(d.x, d.y, f.color, 16, 60);
-  if (f.glitch) aEl.animate([{ filter: "none" }, { filter: "hue-rotate(90deg) contrast(3) saturate(3)", transform: "translateX(-5px) skewX(10deg)" },
-    { filter: "invert(1)", transform: "translateX(5px) skewX(-10deg)" }, { filter: "none", transform: "none" }], { duration: 220 });
-  if (f.temblor) temblar($(".mesa"), false);
+// ---------- efectos de daño: cada carta pega con lo suyo (rayos, ondas, columnas de luz, estática...) ----------
+const NS = "http://www.w3.org/2000/svg";
+const POCO = matchMedia("(pointer: coarse)").matches; // celular: menos partículas
+function capaSVG(ms = 2500) {
+  const s = document.createElementNS(NS, "svg");
+  s.setAttribute("class", "fx-svg"); s.setAttribute("viewBox", `0 0 ${innerWidth} ${innerHeight}`);
+  $("#fx").append(s); setTimeout(() => s.remove(), ms);
+  return s;
 }
+function trazo(svg, d, color, ancho, extra = "") {
+  const p = document.createElementNS(NS, "path");
+  p.setAttribute("d", d); p.setAttribute("fill", "none"); p.setAttribute("stroke", color); p.setAttribute("stroke-width", ancho);
+  p.setAttribute("stroke-linecap", "round"); p.setAttribute("stroke-linejoin", "round");
+  if (extra) p.setAttribute("style", extra);
+  svg.append(p); return p;
+}
+const fin = (a) => a.finished.catch(() => {});
+// rayo en zigzag (Breakcore): núcleo blanco y halo de color, parpadea
+async function fxRayo(o, d, color, dur = 200) {
+  const svg = capaSVG(), pts = [], n = 9, dx = d.x - o.x, dy = d.y - o.y, L = Math.hypot(dx, dy) || 1, px = -dy / L, py = dx / L;
+  for (let i = 0; i <= n; i++) { const t = i / n, j = i === 0 || i === n ? 0 : (Math.random() - 0.5) * Math.min(60, L * 0.18); pts.push(`${o.x + dx * t + px * j},${o.y + dy * t + py * j}`); }
+  const dd = "M" + pts.join(" L");
+  const halo = trazo(svg, dd, color, 14, "opacity:.45"), nucleo = trazo(svg, dd, "#fff", 3.5);
+  const kf = [{ opacity: 0 }, { opacity: 1, offset: 0.1 }, { opacity: 0.3, offset: 0.35 }, { opacity: 1, offset: 0.55 }, { opacity: 0 }];
+  halo.animate(kf, dur); await fin(nucleo.animate(kf, dur));
+  svg.remove();
+}
+// haz de energía que crece desde el que lanza hasta el blanco y se apaga
+async function fxHaz(o, d, color, ancho = 10, dur = 260, ondulado = false) {
+  const svg = capaSVG();
+  let dd = `M${o.x},${o.y} L${d.x},${d.y}`;
+  if (ondulado) { // viento / música: va serpenteando
+    const dx = d.x - o.x, dy = d.y - o.y, L = Math.hypot(dx, dy) || 1, px = -dy / L, py = dx / L, pts = [];
+    for (let i = 0; i <= 24; i++) { const t = i / 24, w = Math.sin(t * Math.PI * 4) * 16 * Math.sin(t * Math.PI); pts.push(`${o.x + dx * t + px * w},${o.y + dy * t + py * w}`); }
+    dd = "M" + pts.join(" L");
+  }
+  const halo = trazo(svg, dd, color, ancho * 2.2, "opacity:.35"), nucleo = trazo(svg, dd, color, ancho), brillo = trazo(svg, dd, "#fff", Math.max(2, ancho * 0.3), "opacity:.85");
+  const L = nucleo.getTotalLength();
+  for (const p of [halo, nucleo, brillo]) { p.style.strokeDasharray = L; p.style.strokeDashoffset = L; }
+  const crece = { strokeDashoffset: [L, 0] };
+  halo.animate(crece, { duration: dur * 0.55, fill: "forwards", easing: "ease-in" }); brillo.animate(crece, { duration: dur * 0.55, fill: "forwards", easing: "ease-in" });
+  await fin(nucleo.animate(crece, { duration: dur * 0.55, fill: "forwards", easing: "ease-in" }));
+  const apaga = [{ opacity: 1 }, { opacity: 0 }];
+  halo.animate(apaga, { duration: dur * 0.45, fill: "forwards" }); brillo.animate(apaga, { duration: dur * 0.45, fill: "forwards" });
+  nucleo.animate(apaga, { duration: dur * 0.45, fill: "forwards" }).finished.then(() => svg.remove(), () => svg.remove());
+}
+// ondas de sonido que viajan del que lanza al blanco (Grindcore, Wey Emo)
+async function fxOndas(o, d, color, n = 4, dur = 320) {
+  const ang = Math.atan2(d.y - o.y, d.x - o.x) * 180 / Math.PI, prom = [];
+  for (let i = 0; i < n; i++) {
+    const r = document.createElement("div");
+    r.className = "fx-arco"; r.style.borderColor = color; r.style.boxShadow = `0 0 12px ${color}`;
+    $("#fx").append(r); setTimeout(() => r.remove(), dur + 900);
+    prom.push(fin(r.animate([{ transform: `translate(${o.x}px,${o.y}px) rotate(${ang}deg) scale(.3)`, opacity: 0 },
+      { transform: `translate(${(o.x + d.x) / 2}px,${(o.y + d.y) / 2}px) rotate(${ang}deg) scale(1)`, opacity: 1, offset: 0.5 },
+      { transform: `translate(${d.x}px,${d.y}px) rotate(${ang}deg) scale(1.5)`, opacity: 0 }], { duration: dur, delay: i * 55, easing: "ease-in" })).then(() => r.remove()));
+  }
+  await Promise.all(prom);
+}
+// columna de luz que cae del cielo (Post-rock)
+async function fxColumna(d, color, dur = 380) {
+  const c = document.createElement("div");
+  c.className = "fx-columna"; c.style.left = d.x + "px"; c.style.height = d.y + "px"; c.style.setProperty("--c", color);
+  $("#fx").append(c); setTimeout(() => c.remove(), dur + 800);
+  await fin(c.animate([{ transform: "translateX(-50%) scaleY(0)", opacity: 1 }, { transform: "translateX(-50%) scaleY(1)", opacity: 1, offset: 0.45 },
+    { transform: "translateX(-50%) scaleY(1) scaleX(1.8)", opacity: 0 }], { duration: dur, easing: "ease-in" }));
+  c.remove();
+}
+// tentáculo que sale, golpea y vuelve (Deathconsciousness)
+async function fxTentaculo(o, d, color, dur = 420) {
+  const svg = capaSVG(), mx = (o.x + d.x) / 2 + (Math.random() - 0.5) * 160, my = Math.min(o.y, d.y) - 80;
+  const dd = `M${o.x},${o.y} Q${mx},${my} ${d.x},${d.y}`;
+  const borde = trazo(svg, dd, "#1a0508", 22), cuerpo = trazo(svg, dd, color, 15), brillo = trazo(svg, dd, "#ffb3c6", 3, "opacity:.6");
+  const L = cuerpo.getTotalLength(), kf = { strokeDashoffset: [L, 0, 0, L], offset: [0, 0.45, 0.6, 1] };
+  for (const p of [borde, cuerpo, brillo]) { p.style.strokeDasharray = L; p.style.strokeDashoffset = L; }
+  borde.animate(kf, { duration: dur, easing: "ease-in-out" }); brillo.animate(kf, { duration: dur, easing: "ease-in-out" });
+  const a = cuerpo.animate(kf, { duration: dur, easing: "ease-in-out" });
+  await esperar(dur * 0.45);
+  explosion(d, color, 70);
+  await fin(a); svg.remove();
+}
+// estática de TV sobre el blanco (Noise)
+function fxEstatica(el) {
+  if (!el) return;
+  const r = el.getBoundingClientRect(), x = document.createElement("div");
+  x.className = "fx-estatica"; Object.assign(x.style, { left: r.left + "px", top: r.top + "px", width: r.width + "px", height: r.height + "px" });
+  $("#fx").append(x); setTimeout(() => x.remove(), 700);
+  x.animate([{ opacity: 0, backgroundPosition: "0 0" }, { opacity: 1, backgroundPosition: "37px 11px", offset: 0.2 }, { opacity: 0.6, backgroundPosition: "-21px 49px", offset: 0.5 },
+    { opacity: 1, backgroundPosition: "13px -30px", offset: 0.7 }, { opacity: 0, backgroundPosition: "0 0" }], { duration: 420, easing: "steps(6)" });
+  el.animate([{ filter: "none" }, { filter: "grayscale(1) contrast(4)", transform: "translateX(-4px)" }, { filter: "invert(1)", transform: "translateX(4px)" }, { filter: "none", transform: "none" }], 300);
+}
+// texto que revienta en el blanco ("¡AAAH!", "BLAST")
+function fxTexto(d, txt, color) {
+  const t = document.createElement("div");
+  t.className = "fx-texto"; t.textContent = txt; t.style.left = d.x + "px"; t.style.top = d.y + "px"; t.style.color = color;
+  $("#fx").append(t); setTimeout(() => t.remove(), 1200);
+  t.animate([{ transform: "translate(-50%,-50%) scale(.3) rotate(-12deg)", opacity: 0 }, { transform: "translate(-50%,-90%) scale(1.25) rotate(4deg)", opacity: 1, offset: 0.25 },
+    { transform: "translate(-50%,-120%) scale(1) rotate(-3deg)", opacity: 0 }], { duration: 900, easing: "ease-out" });
+}
+// explosión: destello, onda y chispas
+function explosion(d, color, tam = 90) {
+  const f = document.createElement("div");
+  f.className = "fx-flash"; f.style.left = d.x + "px"; f.style.top = d.y + "px"; f.style.width = f.style.height = tam + "px"; f.style.setProperty("--c", color);
+  $("#fx").append(f); setTimeout(() => f.remove(), 600);
+  f.animate([{ transform: "translate(-50%,-50%) scale(.2)", opacity: 1 }, { transform: "translate(-50%,-50%) scale(1.3)", opacity: 0 }], { duration: 360, easing: "ease-out" });
+  onda(d.x, d.y, color, tam * 1.4);
+  particulas(d.x, d.y, color, 14, tam * 0.6);
+}
+// gotas que caen (lágrimas, sangre)
+function fxGotas(d, color, n = 8) {
+  for (let i = 0; i < (POCO ? n / 2 : n); i++) {
+    const g = document.createElement("div");
+    g.className = "fx-gota"; g.style.left = d.x + (Math.random() - 0.5) * 50 + "px"; g.style.top = d.y - 30 + "px"; g.style.background = color;
+    $("#fx").append(g); setTimeout(() => g.remove(), 900);
+    g.animate([{ transform: "translateY(0) scaleY(1)", opacity: 1 }, { transform: `translateY(${50 + Math.random() * 40}px) scaleY(1.6)`, opacity: 0 }], { duration: 520 + Math.random() * 250, easing: "ease-in", delay: Math.random() * 120 });
+  }
+}
+// notas musicales que viajan ondulando (Música Andina)
+function fxNotas(o, d, color) {
+  for (let i = 0; i < (POCO ? 3 : 5); i++) {
+    const nn = document.createElement("div");
+    nn.className = "fx-nota"; nn.textContent = ["♪", "♫", "♩", "♬"][i % 4]; nn.style.color = color;
+    $("#fx").append(nn); setTimeout(() => nn.remove(), 1200);
+    const kf = [];
+    for (let k = 0; k <= 10; k++) { const t = k / 10; kf.push({ transform: `translate(${o.x + (d.x - o.x) * t}px, ${o.y + (d.y - o.y) * t + Math.sin(t * 9 + i) * 18}px) scale(${0.6 + t * 0.6})`, opacity: t < 0.9 ? 1 : 0 }); }
+    nn.animate(kf, { duration: 420, delay: i * 50, easing: "linear" });
+  }
+}
+// color del que lanza (por su héroe): así el golpe genérico ya dice de quién viene
+const COLOR_CLASE = { tun: "#ffb347", cruit: "#7ad0ff", tomis: "#ff4d6d" };
+function colorDeRef(ref) {
+  const seat = ref?.[0] === "h" ? +ref[1] : V?.j?.findIndex((p) => p.tablero.some((m) => m.uid === ref));
+  return COLOR_CLASE[V?.j?.[seat]?.heroe] || "#ffe08a";
+}
+let fxSonido = 0;
+const sonar = (f) => { if (Date.now() - fxSonido > 120) { fxSonido = Date.now(); f(); } };
+// cada fx: de dónde sale (o), a dónde pega (d), el elemento golpeado (el)
+const FX_DANO = {
+  grind: async (o, d, el) => { sonar(() => Sonido.golpe(4)); await fxOndas(o, d, "#ff2a2a", 4, 260); explosion(d, "#ff2a2a", 80); fxTexto(d, "BLAST", "#ff3b3b"); temblar($(".mesa"), false); },
+  lagrima: async (o, d, el) => { sonar(() => Sonido.lanzar()); await fxOndas(o, d, "#5ab0ff", 3, 340); fxTexto(d, "¡AAAH!", "#8fd0ff"); fxGotas(d, "#5ab0ff"); explosion(d, "#5ab0ff", 60); },
+  amen: async (o, d, el) => { sonar(() => Sonido.golpe(2)); await fxRayo(o, d, "#ffe14a", 130); fxRayo(o, d, "#ff4df0", 110); explosion(d, "#ffe14a", 50);
+    el?.animate([{ filter: "none" }, { filter: "hue-rotate(90deg) contrast(3) saturate(3)", transform: "translateX(-5px) skewX(10deg)" }, { filter: "invert(1)", transform: "translateX(5px) skewX(-10deg)" }, { filter: "none", transform: "none" }], 200); },
+  crescendo: async (o, d, el) => { sonar(() => Sonido.logro()); await fxColumna(d, "#ffd34f", 340); explosion(d, "#ffd34f", 110); temblar($(".mesa"), false); },
+  quena: async (o, d, el) => { sonar(() => Sonido.lanzar()); fxNotas(o, d, "#ffe7b0"); await fxHaz(o, d, "#e8c48a", 9, 380, true); explosion(d, "#e8c48a", 70); },
+  caracol: async (o, d, el) => { sonar(() => Sonido.lanzar()); await fxHaz(o, d, "#7fd05a", 16, 520); explosion(d, "#7fd05a", 70); fxGotas(d, "#5aa83a", 6); },
+  estatica: async (o, d, el) => { sonar(() => Sonido.golpe(3)); await fxHaz(o, d, "#d8d8d8", 4, 180); fxEstatica(el); explosion(d, "#bbbbbb", 60); },
+  gusano: async (o, d, el) => { sonar(() => Sonido.demonio?.() ?? Sonido.golpe(4)); await fxTentaculo(o, d, "#a8304e", 420); },
+  vampiro: async (o, d, el) => { sonar(() => Sonido.lanzar()); fxGotas(d, "#c0001a", 6); await fxHaz(d, o, "#d0102a", 8, 300); explosion(o, "#ff4d6d", 50); },
+  golpe: async (o, d, el, de) => { const c = colorDeRef(de); sonar(() => Sonido.lanzar()); await fxHaz(o, d, c, 8, 240); explosion(d, c, 70); },
+};
 
 // disparo del trabuco de Chance: fogonazo, trazo de la bala y chispazo
 async function disparar(desdeEl, aEl) {
@@ -1175,7 +1290,7 @@ async function animarUno(e, ev, v, nuevos, yo) {
         if (e.fx === "bala") await disparar(refEl(e.de) || $(`.tablero[data-seat="${V.j[0].tablero.some((m) => m.uid === e.de) ? 0 : 1}"]`) || $(".campo"), refEl(e.a));
         if (e.fx === "vomito") await vomitar(refEl(e.de) || $(`.tablero[data-seat="${e.seat}"]`), (e.a || []).map(refEl).filter(Boolean));
         if (e.fx === "tun") await lanzarCosa(refEl(e.de) || $(".campo"), refEl(e.a), artHTML(DB.tun?.arte || "🐒"), 40, 520, true);
-        if (FX_MUSICA[e.fx]) await fxMusica(FX_MUSICA[e.fx], refEl(e.de) || $(".campo"), refEl(e.a));
+        if (FX_DANO[e.fx] && refEl(e.a)) { const a = refEl(e.a); await FX_DANO[e.fx](centro(refEl(e.de) || $(".campo")), centro(a), a, e.de); }
         if (e.fx === "piedra") await tirarPiedra(refEl(e.de) || $(`.tablero[data-seat="${V.j[0].tablero.some((m) => m.uid === e.de) ? 0 : 1}"]`), refEl(e.a));
         break;
       }
@@ -1919,7 +2034,7 @@ app.addEventListener("pointerdown", (e) => {
   const cartaEl = e.target.closest(".mano .carta");
   const esbEl = e.target.closest(".esbirro, .heroe");
   // con el dedo hace falta moverse más para que cuente como arrastre (si no, un toque tembloroso no hacía nada)
-  gesto = { x: e.clientX, y: e.clientY, t: Date.now(), movio: false, cartaEl, esbEl, largo: null, umbral: e.pointerType === "mouse" ? 8 : 16 };
+  gesto = { x: e.clientX, y: e.clientY, t: Date.now(), movio: false, cartaEl, esbEl, largo: null, umbral: e.pointerType === "mouse" ? 8 : 16, tactil: e.pointerType !== "mouse" };
   // mantener presionado = ver carta en grande
   gesto.largo = setTimeout(() => {
     if (gesto && !gesto.movio && !apuntando) {
@@ -1945,30 +2060,67 @@ app.addEventListener("pointerdown", (e) => {
   }
 });
 
+// empezar a arrastrar una carta de la mano (o apuntar, si es un hechizo con objetivo)
+function iniciarArrastre(el) {
+  if (!el || !el.classList.contains("jugable") || apuntando || !gesto) return;
+  const c = DB[el.dataset.carta];
+  if (c.tipo !== "esbirro" && pideObjetivo(c)) {
+    apuntando = { tipo: "carta", uid: el.dataset.uid, origen: centro(el), validos: objetivosCarta(V, V.yo, c) };
+    el.style.transform = "translateY(-30px) scale(1.1)";
+    marcar(apuntando.validos);
+  } else {
+    const f = el.cloneNode(true);
+    f.classList.add("fantasma");
+    f.removeAttribute("style");
+    document.body.append(f);
+    el.style.opacity = ".2";
+    gesto.arrastre = { f, el, c };
+    $("#mi-tablero").classList.add("zona-soltar");
+    Sonido.carta();
+  }
+}
+// la carta de la mano que está bajo el dedo (por la posición horizontal: las cartas se pisan)
+function cartaManoEn(x) {
+  let mejor = null, dist = Infinity;
+  for (const c of $$(".mano .carta")) { const r = c.getBoundingClientRect(), d = Math.abs(r.left + r.width / 2 - x); if (d < dist) { dist = d; mejor = c; } }
+  return mejor;
+}
+// carta grande arriba del dedo mientras se desliza por la mano
+let scrubUid = null;
+function mostrarScrub(el, x) {
+  let sc = $("#scrub");
+  if (!sc) { sc = document.createElement("div"); sc.id = "scrub"; document.body.append(sc); }
+  if (scrubUid !== el.dataset.uid) {
+    scrubUid = el.dataset.uid;
+    const enMano = V.j[V.yo].mano.find((c) => c.uid === el.dataset.uid);
+    const card = enMano ? cartaMano(enMano) : DB[el.dataset.carta];
+    sc.innerHTML = cartaHTML(card, { clase: el.classList.contains("jugable") ? "jugable" : "" });
+    $$(".mano .carta.scrub-sel").forEach((c) => c.classList.remove("scrub-sel"));
+    el.classList.add("scrub-sel");
+  }
+  const w = sc.offsetWidth || 200;
+  sc.style.left = Math.max(8, Math.min(innerWidth - w - 8, x - w / 2)) + "px";
+}
+function ocultarScrub() {
+  $("#scrub")?.remove(); scrubUid = null;
+  $$(".mano .carta.scrub-sel").forEach((c) => c.classList.remove("scrub-sel"));
+}
+
 addEventListener("pointermove", (e) => {
   if (!gesto && !apuntando) return;
+  // con el dedo, como en Hearthstone: deslizar por la mano muestra cada carta en grande; subir el dedo la agarra
+  if (gesto?.scrub) {
+    const bajoDedo = cartaManoEn(e.clientX);
+    if (bajoDedo) { gesto.cartaEl = bajoDedo; mostrarScrub(bajoDedo, e.clientX); }
+    const manoTop = $(".mano")?.getBoundingClientRect().top ?? innerHeight;
+    if (e.clientY < manoTop - 25 && gesto.cartaEl) { ocultarScrub(); gesto.scrub = false; iniciarArrastre(gesto.cartaEl); }
+  }
   if (gesto && !gesto.movio && Math.hypot(e.clientX - gesto.x, e.clientY - gesto.y) > gesto.umbral) {
     gesto.movio = true;
     clearTimeout(gesto.largo);
-    // empezar a arrastrar una carta de la mano
-    const el = gesto.cartaEl;
-    if (el && el.classList.contains("jugable") && !apuntando) {
-      const c = DB[el.dataset.carta];
-      if (c.tipo !== "esbirro" && pideObjetivo(c)) {
-        apuntando = { tipo: "carta", uid: el.dataset.uid, origen: centro(el), validos: objetivosCarta(V, V.yo, c) };
-        el.style.transform = "translateY(-30px) scale(1.1)";
-        marcar(apuntando.validos);
-      } else {
-        const f = el.cloneNode(true);
-        f.classList.add("fantasma");
-        f.removeAttribute("style");
-        document.body.append(f);
-        el.style.opacity = ".2";
-        gesto.arrastre = { f, el, c };
-        $("#mi-tablero").classList.add("zona-soltar");
-        Sonido.carta();
-      }
-    }
+    const dx = Math.abs(e.clientX - gesto.x), dy = gesto.y - e.clientY;
+    if (gesto.cartaEl && gesto.tactil && !apuntando && dy < dx) { gesto.scrub = true; mostrarScrub(gesto.cartaEl, e.clientX); }
+    else if (gesto.cartaEl) iniciarArrastre(gesto.cartaEl);
   }
   if (gesto?.arrastre) {
     const { f } = gesto.arrastre, r = f.getBoundingClientRect();
@@ -1986,6 +2138,7 @@ addEventListener("pointerup", (e) => {
   const g = gesto;
   gesto = null;
   if (g) clearTimeout(g.largo);
+  if (g?.scrub) { ocultarScrub(); return; } // soltar mientras se miraba la mano: no pasa nada
   $("#mi-tablero")?.classList.remove("zona-soltar");
   if (!V) return;
 

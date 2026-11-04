@@ -338,3 +338,11 @@ Balance tras el nerf a Tomis (misión roba 2, músicos 2/3 sin hechizo, Mejor M�
 
 Cambios de Tomis (otra tanda): Wey Emo reparte 4 (+1 si mata), Audiophile ya no roba, **Slowcore** pasa a ser un esbirro legendario 4 maná 3/3 que al final de tu turno reparte 5 (si lo matan, se acaba), Shoegaze repite los 2 últimos hechizos, **Midwest Emo** pasa a ser un esbirro 3 maná 2/3 con Grito: descubre un hechizo de coste 3 que se lanza dos veces al jugarlo (`descubrir` con `filtro.coste` y `doble`). Mascotas de Tun cuesta 2. Panamá se anima después del mulligan; cuando el rival descubre se ven 3 cartas boca abajo.
 Balance (300 partidas): Tun 63% vs Cruit, Tun 70% vs Tomis, Cruit 50% vs Tomis.
+
+Otra tanda de Tomis: la misión roba 1 carta por nivel (el último da Charts) y cuenta también hechizos repetidos (Shoegaze, Charts, ecos, dobles, al azar) y cartas de música invocadas (Homero, Eternal Worm y los músicos llevan la etiqueta `musica`). Review de RYM cuesta 3, Fumando Porro 5, Audiophile: Grito, tu próximo hechizo cuesta 2 menos (`rebaja_hechizo`), Música Andina cura 7 y reparte 7. Shoegaze y Charts muestran en la carta qué hechizos van a repetir.
+
+**Efectos de daño:** todo daño de una carta muestra un efecto (evento `fx`): si la carta no tiene uno propio va `golpe`, un haz del color de la clase de quien lo lanza con explosión; robo de vida usa `vampiro`. Los de Tomis: Grindcore ondas rojas + "BLAST", Wey Emo ondas azules + "¡AAAH!" y lágrimas, Breakcore rayos con glitch, Post-rock columna de luz desde el cielo, Música Andina haz ondulado con notas, Slowcore haz verde lento, Noise estática de TV, Deathconsciousness tentáculo.
+
+**Celular:** como en Hearthstone, deslizar el dedo por la mano muestra cada carta en grande sobre el dedo; subir el dedo la agarra para jugarla; tocar abre el visor de la mano. Performance: las texturas de fondo (ruido y vetas) ahora son imágenes (`public/tex/`) en vez de filtros SVG en vivo, y en el celular salen la mitad de partículas.
+
+Balance (300 partidas): Tun 67% vs Cruit, Tun 68% vs Tomis, Cruit 51% vs Tomis.
