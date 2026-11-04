@@ -616,11 +616,12 @@ function pantallaMazos() {
   $("#pegar-mazo").onclick = () => {
     const txt = prompt("Pegá el mazo (el texto de \"Copiar lista\"):");
     if (!txt) return;
-    const m = txt.trim().match(/^([a-z_]+)\s*:\s*(\[[\s\S]*\])$/);
-    let cartas = null;
-    try { cartas = m && JSON.parse(m[2]); } catch {}
-    if (!m || !HEROES[m[1]] || !Array.isArray(cartas)) return toast("ese texto no es un mazo");
-    const mazo = { id: "m" + Date.now(), nombre: "Mazo pegado de " + HEROES[m[1]].nombre, heroe: m[1], cartas: cartas.filter((id) => DB[id]) };
+    // formato: primera línea "Nombre (héroe)", después "2x Nombre [id]" por carta
+    const heroe = txt.match(/\(([a-z_]+)\)/)?.[1];
+    const cartas = [];
+    for (const [, k, id] of txt.matchAll(/(\d+)\s*x[^\[\n]*\[([a-z0-9_]+)\]/gi)) for (let i = 0; i < +k; i++) cartas.push(id);
+    if (!HEROES[heroe] || !cartas.length) return toast("ese texto no es un mazo");
+    const mazo = { id: "m" + Date.now(), nombre: "Mazo pegado de " + HEROES[heroe].nombre, heroe, cartas: cartas.filter((id) => DB[id]) };
     guardarLS("mazos", [...misMazos(), mazo]);
     toast(mazoValido(mazo) ? "mazo pegado" : `pegado, pero incompleto (${mazo.cartas.length}/${TAM_MAZO})`, 2200);
     pantallaMazos();
@@ -653,7 +654,8 @@ function verMazo(mazo) {
   $("#volver-mazos").onclick = pantallaMazos;
   // la lista del mazo como texto (para pasarla y que se use como mazo precargado)
   $("#copiar-lista").onclick = async () => {
-    const txt = `${mazo.heroe}: ${JSON.stringify(mazo.cartas)}`;
+    // una línea por carta con su cantidad; el id entre corchetes es lo que lee "Pegar mazo"
+    const txt = [`${mazo.nombre} (${mazo.heroe})`, ...cartas.map((c) => `${n(c.id)}x ${c.nombre} [${c.id}]`)].join("\n");
     try { await navigator.clipboard.writeText(txt); toast("lista copiada"); } catch { prompt("Copiá la lista:", txt); }
   };
 }
