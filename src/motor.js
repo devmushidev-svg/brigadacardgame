@@ -1098,6 +1098,14 @@ export function aplicar(estado, s, accion, db, ahora) {
       ev.push({ e: "mision", seat: s, carta: carta.id });
     } else if (carta.tipo === "hechizo") {
       ev.push({ e: "hechizo", seat: s, carta: carta.id, objetivo: accion.objetivo || null });
+      // Ethypostlife: por el resto de la partida, cada hechizo tuyo invoca un esbirro al azar de su mismo coste
+      // (si no hay ninguno de ese coste, del coste más cercano por debajo)
+      for (const g of estado.globales.filter((x) => x.disparador === "hechizo_invoca" && x.seat === s)) {
+        const pool = Object.values(db).filter((c) => c.tipo === "esbirro" && !c.token && c.coste <= carta.coste);
+        const tope = Math.max(-1, ...pool.map((c) => c.coste));
+        const ops = pool.filter((c) => c.coste === tope);
+        if (ops.length && estado.fase === "jugando") { if (g.origen) ev.push({ e: "dispara_global", seat: s, carta: g.origen }); invocar(estado, s, elegir(estado, ops).id, ev, db); }
+      }
       // ecos pendientes de hechizos anteriores (Fumando Porro): este hechizo también los hace
       const ecos = (p.ecos || []).filter((x) => x.quedan > 0);
       for (const eco of ecos) { eco.quedan--; if (eco.origen) ev.push({ e: "repite", seat: s, carta: eco.origen }); aplicarEfectos(estado, s, eco.efectos, null, ev, db, null); }

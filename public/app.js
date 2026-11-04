@@ -1000,6 +1000,12 @@ async function animarUno(e, ev, v, nuevos, yo) {
         }
         break;
       }
+      case "dispara_global": { // un efecto "por el resto de la partida" se activa: su ícono brilla
+        const g = $(`.global[data-carta="${e.carta}"]`);
+        if (g) { g.animate([{ transform: "scale(1)" }, { transform: "scale(1.6)", filter: "brightness(1.8) drop-shadow(0 0 10px #ffd34f)" }, { transform: "scale(1)" }], 450); const c = centro(g); particulas(c.x, c.y, "#ffd34f", 10, 40); }
+        await esperar(200);
+        break;
+      }
       case "esconde": toast(e.seat === yo ? `${DB[e.carta]?.nombre || "Tu esbirro"} se escondió en la mano del rival...` : "algo se escondió en una carta de tu mano...", 2000); await esperar(300); break;
       case "sale_escondido": Sonido.hechizo(); await banner(`¡${DB[e.carta]?.nombre || "algo"} estaba escondido!`, 1100); break;
       case "arma": { if (!sonidoCarta(e.carta, "jugar")) Sonido.escudo(); const h = refEl("h" + e.seat); if (h) { const c = centro(h); particulas(c.x, c.y, "#d0d6e0", 16, 60); } if (e.seat !== yo) await mostrarCarta(e.carta, 900); break; }

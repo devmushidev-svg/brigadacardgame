@@ -921,3 +921,19 @@ console.log("ok: Mi Playlist #67");
   M.aplicar(e, s, { t: "jugar", uid: "t3" }, db, 0); assert.equal(homeros(), 3, "el tercero ya no");
 }
 console.log("ok: Fumando Porro");
+
+// --- Ethypostlife: por el resto de la partida, tus hechizos invocan un esbirro al azar de su mismo coste ---
+{
+  const e = nueva(115); const s = e.turno;
+  e.j[s].tablero = [];
+  preparar(e, s, ["ethypostlife", "fumando_porro", "mascotas_tun"]);
+  M.aplicar(e, s, { t: "jugar", uid: "t0" }, db, 0);
+  e.j[s].tablero = []; // aunque Ethypostlife ya no esté, el efecto sigue
+  M.aplicar(e, s, { t: "jugar", uid: "t1" }, db, 0);
+  const otro = e.j[s].tablero.find((m) => m.id !== "homero");
+  assert.ok(otro && db[otro.id].coste === 3, "invoca un esbirro de 3 (además del Homero)");
+  e.j[s].tablero = [];
+  M.aplicar(e, s, { t: "jugar", uid: "t2" }, db, 0);
+  assert.ok(e.j[s].tablero.some((m) => db[m.id].coste === 1 && m.id !== "homero"), "un hechizo de 1 invoca uno de 1");
+}
+console.log("ok: Ethypostlife");

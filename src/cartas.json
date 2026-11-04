@@ -1539,6 +1539,26 @@
    "token": true,
    "arte": "/arte/homero.webp",
    "texto": "Otra producción de Marko."
+  },
+  {
+   "id": "ethypostlife",
+   "nombre": "Ethypostlife",
+   "tipo": "esbirro",
+   "coste": 3,
+   "ataque": 2,
+   "vida": 3,
+   "clase": "tomis",
+   "rareza": "legendaria",
+   "arte": "/arte/ethypostlife.webp",
+   "texto": "Grito de batalla: por el resto de la partida, tus hechizos invocan un esbirro al azar de su mismo coste.",
+   "grito": [
+    {
+     "tipo": "global",
+     "disparador": "hechizo_invoca",
+     "origen": "ethypostlife",
+     "efectos": []
+    }
+   ]
   }
  ],
  "heroes": [
