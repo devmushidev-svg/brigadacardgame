@@ -1203,3 +1203,20 @@ console.log("ok: Deathconsciousness");
   assert.equal(vr - e.j[r].vida, 5 + 9 + 5, "sin esbirros: todo a la cara");
 }
 console.log("ok: Shoegaze");
+
+// --- Review de RYM: descubre una carta de tu mazo, la robás y obtenés una copia ---
+{
+  const e = nueva(133); const s = e.turno;
+  e.j[s].tablero = [];
+  preparar(e, s, ["review_rym"]);
+  e.j[s].mazo = ["grindcore", "yamir", "tun_brawl", "yamir"];
+  M.aplicar(e, s, { t: "jugar", uid: "t0" }, db, 0);
+  assert.equal(e.pendiente?.tipo, "descubrir");
+  assert.ok(e.pendiente.opciones.every((id) => ["grindcore", "yamir", "tun_brawl"].includes(id)), "opciones de tu mazo");
+  assert.equal(new Set(e.pendiente.opciones).size, e.pendiente.opciones.length, "distintas");
+  const elegida = e.pendiente.opciones[0];
+  M.aplicar(e, s, { t: "elegir", i: 0 }, db, 0);
+  assert.deepEqual(e.j[s].mano.map((c) => c.id), [elegida, elegida], "la carta y su copia");
+  assert.equal(e.j[s].mazo.length, 3, "salió una del mazo");
+}
+console.log("ok: Review de RYM");

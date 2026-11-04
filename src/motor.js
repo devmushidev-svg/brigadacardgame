@@ -575,6 +575,16 @@ function aplicarEfectos(estado, s, efectos, elegido, ev, db, fuente, ctx = {}) {
       }
       continue;
     }
+    if (ef.tipo === "descubrir_mazo") {
+      // Review de RYM: elegís una de 3 cartas distintas de tu mazo; la robás y obtenés una copia más
+      const distintas = [...new Set(estado.j[s].mazo)], ops = [];
+      while (ops.length < 3 && distintas.length) ops.push(distintas.splice(Math.floor(azar(estado) * distintas.length), 1)[0]);
+      if (!ops.length) continue;
+      if (estado.pendiente) { const id = elegir(estado, ops); estado.j[s].mazo.splice(estado.j[s].mazo.indexOf(id), 1); darCarta(estado, s, id, ev); darCarta(estado, s, id, ev); continue; }
+      estado.pendiente = { seat: s, tipo: "descubrir", opciones: ops, deMazo: true, copias: ef.copias ?? 1 };
+      ev.push({ e: "elegir", seat: s, tipo: "descubrir" });
+      continue;
+    }
     if (ef.tipo === "descubrir") {
       // como Hearthstone: 3 opciones distintas, el jugador se queda con una
       // "todas": true también ofrece fichas y hechizos (Escuela Alumnos: tareas universitarias)
@@ -704,9 +714,10 @@ function aplicarEfectos(estado, s, efectos, elegido, ev, db, fuente, ctx = {}) {
     }
     if (ef.tipo === "repetir_hechizos") {
       // Charts: vuelve a lanzar, en orden, todos los hechizos que lanzaste esta partida (objetivos al azar, con tu poder de hechizo)
-      let ids = (estado.j[s].jugados || []).filter((id) => db[id]?.tipo === "hechizo");
+      // los que a su vez repiten hechizos (Shoegaze) no se repiten: si no, se repetirían sin fin
+      let ids = (estado.j[s].jugados || []).filter((id) => db[id]?.tipo === "hechizo" && !(db[id].efectos || []).some((x) => x.tipo === "repetir_hechizos"));
       // "cantidad": solo los N últimos, sin contar el hechizo que se está lanzando (Shoegaze: 3)
-      if (ef.cantidad != null) { if (ids[ids.length - 1] === ef.excepto) ids.pop(); ids = ids.slice(-n); }
+      if (ef.cantidad != null) ids = ids.slice(-n);
       ids = ids.slice(0, 40);
       for (const id of ids) {
         if (estado.fase !== "jugando" || estado.pendiente) break;
@@ -1081,6 +1092,11 @@ function resolverPendiente(estado, eleccion, ev, db) {
   if (pe.tipo === "descubrir") {
     estado.pendiente = null;
     const id = pe.opciones[eleccion];
+    if (pe.deMazo) { // sale del mazo, y se suman las copias
+      const mazo = estado.j[pe.seat].mazo, i = mazo.indexOf(id);
+      if (i >= 0) mazo.splice(i, 1);
+      for (let k = 0; k < (pe.copias || 0); k++) darCarta(estado, pe.seat, id, ev);
+    }
     if (darCarta(estado, pe.seat, id, ev)) {
       ev.push({ e: "descubierta", seat: pe.seat });
       if (pe.rebaja) { const mano = estado.j[pe.seat].mano; mano[mano.length - 1].rebaja = (mano[mano.length - 1].rebaja || 0) + pe.rebaja; }

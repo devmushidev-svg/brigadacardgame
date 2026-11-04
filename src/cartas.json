@@ -2074,6 +2074,24 @@
      "excepto": "shoegaze"
     }
    ]
+  },
+  {
+   "id": "review_rym",
+   "nombre": "Review de RYM",
+   "tipo": "hechizo",
+   "coste": 3,
+   "clase": "tomis",
+   "etiquetas": [
+    "musica"
+   ],
+   "arte": "⭐",
+   "texto": "Descubre una carta de tu mazo. Robala y obtené una copia de ella.",
+   "efectos": [
+    {
+     "tipo": "descubrir_mazo",
+     "copias": 1
+    }
+   ]
   }
  ],
  "heroes": [
