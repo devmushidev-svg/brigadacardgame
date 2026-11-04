@@ -189,7 +189,7 @@ Diseño de Mario. Arquetipo: paladín molesto — llenar la mesa de Tun, buffear
 | **Funeral de Tun** (hechizo legendario) | 10 | — | Un Tun Zombie por cada Tun muerto en la partida; cada uno que no cabe da +1 de ataque o de vida a un Tun al azar | hecho |
 | Tun Zombie (ficha) | — | 1/1 | Lo invoca Funeral de Tun | hecho — **stats provisionales** |
 | **Porque Me Monean** (legendaria) | 6 | 3/5 | Grito: convierte a todos los esbirros del rival en Tun 1/1 | hecho |
-| Tun Amor (sin género) | 5 | 3/5 | Cada vez que uno de tus Tun ataca, gana +1/+1 | hecho |
+| Tun Amor (sin género) | 4 | 1/8 | Cada vez que uno de tus Tun ataca, gana +1/+1 | hecho |
 | Choza de Monos | 2 | 0/6 | Al final de tu turno, invoca tres Tun | hecho |
 | **Tun Iguana** (legendaria) | 3 | 5/5 | Grito: por el resto de la partida, cada vez que muere uno de tus Tun, invoca un Tun Zombie que ataca a un enemigo al azar | hecho — falta confirmar género |
 | Tun Astrónomo | 1 | 1/5 | Cada vez que ataca, un Tun de tu mano al azar cuesta 2 menos | hecho |
