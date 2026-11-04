@@ -1481,6 +1481,23 @@
      "cantidad": 3
     }
    ]
+  },
+  {
+   "id": "mi_playlist",
+   "nombre": "Mi Playlist #67",
+   "tipo": "esbirro",
+   "coste": 3,
+   "ataque": 3,
+   "vida": 2,
+   "clase": "tomis",
+   "arte": "/arte/mi_playlist.webp",
+   "texto": "Último aliento: lanza 2 hechizos al azar.",
+   "aliento": [
+    {
+     "tipo": "hechizos_azar",
+     "cantidad": 2
+    }
+   ]
   }
  ],
  "heroes": [

@@ -597,8 +597,9 @@ function aplicarEfectos(estado, s, efectos, elegido, ev, db, fuente, ctx = {}) {
       continue;
     }
     if (ef.tipo === "hechizos_azar") {
-      // Cruit Breakdown (como Yogg-Saron): un hechizo al azar por cada hechizo que lanzaste, con objetivos al azar
-      const total = Math.min(30, estado.j[s].hechizosLanzados || 0);
+      // Cruit Breakdown (como Yogg-Saron): un hechizo al azar por cada hechizo que lanzaste, con objetivos al azar.
+      // Con "cantidad", son esos hechizos fijos (Mi Playlist #67: 2)
+      const total = Math.min(30, ef.cantidad != null ? n : estado.j[s].hechizosLanzados || 0);
       const pool = Object.values(db).filter((c) => c.tipo === "hechizo" && c.id !== "moneda" && !c.al_robarse && !(c.efectos || []).some((x) => x.tipo === "vc_opcion"));
       for (let k = 0; k < total && pool.length; k++) {
         if (estado.fase !== "jugando" || (fuente && !buscar(estado, fuente)) || estado.pendiente) break;

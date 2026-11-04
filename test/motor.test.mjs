@@ -895,3 +895,14 @@ console.log("ok: Tomis y poder de hechizo");
   assert.equal(e.j[r].tablero[0].vida, 15 - 3 - 4, "con poder de hechizo: 3 + 4");
 }
 console.log("ok: Grindcore");
+
+// --- Mi Playlist #67: al morir lanza 2 hechizos al azar ---
+{
+  const e = nueva(113); const s = e.turno;
+  e.j[s].tablero = [{ uid: "pl", id: "mi_playlist", tribu: null, ataque: 3, vida: 0, vidaMax: 2, ataques: 0 }];
+  preparar(e, s, []);
+  const res = M.aplicar(e, s, { t: "fin" }, db, 0);
+  const n = res.ev.filter((x) => x.e === "repite").length;
+  assert.ok(n >= 1 && n <= 2, "hasta 2 hechizos al azar (alguno puede no tener objetivo)");
+}
+console.log("ok: Mi Playlist #67");
